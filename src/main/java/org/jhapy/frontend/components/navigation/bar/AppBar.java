@@ -154,7 +154,7 @@ public class AppBar extends FlexBoxLayout {
       SecurityUser securityUser = SecurityUtils.getSecurityUser();
 
       StoredFile userAvatar = AppContext.getInstance().getCurrentAvatar();
-      Optional<String> user = SecurityUtils2.getCurrentUserLogin();
+
       if (userAvatar != null && userAvatar.getId() != null && userAvatar.getContent() != null) {
         avatar.setSrc(new StreamResource(userAvatar.getFilename(),
             () -> new ByteArrayInputStream(userAvatar.getContent())));

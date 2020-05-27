@@ -105,14 +105,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and().authorizeRequests()
         .antMatchers("/ping").permitAll()
         // Allow all flow internal requests.
-        .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+        .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll();
 
         // Public access to Places
-        .antMatchers("/", "/places").permitAll()
+//        .antMatchers("/", "/places").permitAll()
 
         // Allow all requests by logged in users.
-       // .accessDecisionManager(accessDecisionManager())
-        .antMatchers("/login").hasAnyAuthority("user", "admin");
+//        .accessDecisionManager(accessDecisionManager())
         // Configure the login page.
 
         /*

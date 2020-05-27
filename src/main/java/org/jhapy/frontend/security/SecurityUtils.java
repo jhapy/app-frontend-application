@@ -8,9 +8,13 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.ApplicationConstants;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +24,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +41,7 @@ import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.jhapy.frontend.client.security.SecurityServices;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 /**
  * SecurityUtils takes care of all such static operations that have to do with security and querying
@@ -79,7 +85,19 @@ public final class SecurityUtils {
     if (!isUserLoggedIn()) {
       return null;
     }
+    if ( VaadinSession.getCurrent() != null && VaadinSession.getCurrent().getAttribute(SecurityUser.class) != null  )
+      return VaadinSession.getCurrent().getAttribute(SecurityUser.class);
     Object principal = context.getAuthentication().getPrincipal();
+      if (principal instanceof DefaultOidcUser) {
+        Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
+        SecurityUser securityUser = new SecurityUser();
+        securityUser.setEmail(attributes.get("email").toString());
+        securityUser.setFirstName(attributes.get("given_name").toString());
+        securityUser.setLastName(attributes.get("family_name").toString());
+        securityUser.setUsername(attributes.get("preferred_username").toString());
+        VaadinSession.getCurrent().setAttribute(SecurityUser.class, securityUser);
+        return securityUser;
+      } else
     if (principal instanceof SecurityUser) {
       return (SecurityUser) principal;
     }
@@ -245,5 +263,21 @@ public final class SecurityUtils {
     }
     cookie.setMaxAge(0);
     VaadinService.getCurrentResponse().addCookie(cookie);
+  }
+  public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
+    return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
+    return (Collection<String>) claims.getOrDefault("groups",
+        claims.getOrDefault("roles", new ArrayList<>()));
+  }
+
+  private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
+    return roles.stream()
+        .filter(role -> role.startsWith("ROLE_"))
+        .map(SimpleGrantedAuthority::new)
+        .collect(Collectors.toList());
   }
 }

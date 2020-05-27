@@ -7,7 +7,7 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import org.jhapy.frontend.components.FlexBoxLayout;
-import org.jhapy.frontend.utils.css.FlexDirection;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import org.jhapy.frontend.views.JHapyMainView;
 
 /**

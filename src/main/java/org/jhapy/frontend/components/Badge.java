@@ -24,7 +24,7 @@ public class Badge extends Span {
     StringJoiner joiner = new StringJoiner(" ");
     joiner.add(color.getThemeName());
 
-    if (shape.equals(BadgeShape.PILL)) {
+		if (shape.equals(BadgeShape.PILL)) {
       joiner.add(shape.getThemeName());
     }
 

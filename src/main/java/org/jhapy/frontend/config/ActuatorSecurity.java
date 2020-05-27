@@ -22,7 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-//@EnableWebSecurity
+@EnableWebSecurity
 public class ActuatorSecurity {
 
   private Environment env;
@@ -46,7 +46,7 @@ public class ActuatorSecurity {
     return manager;
   }
 
-  //@Configuration
+  @Configuration
   @Order(1)
   public static class MonitoringWebSecurityConfigurationAdapter extends
       WebSecurityConfigurerAdapter {
