@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.components;
 
 import com.vaadin.flow.component.Component;
@@ -10,7 +28,6 @@ import org.jhapy.frontend.layout.size.Wide;
 import org.jhapy.frontend.utils.FontSize;
 import org.jhapy.frontend.utils.TextColor;
 import org.jhapy.frontend.utils.UIUtils;
-import org.jhapy.frontend.utils.css.FlexDirection;
 import org.jhapy.frontend.utils.css.WhiteSpace;
 
 @CssImport("./styles/components/list-item.css")
@@ -21,10 +38,10 @@ public class ListItem extends FlexBoxLayout {
   private Div prefix;
   private Div suffix;
 
-  private FlexBoxLayout content;
+  private final FlexBoxLayout content;
 
-  private Label primary;
-  private Label secondary;
+  private final Label primary;
+  private final Label secondary;
 
 
   public ListItem(String primary, String secondary) {

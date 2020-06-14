@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views;
 
 import com.vaadin.flow.component.Component;
@@ -11,6 +29,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
@@ -20,7 +39,6 @@ import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import java.util.Locale;
-import org.springframework.core.env.Environment;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.utils.StoredFile;
@@ -37,10 +55,11 @@ import org.jhapy.frontend.utils.IconSize;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.TextColor;
 import org.jhapy.frontend.utils.UIUtils;
-import org.jhapy.frontend.utils.css.FlexDirection;
 import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.css.Shadow;
 import org.jhapy.frontend.views.admin.audit.SessionView;
+import org.jhapy.frontend.views.admin.configServer.CloudConfigView;
+import org.jhapy.frontend.views.admin.eureka.EurekaView;
 import org.jhapy.frontend.views.admin.i18n.ActionsView;
 import org.jhapy.frontend.views.admin.i18n.ElementsView;
 import org.jhapy.frontend.views.admin.i18n.MessagesView;
@@ -49,9 +68,11 @@ import org.jhapy.frontend.views.admin.messaging.MailTemplatesAdminView;
 import org.jhapy.frontend.views.admin.messaging.SmsAdminView;
 import org.jhapy.frontend.views.admin.messaging.SmsTemplatesAdminView;
 import org.jhapy.frontend.views.admin.references.CountriesView;
-import org.jhapy.frontend.views.admin.security.SecurityRolesView;
-import org.jhapy.frontend.views.admin.security.SecurityUsersView;
+import org.jhapy.frontend.views.admin.security.SecurityKeycloakGroupsView;
+import org.jhapy.frontend.views.admin.security.SecurityKeycloakRolesView;
+import org.jhapy.frontend.views.admin.security.SecurityKeycloakUsersView;
 import org.jhapy.frontend.views.login.LoginView;
+import org.springframework.core.env.Environment;
 
 @CssImport(value = "./styles/components/charts.css", themeFor = "vaadin-chart", include = "vaadin-chart-default-theme")
 @CssImport(value = "./styles/components/floating-action-button.css", themeFor = "vaadin-button")
@@ -66,8 +87,9 @@ import org.jhapy.frontend.views.login.LoginView;
 @CssImport("./styles/misc/box-shadow-borders.css")
 @CssImport(value = "./styles/styles.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge")
+@Push
 public abstract class JHapyMainView extends FlexBoxLayout
-    implements PageConfigurator, AfterNavigationObserver, HasLogger {
+    implements RouterLayout, PageConfigurator, AfterNavigationObserver, HasLogger {
 
   private static final String CLASS_NAME = "root";
   private final ConfirmDialog confirmDialog;
@@ -78,7 +100,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
   private FlexBoxLayout column;
   private Div appHeaderInner;
   private Div appFooterInner;
-private Environment environment;
+  private Environment environment;
   private Div appFooterOuter;
 
   private AppBar appBar;
@@ -94,6 +116,8 @@ private Environment environment;
           }));
         });
 
+    afterLogin();
+
     this.confirmDialog = new ConfirmDialog();
     confirmDialog.setCancelable(true);
     confirmDialog.setConfirmButtonTheme("raised tertiary error");
@@ -107,7 +131,8 @@ private Environment environment;
     setSizeFull();
 
     // Initialise the UI building blocks
-    initStructure(false,environment.getProperty("APP_VERSION"), environment.getProperty("info.tags.environment") );
+    initStructure(false, environment.getProperty("APP_VERSION"),
+        environment.getProperty("info.tags.environment"));
 
     // Populate the navigation drawer
     initNaviItems();
@@ -137,15 +162,15 @@ private Environment environment;
   }
 
   public void afterLogin() {
-    JHapyMainView.get().rebuildNaviItems();
-    UI.getCurrent().navigate(JHapyMainView.get().getHomePage());
+    //JHapyMainView.get().rebuildNaviItems();
+    //UI.getCurrent().navigate(JHapyMainView.get().getHomePage());
   }
 
 
   /**
    * Initialise the required components and containers.
    */
-  private void initStructure( boolean showSearchMenu, String version, String environnement ) {
+  private void initStructure(boolean showSearchMenu, String version, String environnement) {
     naviDrawer = new NaviDrawer(showSearchMenu, version, environnement);
 
     viewContainer = new FlexBoxLayout();
@@ -250,8 +275,9 @@ private Environment environment;
           SecurityUtils.isAccessGranted(ElementsView.class) ||
           SecurityUtils.isAccessGranted(MessagesView.class) ||
           SecurityUtils.isAccessGranted(CountriesView.class) ||
-          SecurityUtils.isAccessGranted(SecurityUsersView.class) ||
-          SecurityUtils.isAccessGranted(SecurityRolesView.class);
+          SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class) ||
+          SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class) ||
+          SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
       if (isSettingsDisplayed) {
         NaviItem settingsMenu = menu.addNaviItem(VaadinIcon.EDIT,
@@ -368,23 +394,30 @@ private Environment environment;
          * Security
          */
         boolean isDisplaySecurity = hasSecurityMenuEntries() ||
-            SecurityUtils.isAccessGranted(SecurityUsersView.class) ||
-            SecurityUtils.isAccessGranted(SecurityRolesView.class);
+            SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class) ||
+            SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class) ||
+            SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
         if (isDisplaySecurity) {
           NaviItem securitySubMenu = menu.addNaviItem(settingsMenu,
               currentUI.getTranslation(AppConst.TITLE_SECURITY, currentUI.getLocale()), null);
 
-          if (SecurityUtils.isAccessGranted(SecurityUsersView.class)) {
+          if (SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class)) {
             menu.addNaviItem(securitySubMenu,
                 currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS, currentUI.getLocale()),
-                SecurityUsersView.class);
+                SecurityKeycloakUsersView.class);
           }
 
-          if (SecurityUtils.isAccessGranted(SecurityRolesView.class)) {
+          if (SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class)) {
             menu.addNaviItem(securitySubMenu,
                 currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES, currentUI.getLocale()),
-                SecurityRolesView.class);
+                SecurityKeycloakRolesView.class);
+          }
+
+          if (SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class)) {
+            menu.addNaviItem(securitySubMenu,
+                currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS, currentUI.getLocale()),
+                SecurityKeycloakGroupsView.class);
           }
 
           if (SecurityUtils.isAccessGranted(SessionView.class)) {
@@ -394,6 +427,24 @@ private Environment environment;
           }
 
           addToSecurityMenu(menu, securitySubMenu);
+        }
+        boolean isDisplayMonitoring =
+            SecurityUtils.isAccessGranted(EurekaView.class) ||
+                SecurityUtils.isAccessGranted(CloudConfigView.class);
+        if (isDisplayMonitoring) {
+          NaviItem monitoringSubMenu = menu.addNaviItem(settingsMenu,
+              currentUI.getTranslation(AppConst.TITLE_MONITORING, currentUI.getLocale()), null);
+
+          if (SecurityUtils.isAccessGranted(EurekaView.class)) {
+            menu.addNaviItem(monitoringSubMenu,
+                currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN, currentUI.getLocale()),
+                EurekaView.class);
+          }
+          if (SecurityUtils.isAccessGranted(CloudConfigView.class)) {
+            menu.addNaviItem(monitoringSubMenu,
+                currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN, currentUI.getLocale()),
+                CloudConfigView.class);
+          }
         }
       }
     }
@@ -544,8 +595,8 @@ private Environment environment;
   private static class FeederThread extends Thread {
 
     private final UI ui;
-    private Div appFooterInner;
-    private Component[] components;
+    private final Div appFooterInner;
+    private final Component[] components;
 
     private long delay = 0;
 

@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views;
 
 import com.vaadin.flow.component.AttachEvent;
@@ -32,10 +50,10 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   protected final String I18N_PREFIX;
   protected Grid<T> grid;
   protected DefaultDataProvider<T, F> dataProvider;
-  private Class<T> entityType;
+  private final Class<T> entityType;
   private Tabs tabs;
   private Button newRecordButton;
-  private Class entityViewClass;
+  private final Class entityViewClass;
 
   public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider, Class entityViewClass) {
@@ -45,7 +63,9 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     this.entityViewClass = entityViewClass;
   }
 
-  protected Class<T> getEntityType() { return entityType; }
+  protected Class<T> getEntityType() {
+    return entityType;
+  }
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
@@ -63,7 +83,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
 
     initSearchBar();
 
-    if ( canCreateRecord() ) {
+    if (canCreateRecord()) {
       newRecordButton = UIUtils
           .createTertiaryButton(VaadinIcon.PLUS);
       newRecordButton.addClickListener(event -> {

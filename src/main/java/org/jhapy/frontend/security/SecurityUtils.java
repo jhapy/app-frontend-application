@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.security;
 
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
@@ -18,16 +36,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.jhapy.dto.domain.security.RememberMeToken;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.EndSession;
@@ -41,6 +49,16 @@ import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.jhapy.frontend.client.security.SecurityServices;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 /**
@@ -85,20 +103,21 @@ public final class SecurityUtils {
     if (!isUserLoggedIn()) {
       return null;
     }
-    if ( VaadinSession.getCurrent() != null && VaadinSession.getCurrent().getAttribute(SecurityUser.class) != null  )
+    if (VaadinSession.getCurrent() != null
+        && VaadinSession.getCurrent().getAttribute(SecurityUser.class) != null) {
       return VaadinSession.getCurrent().getAttribute(SecurityUser.class);
+    }
     Object principal = context.getAuthentication().getPrincipal();
-      if (principal instanceof DefaultOidcUser) {
-        Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
-        SecurityUser securityUser = new SecurityUser();
-        securityUser.setEmail(attributes.get("email").toString());
-        securityUser.setFirstName(attributes.get("given_name").toString());
-        securityUser.setLastName(attributes.get("family_name").toString());
-        securityUser.setUsername(attributes.get("preferred_username").toString());
-        VaadinSession.getCurrent().setAttribute(SecurityUser.class, securityUser);
-        return securityUser;
-      } else
-    if (principal instanceof SecurityUser) {
+    if (principal instanceof DefaultOidcUser) {
+      Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
+      SecurityUser securityUser = new SecurityUser();
+      securityUser.setEmail(attributes.get("email").toString());
+      securityUser.setFirstName(attributes.get("given_name").toString());
+      securityUser.setLastName(attributes.get("family_name").toString());
+      securityUser.setUsername(attributes.get("preferred_username").toString());
+      VaadinSession.getCurrent().setAttribute(SecurityUser.class, securityUser);
+      return securityUser;
+    } else if (principal instanceof SecurityUser) {
       return (SecurityUser) principal;
     }
     // Anonymous or no authentication.
@@ -226,6 +245,10 @@ public final class SecurityUtils {
   }
 
   private static Optional<Cookie> getRememberMeCookie() {
+    if (VaadinService.getCurrentRequest() == null) {
+      return Optional.empty();
+    }
+
     Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
     if (cookies != null) {
       return Arrays.stream(cookies).filter(c -> c.getName().equals(COOKIE_NAME)).findFirst();
@@ -264,6 +287,7 @@ public final class SecurityUtils {
     cookie.setMaxAge(0);
     VaadinService.getCurrentResponse().addCookie(cookie);
   }
+
   public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
     return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
   }

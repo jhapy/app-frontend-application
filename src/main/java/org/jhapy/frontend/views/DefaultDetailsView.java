@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views;
 
 import ch.carnet.kasparscherrer.EmptyFormLayoutItem;
@@ -6,12 +24,10 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -53,11 +69,11 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   protected DetailsDrawerFooter detailsDrawerFooter;
   protected Binder<T> binder;
   protected T currentEditing;
-  private Class<T> entityType;
-  private Function<T,ServiceResult<T>> saveHandler;
-  private Consumer<T> deleteHandler;
+  private final Class<T> entityType;
+  private final Function<T, ServiceResult<T>> saveHandler;
+  private final Consumer<T> deleteHandler;
   private Tabs tabs;
-  private Class parentViewClassname;
+  private final Class parentViewClassname;
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname) {
     this.I18N_PREFIX = I18N_PREFIX;
@@ -91,7 +107,9 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     return currentEditing;
   }
 
-  protected void setCurrentEditing(T currentEditing ) { this.currentEditing = currentEditing; }
+  protected void setCurrentEditing(T currentEditing) {
+    this.currentEditing = currentEditing;
+  }
 
   protected void initHeader() {
     AppBar appBar = JHapyMainView.get().getAppBar();
@@ -131,6 +149,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
     return tabs;
   }
+
   private Component getContentTab() {
     detailsDrawer = new DetailsDrawer();
     detailsDrawer.setWidthFull();
@@ -146,11 +165,11 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
     // Footer
     detailsDrawerFooter = new DetailsDrawerFooter();
-    if (saveHandler == null || ! canSave() ) {
+    if (saveHandler == null || !canSave()) {
       detailsDrawerFooter.setSaveButtonVisible(false);
       detailsDrawerFooter.setSaveAndNewButtonVisible(false);
     }
-    if (deleteHandler == null || ! canDelete()) {
+    if (deleteHandler == null || !canDelete()) {
       detailsDrawerFooter.setDeleteButtonVisible(false);
     }
 
@@ -170,8 +189,13 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     return detailsDrawer;
   }
 
-  protected boolean canSave() { return true; }
-  protected boolean canDelete() { return true; }
+  protected boolean canSave() {
+    return true;
+  }
+
+  protected boolean canDelete() {
+    return true;
+  }
 
   protected void showDetails(T entity) {
     this.binder = new BeanValidationBinder<>(entityType);
@@ -253,11 +277,12 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
       if (beforeSave(currentEditing)) {
         ServiceResult<T> result = saveHandler.apply(currentEditing);
-        if ( result.getIsSuccess() && result.getData() != null )
+        if (result.getIsSuccess() && result.getData() != null) {
           currentEditing = result.getData();
-        else {
+        } else {
           JHapyMainView.get()
-              .displayErrorMessage(getTranslation("message.global.unknownError", result.getMessage()));
+              .displayErrorMessage(
+                  getTranslation("message.global.unknownError", result.getMessage()));
           return;
         }
       }
@@ -266,7 +291,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
       JHapyMainView.get()
           .displayInfoMessage(getTranslation("message.global.recordSavedMessage"));
 
-      if ( saveAndNew ) {
+      if (saveAndNew) {
         try {
           showDetails(entityType.getDeclaredConstructor().newInstance());
 
@@ -275,11 +300,12 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
         return;
       }
 
-      if ( isNew )
+      if (isNew) {
         UI.getCurrent()
             .navigate(getClass(), currentEditing.getId().toString());
-      else
+      } else {
         showDetails(currentEditing);
+      }
     } else {
       BinderValidationStatus<T> validate = binder.validate();
       String errorText = validate.getFieldValidationStatuses()

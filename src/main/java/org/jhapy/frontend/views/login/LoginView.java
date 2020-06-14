@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views.login;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,9 +88,6 @@ import javax.xml.bind.DatatypeConverter;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.access.annotation.Secured;
 import org.jhapy.commons.SecurityConst;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
@@ -86,17 +101,19 @@ import org.jhapy.dto.serviceQuery.authentification.ValidateUserQuery;
 import org.jhapy.dto.serviceQuery.generic.GetByStrIdQuery;
 import org.jhapy.dto.serviceResponse.authentification.AuthResponse;
 import org.jhapy.dto.serviceResponse.authentification.AuthStatusEnum;
-import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.components.myOAuth2.MyOAuth2Signin;
-import org.jhapy.frontend.config.JHapyProperties;
+import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author jHapy Lead Dev.
@@ -109,18 +126,18 @@ import org.jhapy.frontend.views.JHapyMainView;
 public class LoginView extends ViewFrame
     implements BeforeEnterObserver, HasStyle, HasLogger, LocaleChangeObserver {
 
-  private final JHapyProperties appProperties;
+  private final AppProperties appProperties;
   private final ResourceLoader resourceLoader;
   private final ObjectMapper jsonObjectMapper;
 
-  private Pattern emailPattern = Pattern
+  private final Pattern emailPattern = Pattern
       .compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$");
-  private PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+  private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 
-  private Div content = new Div();
+  private final Div content = new Div();
 
 
-  public LoginView(JHapyProperties appProperties, ResourceLoader resourceLoader,
+  public LoginView(AppProperties appProperties, ResourceLoader resourceLoader,
       ObjectMapper jsonObjectMapper) {
     this.appProperties = appProperties;
     this.resourceLoader = resourceLoader;

@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.components.navigation.bar;
 
 
@@ -9,6 +27,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
@@ -22,9 +41,12 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.mime.MimeTypeException;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.domain.user.BaseUser;
 import org.jhapy.dto.utils.AppContext;
@@ -42,7 +64,7 @@ import org.jhapy.frontend.views.JHapyMainView;
 @CssImport("./styles/components/app-bar.css")
 public class AppBar extends FlexBoxLayout {
 
-  private String CLASS_NAME = "app-bar";
+  private final String CLASS_NAME = "app-bar";
 
   private FlexBoxLayout container;
 
@@ -152,19 +174,29 @@ public class AppBar extends FlexBoxLayout {
 
     if (SecurityUtils.isUserLoggedIn()) {
       SecurityUser securityUser = SecurityUtils.getSecurityUser();
-
+      SecurityUtils2.getCurrentUserLogin();
       StoredFile userAvatar = AppContext.getInstance().getCurrentAvatar();
-
+//TODO: OPTIMIZE !!!!
+      Optional<String> _avatar = SecurityUtils2.getCurrentUserPicture();
+      Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
       if (userAvatar != null && userAvatar.getId() != null && userAvatar.getContent() != null) {
         avatar.setSrc(new StreamResource(userAvatar.getFilename(),
             () -> new ByteArrayInputStream(userAvatar.getContent())));
-      } else if (StringUtils.isNotBlank(securityUser.getImageUrl())) {
-        avatar.setSrc(securityUser.getImageUrl());
+      } else if (_avatar.isPresent()) {
+        String ext = null;
+        try {
+          ext = TikaConfig.getDefaultConfig().getMimeRepository().forName((new Tika()).detect(
+              Base64.getDecoder().decode(_avatar.get()))).getExtension();
+          avatar.setSrc(new StreamResource(currentUserLogin.get() + ext,
+              () -> new ByteArrayInputStream(Base64.getDecoder().decode(_avatar.get()))));
+        } catch (MimeTypeException e) {
+          e.printStackTrace();
+        }
       }
 
       ContextMenu contextMenu = new ContextMenu(avatar);
       contextMenu.setOpenOnClick(true);
-      contextMenu.addItem(securityUser.getUsername());
+      contextMenu.addItem(currentUserLogin.orElse("N/A"));
       if (VaadinSession.getCurrent().getAttribute(BaseUser.class) != null) {
         contextMenu.addItem("Settings",
             e -> getUI().get()
@@ -176,6 +208,7 @@ public class AppBar extends FlexBoxLayout {
             JHapyMainView.get().onLogout();
             UI.getCurrent().getPage().executeJs("location.assign('logout')");
           });
+      contextMenu.addItem(new Anchor("logout", "Log Out 2"));
     }
   }
 

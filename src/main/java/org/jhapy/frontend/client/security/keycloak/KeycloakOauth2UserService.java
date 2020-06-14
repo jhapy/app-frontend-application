@@ -1,67 +1,50 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.client.security.keycloak;
 
-import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
-
-import java.security.Principal;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.security.oauth2.jwt.JwtValidators;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoderJwkSupport;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * @author Alexandre Clavaud.
+ * @author jHapy Lead Dev.
  * @version 1.0
  * @since 07/05/2020
  */
@@ -76,12 +59,11 @@ public class KeycloakOauth2UserService extends OidcUserService {
   private final GrantedAuthoritiesMapper authoritiesMapper;
 
   /**
-   * Augments {@link OidcUserService#loadUser(OidcUserRequest)} to add authorities
-   * provided by Keycloak.
+   * Augments {@link OidcUserService#loadUser(OidcUserRequest)} to add authorities provided by
+   * Keycloak.
    *
-   * Needed because {@link OidcUserService#loadUser(OidcUserRequest)} (currently)
-   * does not provide a hook for adding custom authorities from a
-   * {@link OidcUserRequest}.
+   * Needed because {@link OidcUserService#loadUser(OidcUserRequest)} (currently) does not provide a
+   * hook for adding custom authorities from a {@link OidcUserRequest}.
    */
   @Override
   public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
@@ -92,46 +74,52 @@ public class KeycloakOauth2UserService extends OidcUserService {
     authorities.addAll(user.getAuthorities());
     authorities.addAll(extractKeycloakAuthorities(userRequest));
 
-    return new DefaultOidcUser(authorities, userRequest.getIdToken(), user.getUserInfo(), "preferred_username");
+    return new DefaultOidcUser(authorities, userRequest.getIdToken(), user.getUserInfo(),
+        "preferred_username");
   }
 
   /**
-   * Extracts {@link GrantedAuthority GrantedAuthorities} from the AccessToken in
-   * the {@link OidcUserRequest}.
-   *
-   * @param userRequest
-   * @return
+   * Extracts {@link GrantedAuthority GrantedAuthorities} from the AccessToken in the {@link
+   * OidcUserRequest}.
    */
-  private Collection<? extends GrantedAuthority> extractKeycloakAuthorities(OidcUserRequest userRequest) {
+  private Collection<? extends GrantedAuthority> extractKeycloakAuthorities(
+      OidcUserRequest userRequest) {
 
     Jwt token = parseJwt(userRequest.getAccessToken().getTokenValue());
 
     // Would be great if Spring Security would provide something like a plugable
     // OidcUserRequestAuthoritiesExtractor interface to hide the junk below...
 
-    @SuppressWarnings("unchecked")
-    Map<String, Object> resourceMap = (Map<String, Object>) token.getClaims().get("resource_access");
+    Map<String, Object> claims = token.getClaims();
+    Map<String, Object> resourceMap = (Map<String, Object>) claims.get("resource_access");
+    final Map<String, Object> realmAccess = (Map<String, Object>) token.getClaims()
+        .get("realm_access");
     String clientId = userRequest.getClientRegistration().getClientId();
 
     @SuppressWarnings("unchecked")
-    Map<String, Map<String, Object>> clientResource = (Map<String, Map<String, Object>>) resourceMap.get(clientId);
-    if (CollectionUtils.isEmpty(clientResource)) {
-      return Collections.emptyList();
-    }
+    Map<String, Map<String, Object>> clientResource = (Map<String, Map<String, Object>>) resourceMap
+        .get(clientId);
+    if (!CollectionUtils.isEmpty(clientResource)) {
+      List<String> clientRoles = (List<String>) clientResource.get("roles");
+      if (CollectionUtils.isEmpty(clientRoles)) {
+        return Collections.emptyList();
+      }
+      Collection<? extends GrantedAuthority> authorities = AuthorityUtils
+          .createAuthorityList(clientRoles.toArray(new String[0]));
+      if (authoritiesMapper == null) {
+        return authorities;
+      }
 
-    @SuppressWarnings("unchecked")
-    List<String> clientRoles = (List<String>) clientResource.get("roles");
-    if (CollectionUtils.isEmpty(clientRoles)) {
-      return Collections.emptyList();
-    }
+      return authoritiesMapper.mapAuthorities(authorities);
+    } else {
+      Collection<String> roles = (Collection<String>) claims.getOrDefault("groups",
+          claims.getOrDefault("roles", realmAccess.getOrDefault("roles", new ArrayList<>())));
 
-    Collection<? extends GrantedAuthority> authorities = AuthorityUtils
-        .createAuthorityList(clientRoles.toArray(new String[0]));
-    if (authoritiesMapper == null) {
-      return authorities;
+      return roles.stream()
+          .filter(role -> role.startsWith("ROLE_"))
+          .map(SimpleGrantedAuthority::new)
+          .collect(Collectors.toList());
     }
-
-    return authoritiesMapper.mapAuthorities(authorities);
   }
 
   private Jwt parseJwt(String accessTokenValue) {

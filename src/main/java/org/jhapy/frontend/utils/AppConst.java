@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.utils;
 
 import java.util.Locale;
@@ -29,6 +47,8 @@ public class AppConst {
   public static final String PAGE_MAIL_TEMPLATE_ADMIN = "mailTemplateAdmin";
   public static final String PAGE_SMS_TEMPLATE_ADMIN = "smsTemplateAdmin";
   public static final String PAGE_SESSIONS_ADMIN = "sessionsAdmin";
+  public static final String PAGE_EUREKA_ADMIN = "eurekaAdmin";
+  public static final String PAGE_CLOUD_CONFIG_ADMIN = "cloudConfigAdmin";
   public static final String PAGE_SMS_ADMIN = "smsAdmin";
   public static final String PAGE_MAILS_ADMIN = "mailsAdmin";
   public static final String PAGE_USER_SETTINGS = "userSettings";
@@ -42,6 +62,7 @@ public class AppConst {
   public static final String PAGE_PLACE_TYPE = "settings/places/placeType";
   public static final String PAGE_SECURITY_USERS = "settings/security/securityUsers";
   public static final String PAGE_SECURITY_ROLES = "settings/security/securityRoles";
+  public static final String PAGE_SECURITY_GROUPS = "settings/security/securityGroups";
   public static final String PAGE_COUNTRIES = "settings/reference/countries";
   public static final String PAGE_ACTIVITIES_ADMIN = "settings/activities/activitiesAdmin";
   public static final String PAGE_ACTIVITY_ADMIN = "settings/activities/activitiyAdmin";
@@ -60,6 +81,8 @@ public class AppConst {
   public static final String TITLE_USERS_ADMIN = "element.page.title.usersAdmin";
   public static final String TITLE_MAILS_ADMIN = "element.page.title.mailsAdmin";
   public static final String TITLE_SESSIONS_ADMIN = "element.page.title.sessionsAdmin";
+  public static final String TITLE_EUREKA_ADMIN = "element.page.title.eurekaAdmin";
+  public static final String TITLE_CLOUD_CONFIG_ADMIN = "element.page.title.cloudConfigAdmin";
   public static final String TITLE_SMS_ADMIN = "element.page.title.smsAdmin";
   public static final String TITLE_NOTIFICATION_ADMIN = "element.page.title.notificationAdmin";
   public static final String TITLE_MAIL_TEMPLATES_ADMIN = "element.page.title.mailTemplatesAdmin";
@@ -69,12 +92,14 @@ public class AppConst {
   public static final String TITLE_USER_ADMIN = "element.page.title.userAdmin";
   public static final String TITLE_USER_SETTINGS = "element.page.title.userSettings";
   public static final String TITLE_SECURITY = "element.page.title.security";
+  public static final String TITLE_MONITORING = "element.page.title.monitoring";
   public static final String TITLE_ACTIVITIES_ADMIN = "element.page.title.activitiesAdmin";
   public static final String TITLE_ACTIVITY_ADMIN = "element.page.title.activityAdmin";
   public static final String TITLE_PLACES_ADMIN = "element.page.title.placesAdmin";
   public static final String TITLE_PLACE_ADMIN = "element.page.title.placeAdmin";
   public static final String TITLE_SECURITY_USERS = "element.page.title.securityUsers";
   public static final String TITLE_SECURITY_ROLES = "element.page.title.securityRoles";
+  public static final String TITLE_SECURITY_GROUPS = "element.page.title.securityGroups";
   public static final String TITLE_I18N = "element.page.title.i18n";
   public static final String TITLE_ACTIVITIES = "element.page.title.activities";
   public static final String TITLE_REFERENCES = "element.page.title.references";

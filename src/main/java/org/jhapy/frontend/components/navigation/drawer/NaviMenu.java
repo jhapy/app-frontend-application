@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.components.navigation.drawer;
 
 import com.vaadin.flow.component.Component;
@@ -12,7 +30,7 @@ import java.util.stream.Collectors;
 @CssImport("./styles/components/navi-menu.css")
 public class NaviMenu extends Div {
 
-  private String CLASS_NAME = "navi-menu";
+  private final String CLASS_NAME = "navi-menu";
 
   public NaviMenu() {
     setClassName(CLASS_NAME);
@@ -29,7 +47,7 @@ public class NaviMenu extends Div {
 
   public void filter(String filter) {
     getNaviItems().forEach(naviItem -> {
-      boolean matches = ((NaviItem) naviItem).getText().toLowerCase()
+      boolean matches = naviItem.getText().toLowerCase()
           .contains(filter.toLowerCase());
       naviItem.setVisible(matches);
     });
@@ -80,7 +98,7 @@ public class NaviMenu extends Div {
   }
 
   public List<NaviItem> getNaviItems() {
-    List<NaviItem> items = (List) getChildren()
+    List<NaviItem> items = (List)getChildren()
         .collect(Collectors.toList());
     return items;
   }

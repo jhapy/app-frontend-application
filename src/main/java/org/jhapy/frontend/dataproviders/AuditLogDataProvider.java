@@ -1,18 +1,34 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.dataproviders;
 
-import java.util.function.Function;
-import org.jhapy.dto.domain.audit.AuditLog;
-import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
-import org.jhapy.dto.serviceQuery.auditLog.CountAuditLogQuery;
-import org.jhapy.dto.serviceQuery.auditLog.FindAuditLogQuery;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import java.io.Serializable;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jhapy.dto.domain.audit.AuditLog;
 import org.jhapy.dto.serviceQuery.ServiceResult;
+import org.jhapy.dto.serviceQuery.auditLog.CountAuditLogQuery;
+import org.jhapy.dto.serviceQuery.auditLog.FindAuditLogQuery;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.frontend.dataproviders.AuditLogDataProvider.AuditLogFilter;
@@ -28,11 +44,13 @@ import org.jhapy.frontend.utils.AppConst;
 public class AuditLogDataProvider extends
     DefaultDataProvider<AuditLog, AuditLogFilter> implements
     Serializable {
-  private Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler;
-  private Function<CountAuditLogQuery, ServiceResult<Long>> countHandler;
 
-  public AuditLogDataProvider(Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler,
-      Function<CountAuditLogQuery,ServiceResult<Long>> countHandler ) {
+  private final Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler;
+  private final Function<CountAuditLogQuery, ServiceResult<Long>> countHandler;
+
+  public AuditLogDataProvider(
+      Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler,
+      Function<CountAuditLogQuery, ServiceResult<Long>> countHandler) {
     super(AppConst.DEFAULT_SORT_DIRECTION,
         AppConst.DEFAULT_SORT_FIELDS);
     this.findHandler = findHandler;
@@ -44,7 +62,9 @@ public class AuditLogDataProvider extends
       Query<AuditLog, AuditLogFilter> query,
       Pageable pageable) {
     AuditLogFilter filter = query.getFilter().orElse(null);
-    Page<AuditLog> page = findHandler.apply(new FindAuditLogQuery(filter.getClassName(), filter.getRecordId(), pageable)).getData();
+    Page<AuditLog> page = findHandler
+        .apply(new FindAuditLogQuery(filter.getClassName(), filter.getRecordId(), pageable))
+        .getData();
     if (getPageObserver() != null) {
       getPageObserver().accept(page);
     }
@@ -56,17 +76,20 @@ public class AuditLogDataProvider extends
   protected int sizeInBackEnd(Query<AuditLog, AuditLogFilter> query) {
     AuditLogFilter filter = query.getFilter().orElse(null);
 
-    ServiceResult<Long> _count =  countHandler.apply(new CountAuditLogQuery(filter.getClassName(), filter.getRecordId()));
+    ServiceResult<Long> _count = countHandler
+        .apply(new CountAuditLogQuery(filter.getClassName(), filter.getRecordId()));
 
-    if ( _count.getIsSuccess() && _count.getData() != null )
+    if (_count.getIsSuccess() && _count.getData() != null) {
       return _count.getData().intValue();
-    else
+    } else {
       return 0;
+    }
   }
 
   @Data
   @AllArgsConstructor
   public static class AuditLogFilter extends DefaultFilter {
+
     private String className = null;
     private Long recordId = null;
   }

@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.customFields;
 
 import com.vaadin.flow.component.ClickEvent;
@@ -39,7 +57,6 @@ import org.jhapy.frontend.utils.IconSize;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BorderRadius;
-import org.jhapy.frontend.utils.css.FlexDirection;
 import org.jhapy.frontend.utils.css.Shadow;
 
 /**
@@ -51,10 +68,10 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
     HasValue<AttachmentsFieldValueChangeEvent, StoredFile[]> {
 
   private List<StoredFile> storedFiles = new ArrayList<>();
-  private Upload upload;
-  private Div documentList;
+  private final Upload upload;
+  private final Div documentList;
 
-  private List<ValueChangeListener<? super AttachmentsFieldValueChangeEvent>> changeListeners = new ArrayList<>();
+  private final List<ValueChangeListener<? super AttachmentsFieldValueChangeEvent>> changeListeners = new ArrayList<>();
 
   public AttachmentField() {
     this(null);

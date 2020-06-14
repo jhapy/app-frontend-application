@@ -1,11 +1,27 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views;
 
 import ch.carnet.kasparscherrer.EmptyFormLayoutItem;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.crud.CrudI18n.Confirmations.Confirmation;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -18,12 +34,9 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
-import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
 import com.vaadin.flow.router.BeforeLeaveObserver;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -34,7 +47,6 @@ import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.serviceQuery.ServiceResult;
-import org.jhapy.frontend.components.ConfirmationDialog;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerFooter;
@@ -67,29 +79,32 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   protected DetailsDrawerFooter detailsDrawerFooter;
   protected Binder<T> binder;
   private T currentEditing;
-  private Class<T> entityType;
-  private Function<T, ServiceResult<T>> saveHandler;
-  private Consumer<T> deleteHandler;
+  private final Class<T> entityType;
+  private final Function<T, ServiceResult<T>> saveHandler;
+  private final Consumer<T> deleteHandler;
   private Tabs tabs;
   private Button newRecordButton;
+  private Boolean initialFetch = Boolean.TRUE;
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider) {
-    this.I18N_PREFIX = I18N_PREFIX;
-    this.entityType = entityType;
-    this.binder = new BeanValidationBinder<>(entityType);
-    this.dataProvider = dataProvider;
-    this.saveHandler = null;
-    this.deleteHandler = null;
+    this(I18N_PREFIX, entityType, dataProvider, null, null);
   }
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider,
       Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
+    this(I18N_PREFIX, entityType, dataProvider, true, saveHandler, deleteHandler);
+  }
+
+  public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
+      DefaultDataProvider<T, F> dataProvider, Boolean initialFetch,
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
     this.binder = new BeanValidationBinder<>(entityType);
     this.dataProvider = dataProvider;
+    this.initialFetch = initialFetch;
     this.saveHandler = saveHandler;
     this.deleteHandler = deleteHandler;
   }
@@ -102,25 +117,29 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     setViewContent(createContent());
     setViewDetails(createDetailsDrawer());
 
-    filter(null);
+    if (initialFetch) {
+      filter(null);
+    }
 
-    if ( currentEditing != null )
-      showDetails( currentEditing );
+    if (currentEditing != null) {
+      showDetails(currentEditing);
+    }
   }
 
   @Override
   public void beforeLeave(BeforeLeaveEvent beforeLeaveEvent) {
     ContinueNavigationAction action = beforeLeaveEvent.postpone();
-    checkForDetailsChanges( () -> action.proceed() );
+    checkForDetailsChanges(() -> action.proceed());
   }
 
-  protected void checkForDetailsChanges( Runnable action ) {
-    if ( currentEditing != null &&  this.binder.hasChanges() ) {
+  protected void checkForDetailsChanges(Runnable action) {
+    if (currentEditing != null && this.binder.hasChanges()) {
       ConfirmDialog.createQuestion()
           .withCaption(getTranslation("element.global.unsavedChanged.title"))
           .withMessage(getTranslation("message.global.unsavedChanged"))
-          .withOkButton(() ->action.run(), ButtonOption.focus(), ButtonOption.caption(getTranslation("action.global.yes")))
-          .withCancelButton(ButtonOption.caption( getTranslation("action.global.no")))
+          .withOkButton(() -> action.run(), ButtonOption.focus(),
+              ButtonOption.caption(getTranslation("action.global.yes")))
+          .withCancelButton(ButtonOption.caption(getTranslation("action.global.no")))
           .open();
     } else {
       action.run();
@@ -131,7 +150,9 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     return currentEditing;
   }
 
-  protected void setCurrentEditing(T currentEditing ) { this.currentEditing = currentEditing; }
+  protected void setCurrentEditing(T currentEditing) {
+    this.currentEditing = currentEditing;
+  }
 
   protected void initHeader() {
     AppBar appBar = JHapyMainView.get().getAppBar();
@@ -158,9 +179,14 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   protected boolean canCreateRecord() {
     return true;
   }
-  protected boolean canSave() { return true; }
 
-  protected boolean canDelete() { return true; }
+  protected boolean canSave() {
+    return true;
+  }
+
+  protected boolean canDelete() {
+    return true;
+  }
 
   protected void initSearchBar() {
     AppBar appBar = JHapyMainView.get().getAppBar();
@@ -179,7 +205,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
   public void disableCreateRecord() {
     if (newRecordButton != null) {
-      newRecordButton.setVisible  (false);
+      newRecordButton.setVisible(false);
     }
   }
 
@@ -247,7 +273,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     detailsDrawerHeader = new DetailsDrawerHeader(
         getTranslation("element." + I18N_PREFIX + "className"), tabs);
     detailsDrawerHeader.addCloseListener(e -> {
-      checkForDetailsChanges( () ->  {
+      checkForDetailsChanges(() -> {
         detailsDrawer.hide();
         currentEditing = null;
       });
@@ -256,11 +282,11 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
     // Footer
     detailsDrawerFooter = new DetailsDrawerFooter();
-    if (saveHandler == null || ! canSave()) {
+    if (saveHandler == null || !canSave()) {
       detailsDrawerFooter.setSaveButtonVisible(false);
       detailsDrawerFooter.setSaveAndNewButtonVisible(false);
     }
-    if (deleteHandler == null|| ! canDelete()) {
+    if (deleteHandler == null || !canDelete()) {
       detailsDrawerFooter.setDeleteButtonVisible(false);
     }
 
@@ -281,10 +307,10 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   }
 
   protected void showDetails(T entity) {
-    checkForDetailsChanges( () -> {
-      if (entity.getId() != null)
+    checkForDetailsChanges(() -> {
+      if (entity.getId() != null) {
         detailsDrawerFooter.setSaveAndNewButtonVisible(false);
-      else {
+      } else {
         if (saveHandler != null && canSave()) {
           detailsDrawerFooter.setSaveAndNewButtonVisible(true);
         }
@@ -295,7 +321,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
       detailsDrawer.setContent(createDetails(entity));
       detailsDrawer.show();
       tabs.setSelectedIndex(0);
-    } );
+    });
   }
 
   protected abstract Component createDetails(T entity);
@@ -372,11 +398,12 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
       if (beforeSave(currentEditing)) {
         ServiceResult<T> result = saveHandler.apply(currentEditing);
-        if ( result.getIsSuccess() && result.getData() != null )
+        if (result.getIsSuccess() && result.getData() != null) {
           currentEditing = result.getData();
-        else {
+        } else {
           JHapyMainView.get()
-              .displayErrorMessage(getTranslation("message.global.unknownError", result.getMessage()));
+              .displayErrorMessage(
+                  getTranslation("message.global.unknownError", result.getMessage()));
           return;
         }
       }
@@ -391,7 +418,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
         dataProvider.refreshAll();
       }
 
-      if ( saveAndNew ) {
+      if (saveAndNew) {
         showDetails();
         return;
       }
@@ -415,7 +442,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     ConfirmDialog.create()
         .withCaption(getTranslation("message.global.confirmDelete.title"))
         .withMessage(getTranslation("message.global.confirmDelete.message"))
-        .withOkButton(() ->deleteConfirmed(), ButtonOption.focus(), ButtonOption.caption("YES"))
+        .withOkButton(() -> deleteConfirmed(), ButtonOption.focus(), ButtonOption.caption("YES"))
         .withCancelButton(ButtonOption.caption("NO"))
         .open();
   }

@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views.admin.i18n;
 
 import com.vaadin.flow.component.Component;
@@ -8,7 +26,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextField;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.access.annotation.Secured;
 import org.jhapy.dto.domain.i18n.Element;
 import org.jhapy.dto.domain.i18n.ElementTrl;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -28,6 +45,7 @@ import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author jHapy Lead Dev.
@@ -35,15 +53,16 @@ import org.jhapy.frontend.views.JHapyMainView;
  * @since 2019-04-21
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_ELEMENTS)
-@Secured({SecurityConst.ROLE_I18N, SecurityConst.ROLE_ADMIN})
+@Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
 public class ElementsView extends DefaultMasterDetailsView<Element, DefaultFilter> {
 
   public ElementsView(MyI18NProvider myI18NProvider) {
     super("element.", Element.class, new ElementDataProvider(),
         (e) -> {
           ServiceResult<Element> _elt = I18NServices.getElementService().save(new SaveQuery<>(e));
-          if ( _elt.getIsSuccess() )
+          if (_elt.getIsSuccess()) {
             myI18NProvider.reloadElements();
+          }
           return _elt;
         },
         e -> I18NServices.getElementService().delete(new DeleteByIdQuery(e.getId())));

@@ -1,40 +1,40 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.config;
 
-import java.util.Arrays;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.access.vote.RoleVoter;
-import org.springframework.security.access.vote.UnanimousBased;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.access.expression.WebExpressionVoter;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.serviceQuery.security.securityUser.GetSecurityUserByUsernameQuery;
 import org.jhapy.frontend.client.audit.AuditServiceQueue;
 import org.jhapy.frontend.client.audit.SessionService;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.SecurityUserService;
-import org.jhapy.frontend.security.AuthenticationFailureHandler;
-import org.jhapy.frontend.security.AuthenticationSuccessHandler;
 import org.jhapy.frontend.security.CurrentUser;
 import org.jhapy.frontend.security.CustomRequestCache;
-import org.jhapy.frontend.security.LogoutSuccessHandler;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.UserDetailsServiceImpl;
-import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
-import org.jhapy.frontend.utils.AppConst;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * Configures spring security, doing the following:
@@ -107,12 +107,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Allow all flow internal requests.
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll();
 
-        // Public access to Places
+    // Public access to Places
 //        .antMatchers("/", "/places").permitAll()
 
-        // Allow all requests by logged in users.
+    // Allow all requests by logged in users.
 //        .accessDecisionManager(accessDecisionManager())
-        // Configure the login page.
+    // Configure the login page.
 
         /*
         .and()
@@ -138,6 +138,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     return new UnanimousBased(decisionVoters);
   }
 */
+
   /**
    * Allows access to static resources, bypassing Spring security.
    */

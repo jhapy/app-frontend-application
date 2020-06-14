@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.views.admin.i18n;
 
 import com.vaadin.flow.component.Component;
@@ -8,7 +26,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextField;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.access.annotation.Secured;
 import org.jhapy.dto.domain.i18n.Message;
 import org.jhapy.dto.domain.i18n.MessageTrl;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -28,6 +45,7 @@ import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author jHapy Lead Dev.
@@ -36,15 +54,16 @@ import org.jhapy.frontend.views.JHapyMainView;
  */
 
 @I18NPageTitle(messageKey = AppConst.TITLE_MESSAGES)
-@Secured({SecurityConst.ROLE_I18N, SecurityConst.ROLE_ADMIN})
+@Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
 public class MessagesView extends DefaultMasterDetailsView<Message, DefaultFilter> {
 
   public MessagesView(MyI18NProvider myI18NProvider) {
     super("message.", Message.class, new MessageDataProvider(),
         (e) -> {
           ServiceResult<Message> _elt = I18NServices.getMessageService().save(new SaveQuery<>(e));
-          if ( _elt.getIsSuccess() )
+          if (_elt.getIsSuccess()) {
             myI18NProvider.reloadMessages();
+          }
           return _elt;
         },
         e -> I18NServices.getMessageService().delete(new DeleteByIdQuery(e.getId())));

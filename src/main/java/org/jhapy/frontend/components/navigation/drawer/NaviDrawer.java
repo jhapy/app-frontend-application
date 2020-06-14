@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020-2020 the original author or authors from the JHapy project.
+ *
+ * This file is part of the JHapy project, see https://www.jhapy.org/ for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jhapy.frontend.components.navigation.drawer;
 
 import com.vaadin.flow.component.AttachEvent;
@@ -23,9 +41,9 @@ import org.jhapy.frontend.utils.UIUtils;
 public class NaviDrawer extends Div
     implements AfterNavigationObserver {
 
-  private String CLASS_NAME = "navi-drawer";
-  private String RAIL = "rail";
-  private String OPEN = "open";
+  private final String CLASS_NAME = "navi-drawer";
+  private final String RAIL = "rail";
+  private final String OPEN = "open";
 
   private Div scrim;
 
@@ -37,15 +55,16 @@ public class NaviDrawer extends Div
   private NaviMenu menu;
 
 
-  public NaviDrawer(boolean showSearchMenu, String version, String environement ) {
+  public NaviDrawer(boolean showSearchMenu, String version, String environement) {
     setClassName(CLASS_NAME);
 
     initScrim();
     initMainContent();
 
     initHeader();
-    if ( showSearchMenu )
+    if (showSearchMenu) {
       initSearch();
+    }
 
     initScrollableArea();
     initMenu();
@@ -97,8 +116,9 @@ public class NaviDrawer extends Div
   }
 
   public void toogleSearch() {
-    if ( search != null )
+    if (search != null) {
       search.setVisible(SecurityUtils.isUserLoggedIn());
+    }
   }
 
   private void initScrollableArea() {
@@ -113,10 +133,10 @@ public class NaviDrawer extends Div
   }
 
   private void initFooter(String version, String environement) {
-    if (StringUtils.isNotBlank( version ) ) {
-      Label l = UIUtils.createH5Label("Version " + version + " (" + environement +")");
+    if (StringUtils.isNotBlank(version)) {
+      Label l = UIUtils.createH5Label("Version " + version + " (" + environement + ")");
       l.addClassName(CLASS_NAME + "__footer");
-      l.addClassName( "version" );
+      l.addClassName("version");
       mainContent.add(l);
     }
 
