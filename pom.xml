@@ -38,9 +38,6 @@
     <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
     <spring-data.version>Moore-SR6</spring-data.version>
 
-    <spring-boot-admin.version>2.2.2</spring-boot-admin.version>
-
-    <javamelody.version>1.82.0</javamelody.version>
     <stagemonitor.version>0.88.9</stagemonitor.version>
 
     <!-- Dependencies -->
@@ -181,17 +178,8 @@
       <version>${logstash-gelf.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.bull.javamelody</groupId>
-      <artifactId>javamelody-spring-boot-starter</artifactId>
-      <version>${javamelody.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.codecentric</groupId>
-      <artifactId>spring-boot-admin-starter-client</artifactId>
     </dependency>
 
     <dependency>
@@ -505,13 +493,6 @@
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
         <version>${spring-cloud.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>de.codecentric</groupId>
-        <artifactId>spring-boot-admin-dependencies</artifactId>
-        <version>${spring-boot-admin.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
