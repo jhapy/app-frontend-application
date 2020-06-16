@@ -143,6 +143,12 @@ public class SecurityConfiguration2 extends WebSecurityConfigurerAdapter impleme
         .disable()
         .authorizeRequests()
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+        .antMatchers("/api/auth-info").permitAll()
+        .antMatchers("/api/**").authenticated()
+        .antMatchers("/management/health").permitAll()
+        .antMatchers("/management/info").permitAll()
+        .antMatchers("/management/prometheus").permitAll()
+        .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
         .anyRequest().fullyAuthenticated()
         .and()
         .logout().addLogoutHandler(new LogoutHandler() {
