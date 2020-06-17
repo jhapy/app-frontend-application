@@ -159,19 +159,27 @@ public class SecurityConfiguration2 extends WebSecurityConfigurerAdapter impleme
                                      }
 
                                      private void propagateLogoutToKeycloak(OidcUser user) {
-                                       String loggerPrefix = getLoggerPrefix("propagateLogoutToKeycloak");
-                                       String endSessionEndpoint = user.getIssuer() + "/protocol/openid-connect/logout";
+                                       String loggerPrefix = getLoggerPrefix(
+                                           "propagateLogoutToKeycloak");
+                                       String endSessionEndpoint =
+                                           user.getIssuer() + "/protocol/openid-connect/logout";
 
                                        UriComponentsBuilder builder = UriComponentsBuilder //
                                            .fromUriString(endSessionEndpoint) //
-                                           .queryParam("id_token_hint", user.getIdToken().getTokenValue());
+                                           .queryParam("id_token_hint",
+                                               user.getIdToken().getTokenValue());
 
+                                       logger().info(
+                                           loggerPrefix + "Call Keycloak logout endpoint : "
+                                               + builder.toUriString());
                                        ResponseEntity<String> logoutResponse = restTemplate
                                            .getForEntity(builder.toUriString(), String.class);
                                        if (logoutResponse.getStatusCode().is2xxSuccessful()) {
-                                         logger().info(loggerPrefix + "Successfully logged out in Keycloak");
+                                         logger().info(
+                                             loggerPrefix + "Successfully logged out in Keycloak");
                                        } else {
-                                         logger().info(loggerPrefix + "Could not propagate logout to Keycloak");
+                                         logger().info(loggerPrefix
+                                             + "Could not propagate logout to Keycloak");
                                        }
                                      }
                                    }
