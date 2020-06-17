@@ -173,26 +173,13 @@ public class AppBar extends FlexBoxLayout {
     avatar.setSrc(UIUtils.IMG_PATH + "icons8-question-mark-64.png");
 
     if (SecurityUtils.isUserLoggedIn()) {
-      SecurityUser securityUser = SecurityUtils.getSecurityUser();
-      SecurityUtils2.getCurrentUserLogin();
       StoredFile userAvatar = AppContext.getInstance().getCurrentAvatar();
-//TODO: OPTIMIZE !!!!
-      Optional<String> _avatar = SecurityUtils2.getCurrentUserPicture();
-      Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
-      if (userAvatar != null && userAvatar.getId() != null && userAvatar.getContent() != null) {
+      if (userAvatar != null) {
+        StoredFile finalUserAvatar = userAvatar;
         avatar.setSrc(new StreamResource(userAvatar.getFilename(),
-            () -> new ByteArrayInputStream(userAvatar.getContent())));
-      } else if (_avatar.isPresent()) {
-        String ext = null;
-        try {
-          ext = TikaConfig.getDefaultConfig().getMimeRepository().forName((new Tika()).detect(
-              Base64.getDecoder().decode(_avatar.get()))).getExtension();
-          avatar.setSrc(new StreamResource(currentUserLogin.get() + ext,
-              () -> new ByteArrayInputStream(Base64.getDecoder().decode(_avatar.get()))));
-        } catch (MimeTypeException e) {
-          e.printStackTrace();
-        }
+            () -> new ByteArrayInputStream(finalUserAvatar.getContent())));
       }
+      Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
 
       ContextMenu contextMenu = new ContextMenu(avatar);
       contextMenu.setOpenOnClick(true);
@@ -202,13 +189,7 @@ public class AppBar extends FlexBoxLayout {
             e -> getUI().get()
                 .navigate(JHapyMainView.get().getUserSettingsView(), Long.valueOf(-1)));
       }
-      contextMenu.addItem("Log Out",
-          e -> {
-            SecurityUtils.endSession(VaadinSession.getCurrent().getSession().getId());
-            JHapyMainView.get().onLogout();
-            UI.getCurrent().getPage().executeJs("location.assign('logout')");
-          });
-      contextMenu.addItem(new Anchor("logout", "Log Out 2"));
+      contextMenu.addItem(new Anchor("logout", "Log Out"));
     }
   }
 
