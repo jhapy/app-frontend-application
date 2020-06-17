@@ -243,8 +243,10 @@ public class CloudConfigurationTabContent extends CloudConfigBaseView {
         List<String[]> cloudConfigServer = new ArrayList<>();
         AtomicInteger idx = new AtomicInteger(1);
         cloudConfigServerConfiguration.forEach(o -> {
+          JSONObject jo = ((JSONObject) o);
           cloudConfigServer.add(new String[]{Integer.toString(idx.getAndIncrement()),
-              ((JSONObject) o).get("type").toString(), ((JSONObject) o).get("search").toString()});
+              jo.get("type").toString(),
+              jo.get("search") != null ? jo.get("search").toString() : jo.get("uri").toString()});
         });
 
         configurationSourcesGrid.setItems(cloudConfigServer);
