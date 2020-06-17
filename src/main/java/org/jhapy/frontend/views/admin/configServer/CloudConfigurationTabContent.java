@@ -233,6 +233,8 @@ public class CloudConfigurationTabContent extends CloudConfigBaseView {
 
         JSONParser jsonParser = new JSONParser();
         String infoBody = info.getBody();
+        logger().debug("Info Result = " + infoBody);
+
         JSONObject infoJsonObject = (JSONObject) jsonParser.parse(infoBody);
 
         JSONArray cloudConfigServerConfiguration = (JSONArray) infoJsonObject
