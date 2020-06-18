@@ -18,6 +18,8 @@
 
 package org.jhapy.frontend.client.i18n;
 
+import feign.hystrix.FallbackFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.i18n.Action;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -35,7 +37,29 @@ import org.springframework.stereotype.Component;
  * @since 2019-06-02
  */
 @Component
-public class ActionServiceFallback implements ActionService, HasLogger {
+public class ActionServiceFallback implements ActionService, HasLogger,
+    FallbackFactory<ActionServiceFallback> {
+
+  final Throwable cause;
+
+  public ActionServiceFallback() {
+    this(null);
+  }
+
+  ActionServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public ActionServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause.toString();
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
+    }
+    return new ActionServiceFallback(cause);
+  }
 
   @Override
   public ServiceResult<Page<Action>> findAnyMatching(FindAnyMatchingQuery query) {
