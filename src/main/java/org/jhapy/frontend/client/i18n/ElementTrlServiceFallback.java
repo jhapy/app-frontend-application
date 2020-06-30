@@ -18,8 +18,10 @@
 
 package org.jhapy.frontend.client.i18n;
 
+import feign.hystrix.FallbackFactory;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.i18n.ElementTrl;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -38,7 +40,29 @@ import org.springframework.stereotype.Component;
  * @since 2019-06-02
  */
 @Component
-public class ElementTrlServiceFallback implements ElementTrlService, HasLogger {
+public class ElementTrlServiceFallback implements ElementTrlService, HasLogger,
+    FallbackFactory<ElementTrlServiceFallback> {
+
+  final Throwable cause;
+
+  public ElementTrlServiceFallback() {
+    this(null);
+  }
+
+  ElementTrlServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public ElementTrlServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause.toString();
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
+    }
+    return new ElementTrlServiceFallback(cause);
+  }
 
   @Override
   public ServiceResult<List<ElementTrl>> findByElement(FindByElementQuery query) {

@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-04-21
  */
-@FeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/elementTrlService", fallback = ElementTrlServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/elementTrlService", fallbackFactory = ElementTrlServiceFallback.class)
 @Primary
 public interface ElementTrlService {
 
