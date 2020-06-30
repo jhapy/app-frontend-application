@@ -101,19 +101,19 @@ public class CloudConfigurationTabContent extends CloudConfigBaseView {
     applicationTextField.setValue("application");
     applicationTextField.setWidthFull();
     applicationTextField.addValueChangeListener(event -> refresh());
-    applicationTextField.setValueChangeMode(ValueChangeMode.EAGER);
+    applicationTextField.setValueChangeMode(ValueChangeMode.ON_CHANGE);
 
     profileTextField = new TextField(getTranslation("element." + I18N_PREFIX + "profile"));
     profileTextField.setValue("prod");
     profileTextField.setWidthFull();
     profileTextField.addValueChangeListener(event -> refresh());
-    profileTextField.setValueChangeMode(ValueChangeMode.EAGER);
+    profileTextField.setValueChangeMode(ValueChangeMode.ON_CHANGE);
 
     labelTextField = new TextField(getTranslation("element." + I18N_PREFIX + "label"));
     labelTextField.setValue("master");
     labelTextField.setWidthFull();
     labelTextField.addValueChangeListener(event -> refresh());
-    labelTextField.setValueChangeMode(ValueChangeMode.EAGER);
+    labelTextField.setValueChangeMode(ValueChangeMode.ON_CHANGE);
 
     content.add(applicationTextField, profileTextField, labelTextField);
 
@@ -252,7 +252,8 @@ public class CloudConfigurationTabContent extends CloudConfigBaseView {
         configurationSourcesGrid.setItems(cloudConfigServer);
 
         String url =
-            env.getProperty("spring.cloud.config.uri") + "/" + application + "-" + profile + ".yml";
+            env.getProperty("spring.cloud.config.uri") + "/" + label + "/" + application + "-"
+                + profile + ".yml";
         logger().debug("Config YAML Url = " + url);
         ResponseEntity<String> configprops = restTemplate.exchange(URI.create(url),
             HttpMethod.GET,
@@ -262,7 +263,8 @@ public class CloudConfigurationTabContent extends CloudConfigBaseView {
 
         yamlConfigurationTextArea.setValue(configpropsBody);
 
-        url = env.getProperty("spring.cloud.config.uri") + "/" + application + "-" + profile
+        url = env.getProperty("spring.cloud.config.uri") + "/" + label + "/" + application + "-"
+            + profile
             + ".properties";
         logger().debug("Config Properties Url = " + url);
         configprops = restTemplate.exchange(URI.create(url),
@@ -277,7 +279,8 @@ public class CloudConfigurationTabContent extends CloudConfigBaseView {
         Arrays.asList(configpropsBody.split("\n")).forEach(s -> tableConfig.add(s.split(": ")));
         tableConfigurationGrid.setItems(tableConfig);
 
-        url = env.getProperty("spring.cloud.config.uri") + "/" + application + "-" + profile
+        url = env.getProperty("spring.cloud.config.uri") + "/" + label + "/" + application + "-"
+            + profile
             + ".json";
         logger().debug("Config JSON Url = " + url);
         configprops = restTemplate.exchange(URI.create(url),
