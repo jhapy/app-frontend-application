@@ -19,6 +19,7 @@
 package org.jhapy.frontend.views.admin.i18n;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -27,9 +28,12 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.HeaderRow.HeaderCell;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
@@ -127,17 +131,15 @@ public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter>
     HeaderCell buttonsCell = headerRow.join(categoryColumn, nameColumn);
 
     Button exportI18NButton = new Button(getTranslation("action.i18n.download"));
-    FileDownloadWrapper buttonWrapper = new FileDownloadWrapper(
-        new StreamResource("i18n.xlsx", () -> {
-          ServiceResult<Byte[]> result = I18NServices.getI18NService()
-              .getI18NFile(new BaseRemoteQuery());
-          if (result.getIsSuccess() && result.getData() != null) {
-            return new ByteArrayInputStream(ArrayUtils.toPrimitive(result.getData()));
-          } else {
-            return null;
-          }
-        }));
-    buttonWrapper.wrapComponent(exportI18NButton);
+    exportI18NButton.addClickListener(buttonClickEvent -> {
+      ServiceResult<Byte[]> result = I18NServices.getI18NService()
+          .getI18NFile(new BaseRemoteQuery());
+      final StreamResource resource = new StreamResource("i18n.xlsx",
+          () -> new ByteArrayInputStream(ArrayUtils.toPrimitive(result.getData())));
+      final StreamRegistration registration = VaadinSession.getCurrent().getResourceRegistry()
+          .registerResource(resource);
+      UI.getCurrent().getPage().setLocation(registration.getResourceUri());
+    });
 
     Button importI18NButton = new Button(getTranslation("action.i18n.upload"));
     importI18NButton.addClickListener(buttonClickEvent -> {
@@ -158,7 +160,7 @@ public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter>
               }, () -> importFileDialog.close());
     });
 
-    HorizontalLayout headerHLayout = new HorizontalLayout(buttonWrapper, importI18NButton);
+    HorizontalLayout headerHLayout = new HorizontalLayout(exportI18NButton, importI18NButton);
     buttonsCell.setComponent(headerHLayout);
 
     return grid;
