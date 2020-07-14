@@ -50,7 +50,7 @@
     <problem-spring-web.version>0.25.0</problem-spring-web.version>
     <spring-data-provider.version>2.1.0</spring-data-provider.version>
 
-    <vaadin.version>14.2.2</vaadin.version>
+    <vaadin.version>14.3.0</vaadin.version>
 
     <confirm-dialog.versîon>2.0.0</confirm-dialog.versîon>
     <multiselect-combo-box-flow.version>2.3.0</multiselect-combo-box-flow.version>
