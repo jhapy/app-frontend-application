@@ -28,6 +28,7 @@ import org.jhapy.dto.serviceQuery.i18n.FindByIso3Query;
 import org.jhapy.dto.serviceQuery.i18n.GetByNameAndIso3Query;
 import org.jhapy.dto.serviceQuery.i18n.elementTrl.CountByElementQuery;
 import org.jhapy.dto.serviceQuery.i18n.elementTrl.FindByElementQuery;
+import org.jhapy.frontend.client.AuthorizedFeignClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-04-21
  */
-@FeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/elementTrlService", fallbackFactory = ElementTrlServiceFallback.class)
+@AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/elementTrlService", fallbackFactory = ElementTrlServiceFallback.class)
 @Primary
 public interface ElementTrlService {
 

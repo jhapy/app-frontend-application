@@ -44,7 +44,7 @@ import org.jhapy.frontend.utils.css.BoxSizing;
  * @version 1.0
  * @since 8/27/19
  */
-public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultFilter> extends
+public abstract class   DefaultMasterView<T extends BaseEntity, F extends DefaultFilter> extends
     ViewFrame {
 
   protected final String I18N_PREFIX;
@@ -78,7 +78,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   }
 
   protected void initHeader() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(NaviMode.MENU);
 
     initSearchBar();
@@ -101,7 +101,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   }
 
   protected void initSearchBar() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
     appBar.addSearchListener(event -> filter((String) event.getValue()));
@@ -128,6 +128,6 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     dataProvider
         .setFilter((F) new DefaultFilter(
             StringUtils.isBlank(filter) ? null : filter,
-            Boolean.TRUE));
+            null));
   }
 }

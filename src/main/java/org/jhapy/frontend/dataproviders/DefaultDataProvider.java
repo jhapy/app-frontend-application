@@ -77,14 +77,13 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
   public static class DefaultFilter implements Serializable {
 
     private String filter;
-    private final Boolean showInactive;
+    private Boolean showInactive;
 
-    public DefaultFilter() {
-      this.showInactive = Boolean.FALSE;
+    public DefaultFilter(){
     }
 
     public DefaultFilter(String filter) {
-      this(filter, Boolean.FALSE);
+      this(filter, null);
     }
 
     public DefaultFilter(String filter, Boolean showInactive) {
@@ -93,15 +92,21 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
     }
 
     public static DefaultFilter getEmptyFilter() {
-      return new DefaultFilter(null, false);
+      return new DefaultFilter(null, null);
     }
 
     public String getFilter() {
       return filter;
     }
 
+    public void setFilter(String filter) {
+      this.filter = filter;
+    }
+
     public Boolean isShowInactive() {
       return showInactive;
     }
+
+    public void setShowInactive( Boolean showInactive ) { this.showInactive = showInactive; }
   }
 }

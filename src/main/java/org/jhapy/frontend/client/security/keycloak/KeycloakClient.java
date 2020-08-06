@@ -133,6 +133,42 @@ public class KeycloakClient implements HasLogger {
     }
   }
 
+  public ServiceResult<Boolean> userExists( String username ) {
+    return new ServiceResult<>(true, null, ! getKeycloakRealmInstance().users().search(username, true).isEmpty() );
+  }
+
+  public ServiceResult<Boolean> isValidated( String username ) {
+    List<UserRepresentation> users = getKeycloakRealmInstance().users().search(username, true);
+    if (  users.isEmpty() )return new ServiceResult<>(true, null , Boolean.FALSE);
+    else return new ServiceResult<>(true, null, users.get(0).isEmailVerified());
+  }
+
+  public ServiceResult<String> registerUser(String username) {
+    String loggerPrefix = getLoggerPrefix("registerUser", username );
+    List<UserRepresentation> existingUser = getKeycloakRealmInstance().users().search(username, true);
+    if ( ! existingUser.isEmpty())
+      return new ServiceResult<>(true, null, existingUser.get(0).getUsername());
+    else {
+      UserRepresentation userRepresentation = new UserRepresentation();
+      userRepresentation.setUsername(username);
+
+      userRepresentation.setEmail(username);
+      userRepresentation.setEmailVerified(false);
+      Response response = getKeycloakRealmInstance().users().create(userRepresentation);
+
+      if (response.getStatus() == 201) {
+        String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
+        response.close();
+        return new ServiceResult<>(true, null, username);
+      } else {
+        ErrorRepresentation error = response.readEntity(ErrorRepresentation.class);
+        response.close();
+        logger().warn(loggerPrefix + "User '" + username + "' not created : "
+            + error.getErrorMessage());
+        return new ServiceResult<>(false, "User not created : " + error.getErrorMessage(), null);
+      }
+    }
+  }
   public ServiceResult<SecurityKeycloakUser> saveUser(SaveQuery<SecurityKeycloakUser> query) {
     String loggerPrefix = getLoggerPrefix("saveUser");
 

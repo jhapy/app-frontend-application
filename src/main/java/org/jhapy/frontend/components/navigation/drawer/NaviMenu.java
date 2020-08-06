@@ -74,6 +74,20 @@ public class NaviMenu extends Div {
     return item;
   }
 
+  public NaviItem addNaviItem(NaviItem parent, Image image, String text,
+      Class<? extends Component> navigationTarget) {
+    NaviItem item = new NaviItem(image, text, navigationTarget);
+    addNaviItem(parent, item);
+    return item;
+  }
+
+  public NaviItem addNaviItem(NaviItem parent, VaadinIcon icon, String text,
+      Class<? extends Component> navigationTarget) {
+    NaviItem item = new NaviItem(icon, text, navigationTarget);
+    addNaviItem(parent, item);
+    return item;
+  }
+
   public NaviItem addNaviItem(NaviItem parent, String text,
       Class<? extends Component> navigationTarget) {
     NaviItem item = new NaviItem(text, navigationTarget);

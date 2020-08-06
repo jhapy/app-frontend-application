@@ -43,7 +43,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.jhapy.dto.serviceQuery.ServiceResult;
+import org.jhapy.dto.serviceQuery.generic.GetByStrIdQuery;
 import org.jhapy.dto.utils.StoredFile;
+import org.jhapy.frontend.client.BaseServices;
+import org.jhapy.frontend.client.ResourceService;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.ListItem;
 import org.jhapy.frontend.components.PdfViewer;
@@ -143,7 +147,20 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
           if (item != null && item.getId() != null) {
             StreamResource streamResource = new StreamResource(
                 item.getFilename(),
-                () -> new ByteArrayInputStream(item.getContent()));
+                () -> {
+                  if ( item.getContent() != null )
+                    return new ByteArrayInputStream(item.getContent());
+                  else {
+                    ServiceResult<StoredFile> _storedFile = BaseServices.getResourceService().getById(new GetByStrIdQuery(item.getId()));
+                    if ( _storedFile.getIsSuccess() && _storedFile.getData() != null ) {
+                      item.setContent(_storedFile.getData().getContent());
+                      item.setOrginalContent( _storedFile.getData().getOrginalContent());
+                      return new ByteArrayInputStream(item.getContent());
+                    } else {
+                      return null;
+                    }
+                  }
+                });
 
             if (item.getMimeType().equals("application/pdf")) {
 

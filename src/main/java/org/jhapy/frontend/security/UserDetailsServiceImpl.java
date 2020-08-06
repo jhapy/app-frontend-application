@@ -38,8 +38,8 @@ import org.springframework.stereotype.Service;
  * @version 1.0
  * @since 2019-03-26
  */
-@Service
-@Primary
+//@Service
+//@Primary
 public class UserDetailsServiceImpl implements UserDetailsService {
 
   private final SecurityUserService securityUserService;

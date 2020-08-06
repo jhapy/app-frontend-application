@@ -71,6 +71,17 @@ public @interface AuthorizedFeignClient {
   Class<?> fallback() default void.class;
 
   /**
+   * Define a fallback factory for the specified Feign client interface. The fallback
+   * factory must produce instances of fallback classes that implement the interface
+   * annotated by {@link FeignClient}. The fallback factory must be a valid spring bean.
+   *
+   * @see feign.hystrix.FallbackFactory for details.
+   * @return fallback factory for the specified Feign client interface
+   */
+  Class<?> fallbackFactory() default void.class;
+
+
+  /**
    * Path prefix to be used by all method-level mappings. Can be used with or without {@code
    *
    * @return the path prefix to be used by all method-level mappings.

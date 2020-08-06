@@ -47,6 +47,8 @@ public class NaviItem extends Div {
   private final List<NaviItem> subItems;
   private boolean subItemsVisible;
 
+  private Object relatedObject;
+
   public NaviItem(VaadinIcon icon, String text, Class<? extends Component> navigationTarget) {
     this(text, navigationTarget);
     link.getElement().insertChild(0, new Icon(icon).getElement());
@@ -176,6 +178,14 @@ public class NaviItem extends Div {
 
   public String getText() {
     return text;
+  }
+
+  public Object getRelatedObject() {
+    return relatedObject;
+  }
+
+  public void setRelatedObject(Object relatedObject) {
+    this.relatedObject = relatedObject;
   }
 
   @Override

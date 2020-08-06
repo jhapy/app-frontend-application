@@ -27,6 +27,8 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView2;
+import org.jhapy.frontend.views.JHapyMainView3;
 
 /**
  * A view frame that establishes app design guidelines. It consists of four parts:
@@ -112,7 +114,7 @@ public class SplitViewFrame extends Composite<Div> implements HasStyle {
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    JHapyMainView.get().getAppBar().reset();
+   JHapyMainView3.get().getAppBar().reset();
   }
 
   public enum Position {

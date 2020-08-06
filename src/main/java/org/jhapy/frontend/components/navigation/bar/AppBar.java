@@ -183,12 +183,11 @@ public class AppBar extends FlexBoxLayout {
 
       ContextMenu contextMenu = new ContextMenu(avatar);
       contextMenu.setOpenOnClick(true);
-      contextMenu.addItem(currentUserLogin.orElse("N/A"));
-      if (VaadinSession.getCurrent().getAttribute(BaseUser.class) != null) {
-        contextMenu.addItem("Settings",
-            e -> getUI().get()
-                .navigate(JHapyMainView.get().getUserSettingsView(), Long.valueOf(-1)));
-      }
+      //contextMenu.addItem(currentUserLogin.orElse("N/A"));
+      Anchor userSettingsAnchor = new Anchor("http://onlineplantumleditor-keycloak:9080/auth/realms/onlinePlantUmlEditor/account",currentUserLogin.get());
+      userSettingsAnchor.setTarget("_blank");
+      contextMenu.add(userSettingsAnchor);
+
       contextMenu.addItem(new Anchor("logout", "Log Out"));
     }
   }

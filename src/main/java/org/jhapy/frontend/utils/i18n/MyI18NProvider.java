@@ -207,7 +207,7 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
     }
 
     ElementTrl element = elementMap.get(name);
-    String altName = "baseEntity" + name.substring(name.indexOf('.'));
+    String altName = "baseEntity" + name.substring(name.indexOf('.') == -1 ? 0 : name.indexOf('.'));
     if (element == null) {
       element = elementMap.get(altName);
     }

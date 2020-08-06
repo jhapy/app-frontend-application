@@ -25,6 +25,7 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 
 /**
  * A view frame that establishes app design guidelines. It consists of three parts:
@@ -83,8 +84,8 @@ public class ViewFrame extends Composite<Div> implements HasStyle {
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    if (JHapyMainView.get() != null) {
-      JHapyMainView.get().getAppBar().reset();
+    if (JHapyMainView3.get() != null) {
+      JHapyMainView3.get().getAppBar().reset();
     }
   }
 }

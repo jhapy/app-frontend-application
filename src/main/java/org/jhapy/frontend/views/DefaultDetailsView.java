@@ -22,6 +22,7 @@ import ch.carnet.kasparscherrer.EmptyFormLayoutItem;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
@@ -40,6 +41,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.claspina.confirmdialog.ButtonOption;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -112,10 +114,24 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   }
 
   protected void initHeader() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
     appBar.getContextIcon().addClickListener(event -> goBack());
     appBar.setTitle(getTitle(currentEditing));
+  }
+
+  protected void checkForDetailsChanges(Runnable action) {
+    if (currentEditing != null && this.binder.hasChanges()) {
+      org.claspina.confirmdialog.ConfirmDialog.createQuestion()
+          .withCaption(getTranslation("element.global.unsavedChanged.title"))
+          .withMessage(getTranslation("message.global.unsavedChanged"))
+          .withOkButton(() -> action.run(), ButtonOption.focus(),
+              ButtonOption.caption(getTranslation("action.global.yes")))
+          .withCancelButton(ButtonOption.caption(getTranslation("action.global.no")))
+          .open();
+    } else {
+      action.run();
+    }
   }
 
   protected abstract String getTitle(T entity);
@@ -209,6 +225,8 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     TextField id = new TextField();
     id.setWidthFull();
 
+    Checkbox isActive = new Checkbox();
+
     TextField created = new TextField();
     created.setWidthFull();
 
@@ -232,7 +250,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
             FormLayout.ResponsiveStep.LabelsPosition.TOP));
 
     auditForm.addFormItem(id, getTranslation("element.baseEntity.id"));
-    auditForm.add(new EmptyFormLayoutItem());
+    auditForm.addFormItem(isActive, getTranslation("element.baseEntity.isActive"));
     auditForm.addFormItem(created, getTranslation("element.baseEntity.created"));
     auditForm.addFormItem(updated, getTranslation("element.baseEntity.updated"));
     auditForm.addFormItem(createdBy, getTranslation("element.baseEntity.createdBy"));
@@ -241,6 +259,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     binder.bind(id, entity1 -> entity1.getId() == null ? null :
             entity1.getId().toString(),
         null);
+    binder.bind(isActive, BaseEntity::getIsActive, BaseEntity::setIsActive);
     binder.bind(created, entity1 -> entity1.getCreated() == null ? ""
         : DateTimeFormatter.format(entity1.getCreated()), (a, b) -> {
     });

@@ -32,6 +32,7 @@ import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
 import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
 import org.jhapy.frontend.security.SecurityUtils;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -143,6 +144,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .disable()
         .authorizeRequests()
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+        .antMatchers("/places").permitAll()
         .antMatchers("/api/auth-info").permitAll()
         .antMatchers("/api/**").authenticated()
         .antMatchers("/management/health").permitAll()
@@ -192,7 +194,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         // I don't want a page with different clients as login options
         // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
         // plus the configured realm as immediate redirect to Keycloak
-        .loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
+        .loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);  /*.successHandler((httpServletRequest, httpServletResponse, authentication) -> {
+      String loggerPrefix = getLoggerPrefix("successHandler");
+          logger().debug(loggerPrefix+"Success login");
+          // JHapyMainView3.get().afterLogin();
+    });*/
   }
 
   Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
@@ -236,7 +242,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
     return new KeycloakLogoutHandler(new RestTemplate());
   }
 
-  /*
+/*
   @Override
   public void configure(HttpSecurity http) throws Exception {
       // @formatter:off

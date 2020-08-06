@@ -19,9 +19,12 @@
 package org.jhapy.frontend.views;
 
 import ch.carnet.kasparscherrer.EmptyFormLayoutItem;
+import com.github.appreciated.app.layout.component.applayout.AppLayout;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -78,7 +81,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   protected DetailsDrawerHeader detailsDrawerHeader;
   protected DetailsDrawerFooter detailsDrawerFooter;
   protected Binder<T> binder;
-  private T currentEditing;
+  protected T currentEditing;
   private final Class<T> entityType;
   private final Function<T, ServiceResult<T>> saveHandler;
   private final Consumer<T> deleteHandler;
@@ -155,7 +158,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   }
 
   protected void initHeader() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(NaviMode.MENU);
 
     initSearchBar();
@@ -189,7 +192,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   }
 
   protected void initSearchBar() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
     appBar.addSearchListener(event -> filter((String) event.getValue()));
@@ -330,6 +333,8 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     TextField id = new TextField();
     id.setWidth("100%");
 
+    Checkbox isActive = new Checkbox();
+
     TextField created = new TextField();
     created.setWidth("100%");
 
@@ -353,7 +358,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
             FormLayout.ResponsiveStep.LabelsPosition.TOP));
 
     auditForm.addFormItem(id, getTranslation("element.baseEntity.id"));
-    auditForm.add(new EmptyFormLayoutItem());
+    auditForm.addFormItem(isActive, getTranslation("element.baseEntity.isActive"));
     auditForm.addFormItem(created, getTranslation("element.baseEntity.created"));
     auditForm.addFormItem(updated, getTranslation("element.baseEntity.updated"));
     auditForm.addFormItem(createdBy, getTranslation("element.baseEntity.createdBy"));
@@ -362,6 +367,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     binder.bind(id, entity1 -> entity1.getId() == null ? null :
             entity1.getId().toString(),
         null);
+    binder.bind(isActive, BaseEntity::getIsActive, BaseEntity::setIsActive);
     binder.bind(created, entity1 -> entity1.getCreated() == null ? ""
         : DateTimeFormatter.format(entity1.getCreated()), (a, b) -> {
     });
@@ -465,6 +471,6 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     dataProvider
         .setFilter((F) new DefaultFilter(
             StringUtils.isBlank(filter) ? null : filter,
-            Boolean.TRUE));
+            null));
   }
 }

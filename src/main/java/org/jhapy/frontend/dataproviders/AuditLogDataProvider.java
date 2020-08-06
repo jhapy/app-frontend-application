@@ -91,6 +91,6 @@ public class AuditLogDataProvider extends
   public static class AuditLogFilter extends DefaultFilter {
 
     private String className = null;
-    private Long recordId = null;
+    private String recordId = null;
   }
 }

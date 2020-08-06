@@ -38,6 +38,8 @@ import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
@@ -45,7 +47,7 @@ import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
-import org.jhapy.frontend.components.navigation.drawer.NaviDrawer;
+import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
 import org.jhapy.frontend.components.navigation.drawer.NaviItem;
 import org.jhapy.frontend.components.navigation.drawer.NaviMenu;
 import org.jhapy.frontend.security.SecurityUtils;
@@ -72,7 +74,10 @@ import org.jhapy.frontend.views.admin.security.SecurityKeycloakGroupsView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakRolesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakUsersView;
 import org.jhapy.frontend.views.login.LoginView;
+import org.jhapy.frontend.views.menu.MenuData;
+import org.jhapy.frontend.views.menu.MenuEntry;
 import org.springframework.core.env.Environment;
+import org.vaadin.tatu.Tree;
 
 @CssImport(value = "./styles/components/charts.css", themeFor = "vaadin-chart", include = "vaadin-chart-default-theme")
 @CssImport(value = "./styles/components/floating-action-button.css", themeFor = "vaadin-button")
@@ -88,7 +93,7 @@ import org.springframework.core.env.Environment;
 @CssImport(value = "./styles/styles.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge")
 @Push
-public abstract class JHapyMainView extends FlexBoxLayout
+public abstract class JHapyMainView3 extends FlexBoxLayout
     implements RouterLayout, PageConfigurator, AfterNavigationObserver, HasLogger {
 
   private static final String CLASS_NAME = "root";
@@ -96,7 +101,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
   protected FlexBoxLayout viewContainer;
   private Div appHeaderOuter;
   private FlexBoxLayout row;
-  private NaviDrawer naviDrawer;
+  private NaviDrawerWithTreeMenu naviDrawer;
   private FlexBoxLayout column;
   private Div appHeaderInner;
   private Div appFooterInner;
@@ -105,7 +110,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
 
   private AppBar appBar;
 
-  public JHapyMainView(Environment environment) {
+  public JHapyMainView3(Environment environment) {
     VaadinSession.getCurrent()
         .setErrorHandler((ErrorHandler) errorEvent -> {
           logger().error("Uncaught UI exception",
@@ -136,6 +141,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
 
     // Populate the navigation drawer
     initNaviItems();
+    postNaviItems(naviDrawer.getMenuComponent());
 
     // Configure the headers and footers (optional)
     initHeadersAndFooters();
@@ -143,7 +149,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
     getElement().appendChild(new AppCookieConsent().getElement());
   }
 
-  public static JHapyMainView3   get() {
+  public static JHapyMainView3 get() {
     return (JHapyMainView3) UI.getCurrent().getChildren()
         .filter(component -> RouterLayout.class.isAssignableFrom(component.getClass()))
         .findFirst().orElse(null);
@@ -171,7 +177,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
    * Initialise the required components and containers.
    */
   private void initStructure(boolean showSearchMenu, String version, String environnement) {
-    naviDrawer = new NaviDrawer(showSearchMenu, version, environnement);
+    naviDrawer = new NaviDrawerWithTreeMenu(showSearchMenu, version, environnement);
 
     viewContainer = new FlexBoxLayout();
     viewContainer.addClassName(CLASS_NAME + "__view-container");
@@ -196,9 +202,20 @@ public abstract class JHapyMainView extends FlexBoxLayout
   }
 
   public void rebuildNaviItems(boolean resetAppBar) {
-    naviDrawer.getMenu().removeAll();
+    List<MenuEntry> expandedMenus = new ArrayList<>();
+
+    naviDrawer.getMenu().getMenuList().forEach( menuEntry -> {
+    if ( naviDrawer.getMenuComponent().isExpanded(menuEntry) ) {
+      expandedMenus.add( menuEntry);
+    }}
+        );
+
+   // naviDrawer.refreshMenu();
+
     naviDrawer.toogleSearch();
     initNaviItems();
+
+    UI.getCurrent().access(() -> naviDrawer.getMenuComponent().expand( expandedMenus ));
 
     if (resetAppBar) {
       appBar.reset();
@@ -206,67 +223,42 @@ public abstract class JHapyMainView extends FlexBoxLayout
     }
   }
 
-  protected void addToMainMenu(NaviMenu mainMenu) {
+  protected void addToMainMenu(MenuData menuData) {
   }
 
-  protected void addToSettingsMenu(NaviMenu mainMenu, NaviItem settingMenu) {
+  protected void addToSettingsMenu(MenuData menuData, MenuEntry settingMenu) {
   }
 
   protected boolean hasSettingsMenuEntries() {
     return false;
   }
 
-  protected void addToReferencesMenu(NaviMenu mainMenu, NaviItem referenceMenu) {
+  protected void addToReferencesMenu(MenuEntry referenceMenu) {
   }
 
   protected boolean hasReferencesMenuEntries() {
     return false;
   }
 
-  protected void addToSecurityMenu(NaviMenu mainMenu, NaviItem referenceMenu) {
+  protected void addToSecurityMenu(MenuEntry securityMenu) {
   }
 
   protected boolean hasSecurityMenuEntries() {
     return false;
   }
 
+  protected void postNaviItems(Tree<MenuEntry> menu) {
+
+  }
   /**
    * Initialise the navigation items.
    */
   private void initNaviItems() {
     UI currentUI = UI.getCurrent();
 
-    SecurityUser currentUser = SecurityUtils.getSecurityUser();
-    if (currentUser != null && currentUser.getDefaultLocale() != null) {
-      if (!UI.getCurrent().getLocale().getLanguage()
-          .equals(currentUser.getDefaultLocale().getLanguage())) {
-        confirmDialog.setHeader(getTranslation("element.title.confirmLocalChange"));
-        confirmDialog.setText(
-            getTranslation("message.confirmLocalChange.message") + "Current = " + UI.getCurrent()
-                .getLocale().getDisplayLanguage() + ", Settings = " + currentUser.getDefaultLocale()
-                .getDisplayLanguage());
-        confirmDialog.setConfirmButton(getTranslation("action.localChange.confirm"), event -> {
-          Locale newLocale = currentUser.getDefaultLocale();
-          UI.getCurrent().setLocale(newLocale);
-          UI.getCurrent().getSession().setLocale(newLocale);
-          confirmDialog.close();
-          UI.getCurrent().getPage().executeJs("location.reload();");
-        });
-        confirmDialog.setCancelButton(getTranslation("action.localChange.cancel"),
-            event -> confirmDialog.close());
+    MenuData menuData = naviDrawer.getFreshMenu();
 
-        confirmDialog.open();
-      }
-    }
-
-    NaviMenu menu = naviDrawer.getMenu();
-    if (!SecurityUtils.isUserLoggedIn()) {
-      menu.addNaviItem(VaadinIcon.CONNECT,
-          currentUI.getTranslation(AppConst.TITLE_LOGIN, currentUI.getLocale()),
-          LoginView.class);
-    }
-
-    addToMainMenu(menu);
+    addToMainMenu(menuData);
 
     if (SecurityUtils.isUserLoggedIn()) {
 
@@ -280,12 +272,13 @@ public abstract class JHapyMainView extends FlexBoxLayout
           SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
       if (isSettingsDisplayed) {
-        NaviItem settingsMenu = menu.addNaviItem(VaadinIcon.EDIT,
-            currentUI.getTranslation(AppConst.TITLE_SETTINGS, currentUI.getLocale()),
-            null);
+        MenuEntry settingsSubMenu = new MenuEntry();
+        settingsSubMenu.setIcon(VaadinIcon.EDIT);
+        settingsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SETTINGS));
 
-        addToSettingsMenu(menu, settingsMenu);
+        addToSettingsMenu(menuData, settingsSubMenu);
 
+        menuData.addMenuEntry( settingsSubMenu );
         /*
          * i18N
          */
@@ -297,27 +290,41 @@ public abstract class JHapyMainView extends FlexBoxLayout
         }
 
         if (isDisplayI18n) {
-          NaviItem i18nSubmenu = menu
-              .addNaviItem(settingsMenu,
-                  currentUI.getTranslation(AppConst.TITLE_I18N, currentUI.getLocale()),
-                  null);
+          MenuEntry i18nSubmenu = new MenuEntry();
+          i18nSubmenu.setIcon(VaadinIcon.SITEMAP);
+          i18nSubmenu.setTitle(currentUI.getTranslation(AppConst.TITLE_I18N));
+          i18nSubmenu.setParentMenuEntry(settingsSubMenu);
+
+          menuData.addMenuEntry(i18nSubmenu);
 
           if (SecurityUtils.isAccessGranted(ActionsView.class)) {
-            menu.addNaviItem(i18nSubmenu,
-                currentUI.getTranslation(AppConst.TITLE_ACTIONS, currentUI.getLocale()),
-                ActionsView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ACTIONS));
+            subMenu.setTargetClass(ActionsView.class);
+            subMenu.setParentMenuEntry(i18nSubmenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(ElementsView.class)) {
-            menu.addNaviItem(i18nSubmenu,
-                currentUI.getTranslation(AppConst.TITLE_ELEMENTS, currentUI.getLocale()),
-                ElementsView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ELEMENTS));
+            subMenu.setTargetClass(ElementsView.class);
+            subMenu.setParentMenuEntry(i18nSubmenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(MessagesView.class)) {
-            menu.addNaviItem(i18nSubmenu,
-                currentUI.getTranslation(AppConst.TITLE_MESSAGES, currentUI.getLocale()),
-                MessagesView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MESSAGES));
+            subMenu.setTargetClass(MessagesView.class);
+            subMenu.setParentMenuEntry(i18nSubmenu);
+
+            menuData.addMenuEntry(subMenu);
           }
         }
 
@@ -328,11 +335,14 @@ public abstract class JHapyMainView extends FlexBoxLayout
             SecurityUtils.isAccessGranted(CountriesView.class);
 
         if (isReferenceMenuDisplay) {
-          NaviItem referenceSubMenu = menu.addNaviItem(settingsMenu,
-              currentUI.getTranslation(AppConst.TITLE_REFERENCES, currentUI.getLocale()), null);
+          MenuEntry referenceSubMenu = new MenuEntry();
+          referenceSubMenu.setIcon(VaadinIcon.SITEMAP);
+          referenceSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_REFERENCES));
+          referenceSubMenu.setParentMenuEntry(settingsSubMenu);
 
-          addToReferencesMenu(menu, referenceSubMenu);
+          menuData.addMenuEntry(referenceSubMenu);
 
+          /*
           boolean isDisplayReference = false;
           if (SecurityUtils.isAccessGranted(CountriesView.class)) {
             isDisplayReference = true;
@@ -341,11 +351,16 @@ public abstract class JHapyMainView extends FlexBoxLayout
           if (isDisplayReference) {
 
             if (SecurityUtils.isAccessGranted(CountriesView.class)) {
-              menu.addNaviItem(referenceSubMenu,
-                  currentUI.getTranslation(AppConst.TITLE_COUNTRIES, currentUI.getLocale()),
-                  CountriesView.class);
+              MenuEntry subMenu = new MenuEntry();
+              subMenu.setIcon(VaadinIcon.QUESTION);
+              subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_COUNTRIES));
+              subMenu.setTargetClass(CountriesView.class);
+              subMenu.setParentMenuEntry(referenceSubMenu);
+
+              menuData.addMenuEntry(subMenu);
             }
           }
+           */
         }
         /*
          * Notification
@@ -359,35 +374,51 @@ public abstract class JHapyMainView extends FlexBoxLayout
         }
 
         if (isDisplayNotifications) {
-          NaviItem notificationsSubMenu = menu
-              .addNaviItem(settingsMenu,
-                  currentUI
-                      .getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN, currentUI.getLocale()),
-                  null);
+          MenuEntry notificationsSubMenu = new MenuEntry();
+          notificationsSubMenu.setIcon(VaadinIcon.SITEMAP);
+          notificationsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
+          notificationsSubMenu.setParentMenuEntry(settingsSubMenu);
+
+          menuData.addMenuEntry(notificationsSubMenu);
 
           if (SecurityUtils.isAccessGranted(MailTemplatesAdminView.class)) {
-            menu.addNaviItem(notificationsSubMenu,
-                currentUI
-                    .getTranslation(AppConst.TITLE_MAIL_TEMPLATES_ADMIN, currentUI.getLocale()),
-                MailTemplatesAdminView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAIL_TEMPLATES_ADMIN));
+            subMenu.setTargetClass(MailTemplatesAdminView.class);
+            subMenu.setParentMenuEntry(notificationsSubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class)) {
-            menu.addNaviItem(notificationsSubMenu,
-                currentUI.getTranslation(AppConst.TITLE_SMS_TEMPLATES_ADMIN, currentUI.getLocale()),
-                SmsTemplatesAdminView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS_TEMPLATES_ADMIN));
+            subMenu.setTargetClass(SmsTemplatesAdminView.class);
+            subMenu.setParentMenuEntry(notificationsSubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SmsAdminView.class)) {
-            menu.addNaviItem(notificationsSubMenu,
-                currentUI.getTranslation(AppConst.TITLE_SMS, currentUI.getLocale()),
-                SmsAdminView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS));
+            subMenu.setTargetClass(SmsAdminView.class);
+            subMenu.setParentMenuEntry(notificationsSubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(MailAdminView.class)) {
-            menu.addNaviItem(notificationsSubMenu,
-                currentUI.getTranslation(AppConst.TITLE_MAILS, currentUI.getLocale()),
-                MailAdminView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAILS));
+            subMenu.setTargetClass(MailAdminView.class);
+            subMenu.setParentMenuEntry(notificationsSubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
         }
         /*
@@ -399,54 +430,87 @@ public abstract class JHapyMainView extends FlexBoxLayout
             SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
         if (isDisplaySecurity) {
-          NaviItem securitySubMenu = menu.addNaviItem(settingsMenu,
-              currentUI.getTranslation(AppConst.TITLE_SECURITY, currentUI.getLocale()), null);
+          MenuEntry securitySubMenu = new MenuEntry();
+          securitySubMenu.setIcon(VaadinIcon.KEY);
+          securitySubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY));
+          securitySubMenu.setParentMenuEntry(settingsSubMenu);
+
+          menuData.addMenuEntry(securitySubMenu);
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class)) {
-            menu.addNaviItem(securitySubMenu,
-                currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS, currentUI.getLocale()),
-                SecurityKeycloakUsersView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS));
+            subMenu.setTargetClass(SecurityKeycloakUsersView.class);
+            subMenu.setParentMenuEntry(securitySubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class)) {
-            menu.addNaviItem(securitySubMenu,
-                currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES, currentUI.getLocale()),
-                SecurityKeycloakRolesView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES));
+            subMenu.setTargetClass(SecurityKeycloakRolesView.class);
+            subMenu.setParentMenuEntry(securitySubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class)) {
-            menu.addNaviItem(securitySubMenu,
-                currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS, currentUI.getLocale()),
-                SecurityKeycloakGroupsView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS));
+            subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
+            subMenu.setParentMenuEntry(securitySubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SessionView.class)) {
-            menu.addNaviItem(securitySubMenu,
-                currentUI.getTranslation(AppConst.TITLE_SESSIONS_ADMIN, currentUI.getLocale()),
-                SessionView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SESSIONS_ADMIN));
+            subMenu.setTargetClass(SessionView.class);
+            subMenu.setParentMenuEntry(securitySubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
 
-          addToSecurityMenu(menu, securitySubMenu);
+          addToSecurityMenu( securitySubMenu);
         }
         boolean isDisplayMonitoring =
             SecurityUtils.isAccessGranted(EurekaView.class) ||
                 SecurityUtils.isAccessGranted(CloudConfigView.class);
         if (isDisplayMonitoring) {
-          NaviItem monitoringSubMenu = menu.addNaviItem(settingsMenu,
-              currentUI.getTranslation(AppConst.TITLE_MONITORING, currentUI.getLocale()), null);
+          MenuEntry monitoringSubMenu = new MenuEntry();
+          monitoringSubMenu.setIcon(VaadinIcon.GLASSES);
+          monitoringSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MONITORING));
+          monitoringSubMenu.setParentMenuEntry(settingsSubMenu);
+
+          menuData.addMenuEntry(monitoringSubMenu);
 
           if (SecurityUtils.isAccessGranted(EurekaView.class)) {
-            menu.addNaviItem(monitoringSubMenu,
-                currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN, currentUI.getLocale()),
-                EurekaView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN));
+            subMenu.setTargetClass(EurekaView.class);
+            subMenu.setParentMenuEntry(monitoringSubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
           if (SecurityUtils.isAccessGranted(CloudConfigView.class)) {
-            menu.addNaviItem(monitoringSubMenu,
-                currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN, currentUI.getLocale()),
-                CloudConfigView.class);
+            MenuEntry subMenu = new MenuEntry();
+            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN));
+            subMenu.setTargetClass(CloudConfigView.class);
+            subMenu.setParentMenuEntry(monitoringSubMenu);
+
+            menuData.addMenuEntry(subMenu);
           }
         }
       }
+      naviDrawer.refreshMenu();
     }
   }
 
@@ -517,7 +581,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
         "256x256");
   }
 
-  public NaviDrawer getNaviDrawer() {
+  public NaviDrawerWithTreeMenu getNaviDrawer() {
     return naviDrawer;
   }
 
@@ -572,17 +636,15 @@ public abstract class JHapyMainView extends FlexBoxLayout
 
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
-    NaviItem active = getActiveItem(event);
+    MenuEntry active = getActiveItem(event);
     if (active != null) {
-      getAppBar().setTitle(active.getText());
+      getAppBar().setTitle(active.getTitle());
     }
   }
 
-  private NaviItem getActiveItem(AfterNavigationEvent e) {
-    for (NaviItem item : naviDrawer.getMenu().getNaviItems()) {
-      if (item.isHighlighted(e)) {
-        return item;
-      }
+  private MenuEntry getActiveItem(AfterNavigationEvent e) {
+    for (MenuEntry item : naviDrawer.getMenuComponent().getSelectedItems()) {
+      return item;
     }
     return null;
   }

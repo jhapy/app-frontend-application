@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-04-21
  */
-@FeignClient(name = "${jhapy.remote-services.registry-server.name:null}", url = "${jhapy.remote-services.registry-server.url:}", path = "/api/eureka", fallback = EurekaServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.registry-server.name:null}", url = "${jhapy.remote-services.registry-server.url:}", path = "/api/eureka", fallbackFactory = EurekaServiceFallback.class)
 @Primary
 public interface EurekaService {
 
