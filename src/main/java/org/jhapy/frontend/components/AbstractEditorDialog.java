@@ -93,7 +93,7 @@ public abstract class AbstractEditorDialog<T extends Serializable>
 
   private void initFormLayout() {
     formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1),
-        new FormLayout.ResponsiveStep("25em", 2));
+        new FormLayout.ResponsiveStep("26em", 2));
     Div div = new Div(formLayout);
     div.addClassName("has-padding");
     add(div);

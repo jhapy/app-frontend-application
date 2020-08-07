@@ -115,7 +115,7 @@ public class MailAdminView extends DefaultMasterDetailsView<Mail, DefaultFilter>
     editingForm.setResponsiveSteps(
         new FormLayout.ResponsiveStep("0", 1,
             FormLayout.ResponsiveStep.LabelsPosition.TOP),
-        new FormLayout.ResponsiveStep("21em", 2,
+        new FormLayout.ResponsiveStep("26em", 2,
             FormLayout.ResponsiveStep.LabelsPosition.TOP));
     FormLayout.FormItem fromFieldItem = editingForm
         .addFormItem(fromField, getTranslation("element." + I18N_PREFIX + "from"));

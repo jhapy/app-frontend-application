@@ -121,7 +121,7 @@ public class SmsTemplateAdminView extends ViewFrame implements RouterLayout, Has
     formLayout.addClassNames(LumoStyles.Padding.Bottom.L,
         LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
     formLayout.setResponsiveSteps(
-        new ResponsiveStep("25em", 1,
+        new ResponsiveStep("26em", 1,
             ResponsiveStep.LabelsPosition.TOP),
         new ResponsiveStep("32em", 2,
             ResponsiveStep.LabelsPosition.TOP));
