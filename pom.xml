@@ -125,7 +125,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-activemq</artifactId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.retry</groupId>
@@ -301,8 +301,8 @@
       <version>4.0.0.rc5</version>
     </dependency>
     <dependency>
-      <groupId>org.vaadin.tatu</groupId>
-      <artifactId>tree</artifactId>
+      <groupId>org.jhapy</groupId>
+      <artifactId>tree-flow</artifactId>
       <version>1.1.1</version>
     </dependency>
     <!--dependency>
