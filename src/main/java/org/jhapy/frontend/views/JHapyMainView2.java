@@ -284,7 +284,7 @@ private Tree<MenuEntry> menuTree;
           SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
       if (isSettingsDisplayed) {
-        MenuEntry settingsSubMenu = new MenuEntry();
+        MenuEntry settingsSubMenu = new MenuEntry(AppConst.PAGE_SETTINGS);
         settingsSubMenu.setIcon(VaadinIcon.EDIT);
         settingsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SETTINGS));
 
@@ -302,7 +302,7 @@ private Tree<MenuEntry> menuTree;
         }
 
         if (isDisplayI18n) {
-          MenuEntry i18nSubmenu = new MenuEntry();
+          MenuEntry i18nSubmenu = new MenuEntry(AppConst.PAGE_I18N);
           i18nSubmenu.setIcon(VaadinIcon.SITEMAP);
           i18nSubmenu.setTitle(currentUI.getTranslation(AppConst.TITLE_I18N));
           i18nSubmenu.setParentMenuEntry(settingsSubMenu);
@@ -310,7 +310,7 @@ private Tree<MenuEntry> menuTree;
           menuData.addMenuEntry(i18nSubmenu);
 
           if (SecurityUtils.isAccessGranted(ActionsView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ACTIONS);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ACTIONS));
             subMenu.setTargetClass(ActionsView.class);
@@ -320,7 +320,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(ElementsView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ELEMENTS);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ELEMENTS));
             subMenu.setTargetClass(ElementsView.class);
@@ -330,7 +330,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(MessagesView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MESSAGES);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MESSAGES));
             subMenu.setTargetClass(MessagesView.class);
@@ -346,7 +346,7 @@ private Tree<MenuEntry> menuTree;
         boolean isReferenceMenuDisplay = hasReferencesMenuEntries() || SecurityUtils.isAccessGranted(CountriesView.class);
 
         if (isReferenceMenuDisplay) {
-          MenuEntry referenceSubMenu = new MenuEntry();
+          MenuEntry referenceSubMenu = new MenuEntry(AppConst.PAGE_REFERENCES);
           referenceSubMenu.setIcon(VaadinIcon.SITEMAP);
           referenceSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_REFERENCES));
           referenceSubMenu.setParentMenuEntry(settingsSubMenu);
@@ -361,7 +361,7 @@ private Tree<MenuEntry> menuTree;
           if (isDisplayReference) {
 
             if (SecurityUtils.isAccessGranted(CountriesView.class)) {
-              MenuEntry subMenu = new MenuEntry();
+              MenuEntry subMenu = new MenuEntry(AppConst.PAGE_COUNTRIES);
               subMenu.setIcon(VaadinIcon.QUESTION);
               subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_COUNTRIES));
               subMenu.setTargetClass(CountriesView.class);
@@ -383,7 +383,7 @@ private Tree<MenuEntry> menuTree;
         }
 
         if (isDisplayNotifications) {
-          MenuEntry notificationsSubMenu = new MenuEntry();
+          MenuEntry notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);
           notificationsSubMenu.setIcon(VaadinIcon.SITEMAP);
           notificationsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
           notificationsSubMenu.setParentMenuEntry(settingsSubMenu);
@@ -391,7 +391,7 @@ private Tree<MenuEntry> menuTree;
           menuData.addMenuEntry(notificationsSubMenu);
 
           if (SecurityUtils.isAccessGranted(MailTemplatesAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MAIL_TEMPLATES_ADMIN);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAIL_TEMPLATES_ADMIN));
             subMenu.setTargetClass(MailTemplatesAdminView.class);
@@ -401,7 +401,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SMS_TEMPLATES_ADMIN);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS_TEMPLATES_ADMIN));
             subMenu.setTargetClass(SmsTemplatesAdminView.class);
@@ -411,7 +411,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(SmsAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SMS_ADMIN);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS));
             subMenu.setTargetClass(SmsAdminView.class);
@@ -421,7 +421,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(MailAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MAILS_ADMIN);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAILS));
             subMenu.setTargetClass(MailAdminView.class);
@@ -439,7 +439,7 @@ private Tree<MenuEntry> menuTree;
             SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
         if (isDisplaySecurity) {
-          MenuEntry securitySubMenu = new MenuEntry();
+          MenuEntry securitySubMenu = new MenuEntry(AppConst.PAGE_SECURITY);
           securitySubMenu.setIcon(VaadinIcon.KEY);
           securitySubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY));
           securitySubMenu.setParentMenuEntry(settingsSubMenu);
@@ -447,7 +447,7 @@ private Tree<MenuEntry> menuTree;
           menuData.addMenuEntry(securitySubMenu);
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_USERS);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS));
             subMenu.setTargetClass(SecurityKeycloakUsersView.class);
@@ -457,7 +457,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ROLES);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES));
             subMenu.setTargetClass(SecurityKeycloakRolesView.class);
@@ -467,7 +467,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_GROUPS);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS));
             subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
@@ -477,7 +477,7 @@ private Tree<MenuEntry> menuTree;
           }
 
           if (SecurityUtils.isAccessGranted(SessionView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SESSIONS);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SESSIONS_ADMIN));
             subMenu.setTargetClass(SessionView.class);
@@ -492,7 +492,7 @@ private Tree<MenuEntry> menuTree;
             SecurityUtils.isAccessGranted(EurekaView.class) ||
                 SecurityUtils.isAccessGranted(CloudConfigView.class);
         if (isDisplayMonitoring) {
-          MenuEntry monitoringSubMenu = new MenuEntry();
+          MenuEntry monitoringSubMenu = new MenuEntry(AppConst.PAGE_MONITORING);
           monitoringSubMenu.setIcon(VaadinIcon.GLASSES);
           monitoringSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MONITORING));
           monitoringSubMenu.setParentMenuEntry(settingsSubMenu);
@@ -500,7 +500,7 @@ private Tree<MenuEntry> menuTree;
           menuData.addMenuEntry(monitoringSubMenu);
 
           if (SecurityUtils.isAccessGranted(EurekaView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_EUREKA_ADMIN);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN));
             subMenu.setTargetClass(EurekaView.class);
@@ -509,7 +509,7 @@ private Tree<MenuEntry> menuTree;
             menuData.addMenuEntry(subMenu);
           }
           if (SecurityUtils.isAccessGranted(CloudConfigView.class)) {
-            MenuEntry subMenu = new MenuEntry();
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_CLOUD_CONFIG_ADMIN);
             subMenu.setIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN));
             subMenu.setTargetClass(CloudConfigView.class);

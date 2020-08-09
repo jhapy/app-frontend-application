@@ -49,6 +49,8 @@ import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.ResourceService;
 import org.jhapy.frontend.components.FlexBoxLayout;
+import org.jhapy.frontend.components.InputDialog;
+import org.jhapy.frontend.components.InputDialog.FluentButton;
 import org.jhapy.frontend.components.ListItem;
 import org.jhapy.frontend.components.PdfViewer;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
@@ -165,6 +167,7 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
             if (item.getMimeType().equals("application/pdf")) {
 
               PdfViewer viewer = new PdfViewer(streamResource);
+              viewer.setHeight("600px");
               createPopup(item, viewer);
             } else {
               createPopup(item, new Image(streamResource, item.getFilename()));
@@ -189,7 +192,7 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
 
     popup.setFooter(popupFooter);
 
-    popupDialog.setWidth("600px");
+    //popupDialog.setWidth("600px");
 
     popup.setContent(viewer);
 

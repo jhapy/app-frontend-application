@@ -272,6 +272,10 @@ public class AppBar extends FlexBoxLayout {
     updateActionItemsVisibility();
   }
 
+  public boolean hasActionItems() {
+    return actionItems.getComponentCount() > 0;
+  }
+
   public Image getAvatar() {
     return avatar;
   }

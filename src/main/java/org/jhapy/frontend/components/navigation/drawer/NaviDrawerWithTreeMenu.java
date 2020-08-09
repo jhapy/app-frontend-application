@@ -222,20 +222,24 @@ public class NaviDrawerWithTreeMenu extends Div
   }
 
   private void navigate( MenuEntry menuEntry ) {
-    String loggerPrefix = getLoggerPrefix("navigate", menuEntry);
+    String loggerPrefix = getLoggerPrefix("navigate");
 
     if ( menuEntry.getTargetParams() != null ) {
-      logger().debug(loggerPrefix+"Navigate with Target Params " + menuEntry.getTargetParams());
-      UI.getCurrent().navigate(menuEntry.getTargetClass(),  menuEntry.getTargetParams().toString() );
+      logger().debug(loggerPrefix+"Navigate with Target Params" );
+      String params = menuEntry.getTargetParams().toString();
+      logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass()+", Parameter = " + params);
+      UI.getCurrent().navigate(menuEntry.getTargetClass(), params );
     } else
     if ( menuEntry.getTargetId() != null ) {
       logger().debug(loggerPrefix+"Navigate with Target ID");
       String targetId = menuEntry.getTargetId();
 
-        UI.getCurrent().navigate(menuEntry.getTargetClass(), menuEntry.getTargetId());
+      logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass()+", Parameter = " + targetId);
+        UI.getCurrent().navigate(menuEntry.getTargetClass(),targetId);
     }
     else {
       logger().debug(loggerPrefix+"Navigate without Target Params or Target ID");
+      logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass());
       UI.getCurrent().navigate(menuEntry.getTargetClass());
     }
   }

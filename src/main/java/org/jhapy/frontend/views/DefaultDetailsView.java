@@ -25,6 +25,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -72,7 +73,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   protected Binder<T> binder;
   protected T currentEditing;
   private final Class<T> entityType;
-  private final Function<T, ServiceResult<T>> saveHandler;
+  private Function<T, ServiceResult<T>> saveHandler;
   private final Consumer<T> deleteHandler;
   private Tabs tabs;
   private final Class parentViewClassname;
@@ -105,6 +106,9 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     setViewContent(createContent());
   }
 
+  protected void setSaveHandler(Function<T, ServiceResult<T>> saveHandler) {
+    this.saveHandler = saveHandler;
+  }
   protected T getCurrentEditing() {
     return currentEditing;
   }
@@ -146,6 +150,10 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     return content;
   }
 
+  protected Component buildContent() {
+    return new Div();
+  }
+
   protected Tabs buildTabs() {
     Tab details = new Tab(getTranslation("element.title.details"));
     Tab audit = new Tab(getTranslation("element.title.audit"));
@@ -173,10 +181,17 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
     tabs = buildTabs();
 
+    if  ( tabs == null )
+      detailsDrawer.setContent( buildContent());
+    else
     detailsDrawer
         .setContent(createDetails(currentEditing));
 
+    if ( tabs != null )
     detailsDrawerHeader = new DetailsDrawerHeader("", tabs, false, false);
+    else
+      detailsDrawerHeader = new DetailsDrawerHeader("", false, false);
+
     detailsDrawer.setHeader(detailsDrawerHeader);
 
     // Footer
