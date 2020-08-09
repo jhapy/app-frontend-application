@@ -303,7 +303,7 @@
     <dependency>
       <groupId>org.jhapy</groupId>
       <artifactId>tree-flow</artifactId>
-      <version>1.1.1</version>
+      <version>1.1.1-SNAPSHOT</version>
     </dependency>
 
     <!--dependency>
