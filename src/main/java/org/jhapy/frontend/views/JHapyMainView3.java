@@ -36,11 +36,16 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.ErrorHandler;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
+import com.vaadin.flow.server.ServiceInitEvent;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import javax.servlet.http.Cookie;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.utils.StoredFile;
@@ -107,7 +112,6 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private Div appFooterInner;
   private Environment environment;
   private Div appFooterOuter;
-private String currentUser;
   private AppBar appBar;
 
   public JHapyMainView3(Environment environment) {
@@ -120,7 +124,6 @@ private String currentUser;
           }, () -> {
           }));
         });
-    this.currentUser = org.jhapy.commons.security.SecurityUtils.getCurrentUserLogin().get();
 
     afterLogin();
 
@@ -168,13 +171,12 @@ private String currentUser;
     return null;
   }
 
-  protected String getCurrentUser() { return currentUser; }
+  protected String getCurrentUser() { return org.jhapy.commons.security.SecurityUtils.getCurrentUserLogin().get(); }
 
   public void afterLogin() {
     //JHapyMainView.get().rebuildNaviItems();
     //UI.getCurrent().navigate(JHapyMainView.get().getHomePage());
   }
-
 
   /**
    * Initialise the required components and containers.

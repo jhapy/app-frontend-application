@@ -19,6 +19,7 @@
 package org.jhapy.frontend.components.navigation.bar;
 
 
+import ch.carnet.kasparscherrer.LanguageSelect;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasValue;
@@ -26,24 +27,33 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import javax.servlet.http.Cookie;
 import org.apache.tika.Tika;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.mime.MimeTypeException;
@@ -62,7 +72,7 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.views.JHapyMainView;
 
 @CssImport("./styles/components/app-bar.css")
-public class AppBar extends FlexBoxLayout {
+public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
 
   private final String CLASS_NAME = "app-bar";
 
@@ -183,13 +193,42 @@ public class AppBar extends FlexBoxLayout {
 
       ContextMenu contextMenu = new ContextMenu(avatar);
       contextMenu.setOpenOnClick(true);
-      //contextMenu.addItem(currentUserLogin.orElse("N/A"));
+
+      Locale currentLocale = UI.getCurrent().getSession().getLocale();
+      MenuItem languageMenu = contextMenu.addItem(getTranslation("action.settings.language"));
+
+      MenuItem frMenu= languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/fr.png", "French"), new Label("Francais")));
+      MenuItem enMenu = languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/us.png", "US"), new Label("English")));
+
+      frMenu.addClickListener( event -> {
+        enMenu.setChecked(false);
+        setLanguage( Locale.FRENCH);
+      });
+      frMenu.setCheckable(true);
+      frMenu.setChecked(currentLocale.equals(Locale.FRENCH));
+
+      enMenu.addClickListener( event -> {
+        frMenu.setChecked(false);
+        setLanguage( Locale.ENGLISH);
+      });
+      enMenu.setCheckable(true);
+      enMenu.setChecked(currentLocale.equals(Locale.ENGLISH));
+
       Anchor userSettingsAnchor = new Anchor("http://onlineplantumleditor-keycloak:9080/auth/realms/onlinePlantUmlEditor/account",currentUserLogin.get());
       userSettingsAnchor.setTarget("_blank");
-      contextMenu.add(userSettingsAnchor);
-
+      contextMenu.addItem(userSettingsAnchor);
       contextMenu.addItem(new Anchor("logout", "Log Out"));
     }
+  }
+
+  private void setLanguage( Locale language ){
+    UI.getCurrent().getSession().setLocale(language);
+      Cookie languageCookie = new Cookie("PreferredLanguage", language.getLanguage());
+      languageCookie.setMaxAge(31449600);
+      languageCookie.setPath("/");
+      languageCookie.setSecure(true);
+      VaadinService.getCurrentResponse().addCookie(languageCookie);
+    UI.getCurrent().getPage().reload();
   }
 
   private void initActionItems() {
@@ -442,6 +481,11 @@ public class AppBar extends FlexBoxLayout {
 
   public String getSearchString() {
     return search.getValue();
+  }
+
+  @Override
+  public void localeChange(LocaleChangeEvent event) {
+   // getUI().get().getPage().reload();
   }
 
 

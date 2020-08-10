@@ -53,7 +53,7 @@ public class MenuEntry implements Serializable, HasLogger {
     this.targetClass = targetClass;
     //UpNavigationHelper.registerNavigationRoute(targetClass);
     RouteConfiguration configuration = RouteConfiguration.forSessionScope();
-
+/*
     String route = id;
     if ( ! configuration.isPathRegistered(route) )  {
       logger().debug(loggerPrefix+"Register Route : Path = " + route + ", Target = " + targetClass.getSimpleName());
@@ -61,5 +61,6 @@ public class MenuEntry implements Serializable, HasLogger {
     } else {
       //logger().warn(loggerPrefix+"Route already registered : Path = " + route + ", Target = " + targetClass.getSimpleName());
     }
+ */
   }
 }

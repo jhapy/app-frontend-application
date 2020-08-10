@@ -305,7 +305,11 @@
       <artifactId>tree-flow</artifactId>
       <version>1.1.1-SNAPSHOT</version>
     </dependency>
-
+    <dependency>
+      <groupId>ch.carnet.kasparscherrer</groupId>
+      <artifactId>language-select</artifactId>
+      <version>1.0.8</version>
+    </dependency>
     <!--dependency>
       <groupId>org.webjars.bowergithub.polymer</groupId>
       <artifactId>polymer</artifactId>
