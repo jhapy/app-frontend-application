@@ -104,6 +104,7 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
     upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif", "image/tiff",
         "application/pdf");
     upload.setAutoUpload(true);
+    upload.setMaxFileSize(10485760);
     upload.setMaxFiles(10);
 
     upload.addSucceededListener(event -> {

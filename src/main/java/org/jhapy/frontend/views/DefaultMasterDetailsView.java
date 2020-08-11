@@ -439,7 +439,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
           .collect(Collectors.joining(", "));
 
       Notification
-          .show(getTranslation("message.global.validationErrorMessage") + " : " + errorText, 3000,
+          .show(getTranslation("message.global.validationErrorMessage", errorText), 3000,
               Notification.Position.BOTTOM_CENTER);
     }
   }
