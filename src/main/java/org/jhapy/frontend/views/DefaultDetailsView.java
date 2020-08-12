@@ -375,7 +375,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     goBack();
   }
 
-  private void goBack() {
+  protected void goBack() {
     UI.getCurrent().navigate(parentViewClassname);
   }
 }
