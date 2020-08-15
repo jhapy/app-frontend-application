@@ -22,8 +22,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.FormatStyle;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author jHapy Lead Dev.
@@ -32,7 +34,7 @@ import java.util.Date;
  */
 public class DateTimeFormatter {
 
-  public static String formatNoYear(LocalDate localDate) {
+  public static String formatNoYear(LocalDate localDate, Locale currentLocal) {
     if (localDate == null) {
       return "";
     } else {
@@ -40,29 +42,39 @@ public class DateTimeFormatter {
     }
   }
 
-  public static String format(LocalDate localDate) {
+  public static String format(LocalDate localDate, Locale currentLocal) {
     if (localDate == null) {
       return "";
     } else {
-      return localDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.YYYY"));
+      return java.time.format.DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(currentLocal).format(localDate);
     }
   }
 
-  public static String format(LocalDateTime localDateTime) {
+  public static String format(LocalDateTime localDateTime, Locale currentLocal) {
     if (localDateTime == null) {
       return "";
     } else {
-      return localDateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.YYYY HH:mm"));
+      return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,
+          FormatStyle.MEDIUM).withLocale(currentLocal).format(localDateTime);
     }
   }
 
-  public static String format(Instant instant) {
-    return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-        .withZone(ZoneId.systemDefault()).format(instant);
+  public static String format(Instant instant, Locale currentLocal) {
+    if (instant == null) {
+      return "";
+    } else {
+      return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,
+          FormatStyle.MEDIUM).withLocale(currentLocal).format(LocalDateTime
+          .ofInstant(instant, ZoneOffset.systemDefault()));
+    }
   }
 
-  public static String format(Date date) {
-    return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+  public static String format(Date date, Locale currentLocal) {
+    if (date == null) {
+      return "";
+    } else {
+    return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(currentLocal)
         .withZone(ZoneId.systemDefault()).format(date.toInstant());
+    }
   }
 }

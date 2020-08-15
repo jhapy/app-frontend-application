@@ -44,6 +44,7 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -71,7 +72,7 @@ public class SmsTemplatesAdminView extends ViewFrame implements RouterLayout, Ha
   }
 
   private void initHeader() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(NaviMode.MENU);
 
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);

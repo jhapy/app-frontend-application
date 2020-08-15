@@ -29,6 +29,7 @@ import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.core.env.Environment;
 import org.springframework.security.access.annotation.Secured;
 
@@ -76,7 +77,7 @@ public class CloudConfigView extends ViewFrame implements HasLogger {
   }
 
   private void initAppBar() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     configurationTab = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.cloudConfig"));
     encryptionTab = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.encryption"));
 

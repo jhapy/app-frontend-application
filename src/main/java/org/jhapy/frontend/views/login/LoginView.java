@@ -111,6 +111,7 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.access.annotation.Secured;
@@ -139,6 +140,7 @@ public class LoginView extends ViewFrame
 
   public LoginView(AppProperties appProperties, ResourceLoader resourceLoader,
       ObjectMapper jsonObjectMapper) {
+    super();
     this.appProperties = appProperties;
     this.resourceLoader = resourceLoader;
     this.jsonObjectMapper = jsonObjectMapper;

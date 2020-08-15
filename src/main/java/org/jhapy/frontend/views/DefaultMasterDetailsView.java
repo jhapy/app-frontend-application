@@ -310,6 +310,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   }
 
   protected void showDetails(T entity) {
+    if ( detailsDrawerFooter != null )
     checkForDetailsChanges(() -> {
       if (entity.getId() != null) {
         detailsDrawerFooter.setSaveAndNewButtonVisible(false);
@@ -369,14 +370,12 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
         null);
     binder.bind(isActive, BaseEntity::getIsActive, BaseEntity::setIsActive);
     binder.bind(created, entity1 -> entity1.getCreated() == null ? ""
-        : DateTimeFormatter.format(entity1.getCreated()), (a, b) -> {
-    });
+        : DateTimeFormatter.format(entity1.getCreated(), getLocale()), null);
     binder.bind(createdBy,
         activityDisplay -> entity.getCreatedBy(),
         null);
     binder.bind(updated, entity1 -> entity1.getModified() == null ? ""
-        : DateTimeFormatter.format(entity1.getModified()), (a, b) -> {
-    });
+        : DateTimeFormatter.format(entity1.getModified(), getLocale()), null);
     binder.bind(updatedBy,
         activityDisplay -> entity.getModifiedBy(),
         null);

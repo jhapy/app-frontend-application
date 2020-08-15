@@ -18,7 +18,6 @@
 
 package org.jhapy.frontend.views;
 
-import ch.carnet.kasparscherrer.EmptyFormLayoutItem;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -79,6 +78,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   private final Class parentViewClassname;
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname) {
+    super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
     this.binder = new BeanValidationBinder<>(entityType);
@@ -89,6 +89,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
       Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
+    super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
     this.binder = new BeanValidationBinder<>(entityType);
@@ -276,14 +277,12 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
         null);
     binder.bind(isActive, BaseEntity::getIsActive, BaseEntity::setIsActive);
     binder.bind(created, entity1 -> entity1.getCreated() == null ? ""
-        : DateTimeFormatter.format(entity1.getCreated()), (a, b) -> {
-    });
+        : DateTimeFormatter.format(entity1.getCreated(), getLocale()), null);
     binder.bind(createdBy,
         activityDisplay -> entity.getCreatedBy(),
         null);
     binder.bind(updated, entity1 -> entity1.getModified() == null ? ""
-        : DateTimeFormatter.format(entity1.getModified()), (a, b) -> {
-    });
+        : DateTimeFormatter.format(entity1.getModified(), getLocale()),null);
     binder.bind(updatedBy,
         activityDisplay -> entity.getModifiedBy(),
         null);

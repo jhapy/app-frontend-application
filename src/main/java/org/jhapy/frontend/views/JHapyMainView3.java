@@ -36,16 +36,12 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.ErrorHandler;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
-import com.vaadin.flow.server.ServiceInitEvent;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.Lumo;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import javax.servlet.http.Cookie;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.utils.StoredFile;
@@ -53,8 +49,6 @@ import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
-import org.jhapy.frontend.components.navigation.drawer.NaviItem;
-import org.jhapy.frontend.components.navigation.drawer.NaviMenu;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.FontSize;
@@ -78,9 +72,9 @@ import org.jhapy.frontend.views.admin.references.CountriesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakGroupsView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakRolesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakUsersView;
-import org.jhapy.frontend.views.login.LoginView;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.vaadin.tatu.Tree;
 
@@ -112,6 +106,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private Div appFooterInner;
   private Environment environment;
   private Div appFooterOuter;
+
   private AppBar appBar;
 
   public JHapyMainView3(Environment environment) {
@@ -528,7 +523,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
     // setAppFooterInner();
 
-    appBar = new AppBar("");
+    appBar = new AppBar();
     UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }

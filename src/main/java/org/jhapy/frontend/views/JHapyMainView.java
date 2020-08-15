@@ -459,7 +459,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
 
     // setAppFooterInner();
 
-    appBar = new AppBar("");
+    appBar = new AppBar();
     UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }

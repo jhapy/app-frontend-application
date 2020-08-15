@@ -86,7 +86,7 @@ public abstract class BaseMasterDetailsView<T, F extends DefaultFilter> extends 
   }
 
   protected void initHeader() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(NaviMode.MENU);
 
     initSearchBar();
@@ -101,7 +101,7 @@ public abstract class BaseMasterDetailsView<T, F extends DefaultFilter> extends 
   }
 
   protected void initSearchBar() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
     appBar.addSearchListener(event -> filter((String) event.getValue()));

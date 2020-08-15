@@ -57,6 +57,7 @@ public abstract class   DefaultMasterView<T extends BaseEntity, F extends Defaul
 
   public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider, Class entityViewClass) {
+    super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
     this.dataProvider = dataProvider;

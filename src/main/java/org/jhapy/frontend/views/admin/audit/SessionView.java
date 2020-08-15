@@ -127,10 +127,10 @@ public class SessionView extends DefaultMasterDetailsView<Session, DefaultFilter
     binder.bind(usernameField, Session::getUsername, null);
     binder.bind(sourceIpField, Session::getSourceIp, null);
     binder.bind(sessionStartField, entity1 -> entity1.getSessionStart() == null ? ""
-        : DateTimeFormatter.format(entity1.getSessionStart()), (a, b) -> {
+        : DateTimeFormatter.format(entity1.getSessionStart(), getLocale()), (a, b) -> {
     });
     binder.bind(sessionEndField, entity1 -> entity1.getSessionEnd() == null ? ""
-        : DateTimeFormatter.format(entity1.getSessionEnd()), (a, b) -> {
+        : DateTimeFormatter.format(entity1.getSessionEnd(), getLocale()), (a, b) -> {
     });
     binder.bind(sessionDurationField,
         (e) -> e.getSessionDuration() == null ? null : e.getSessionDuration().toString(), null);

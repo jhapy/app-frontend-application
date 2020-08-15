@@ -22,6 +22,7 @@ package org.jhapy.frontend.components.navigation.bar;
 import ch.carnet.kasparscherrer.LanguageSelect;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -47,16 +48,23 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import javax.servlet.http.Cookie;
 import org.apache.tika.Tika;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.mime.MimeTypeException;
+import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.domain.user.BaseUser;
 import org.jhapy.dto.utils.AppContext;
@@ -72,7 +80,26 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.views.JHapyMainView;
 
 @CssImport("./styles/components/app-bar.css")
-public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
+public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLogger {
+  private static final Set<String> rtlSet;
+
+  static {
+    Set<String> lang = new HashSet<>();
+    lang.add("ar"); // Arabic
+    lang.add("dv"); // Divehi
+    lang.add("fa"); // Persian
+    lang.add("ha"); // Hausa
+    lang.add("he"); // Hebrew
+    lang.add("iw"); // Hebrew
+    lang.add("ji"); // Yiddish
+    lang.add("ps"); // Pushto
+    lang.add("sd"); // Sindhi
+    lang.add("ug"); // Uighur
+    lang.add("ur"); // Urdu
+    lang.add("yi"); // Yiddish
+
+    rtlSet = Collections.unmodifiableSet(lang);
+  }
 
   private final String CLASS_NAME = "app-bar";
 
@@ -97,16 +124,16 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
   private Registration searchRegistration;
   private Registration searchEscRegistration;
 
-  public AppBar(String title, NaviTab... tabs) {
+  public AppBar() {
     setClassName(CLASS_NAME);
     initMenuIcon();
     initContextIcon();
-    initTitle(title);
+    initTitle("");
     initSearch();
     initAvatar();
     initActionItems();
     initContainer();
-    initTabs(tabs);
+    initTabs();
   }
 
   public void setNaviMode(NaviMode mode) {
@@ -199,9 +226,10 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
 
       MenuItem frMenu= languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/fr.png", "French"), new Label("Francais")));
       MenuItem enMenu = languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/us.png", "US"), new Label("English")));
-
+      MenuItem arMenu = languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/ma.png", "Arabic"), new Label("Arabic")));
       frMenu.addClickListener( event -> {
         enMenu.setChecked(false);
+        arMenu.setChecked(false);
         setLanguage( Locale.FRENCH);
       });
       frMenu.setCheckable(true);
@@ -209,10 +237,19 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
 
       enMenu.addClickListener( event -> {
         frMenu.setChecked(false);
+        arMenu.setChecked(false);
         setLanguage( Locale.ENGLISH);
       });
       enMenu.setCheckable(true);
       enMenu.setChecked(currentLocale.equals(Locale.ENGLISH));
+
+      arMenu.addClickListener( event -> {
+        enMenu.setChecked(false);
+        frMenu.setChecked(false);
+        setLanguage( new Locale("ar", "MA"));
+      });
+      arMenu.setCheckable(true);
+      arMenu.setChecked(currentLocale.equals(new Locale("ar", "MA")));
 
       Anchor userSettingsAnchor = new Anchor("http://onlineplantumleditor-keycloak:9080/auth/realms/onlinePlantUmlEditor/account",currentUserLogin.get());
       userSettingsAnchor.setTarget("_blank");
@@ -292,9 +329,18 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
   }
 
   public Component addActionItem(Component component) {
+    String loggerPrefix = getLoggerPrefix("addActionItem", System.identityHashCode( this ));
+    logger().debug(loggerPrefix+"Add Action Item");
     actionItems.add(component);
     updateActionItemsVisibility();
     return component;
+  }
+
+  public void removeActionItem(Component component) {
+    String loggerPrefix = getLoggerPrefix("removeActionItem", System.identityHashCode( this ));
+    logger().debug(loggerPrefix+"Remove Action Item");
+    actionItems.remove(component);
+    updateActionItemsVisibility();
   }
 
   /* === ACTION ITEMS === */
@@ -485,7 +531,11 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver  {
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-   // getUI().get().getPage().reload();
+    if (rtlSet.contains(event.getLocale().getLanguage())) {
+      UI.getCurrent().setDirection(Direction.RIGHT_TO_LEFT);
+    } else {
+      UI.getCurrent().setDirection(Direction.LEFT_TO_RIGHT);
+    }
   }
 
 

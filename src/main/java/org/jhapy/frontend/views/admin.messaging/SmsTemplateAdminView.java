@@ -55,6 +55,7 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -72,9 +73,6 @@ public class SmsTemplateAdminView extends ViewFrame implements RouterLayout, Has
   private SmsTemplate smsTemplate;
   private DefaultDataProvider<SmsTemplate, DefaultFilter> securityUserDataProvider;
 
-  public SmsTemplateAdminView() {
-  }
-
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
@@ -88,7 +86,7 @@ public class SmsTemplateAdminView extends ViewFrame implements RouterLayout, Has
   }
 
   private AppBar initAppBar() {
-    AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
     appBar.getContextIcon().addClickListener(event -> goBack());
     return appBar;
