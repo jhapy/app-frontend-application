@@ -81,26 +81,33 @@ public class SecurityUserConverter extends
     if (source.getAttributes() != null && source.getAttributes().get("phone") != null) {
       result.setMobileNumber(source.getAttributes().get("phone").get(0));
     }
+    if (source.getAttributes() != null && source.getAttributes().get("locale") != null) {
+      result.setLocale(source.getAttributes().get("locale").get(0));
+    }
     result.setIsLocal(source.getFederationLink() != null || (source.getSocialLinks() != null
         && source.getSocialLinks().size() > 0));
-    if (source.getAttributes() != null && source.getAttributes().get("picture") != null) {
+    if (source.getAttributes() != null && source.getAttributes().get("picture") != null ) {
       String pictureStr = source.getAttributes().get("picture").get(0);
-      byte[] pictureDecoded = java.util.Base64.getDecoder().decode(pictureStr);
-      try {
-        MimeType mimeType = TikaConfig.getDefaultConfig().getMimeRepository()
-            .forName((new Tika()).detect(pictureDecoded));
-        String fileExt = mimeType.getExtension();
+      if (pictureStr.startsWith("http"))
+        result.getAttributes().put("picture", pictureStr);
+      else {
+        byte[] pictureDecoded = java.util.Base64.getDecoder().decode(pictureStr);
+        try {
+          MimeType mimeType = TikaConfig.getDefaultConfig().getMimeRepository()
+              .forName((new Tika()).detect(pictureDecoded));
+          String fileExt = mimeType.getExtension();
 
-        StoredFile storedFile = new StoredFile();
-        storedFile.setContent(pictureDecoded);
-        storedFile.setOrginalContent(pictureDecoded);
-        storedFile.setId(UUID.randomUUID().toString());
-        storedFile.setFilename(storedFile.getId() + fileExt);
-        storedFile.setFilesize((long) pictureDecoded.length);
-        storedFile.setMimeType(mimeType.toString());
-        result.setPicture(storedFile);
-      } catch (MimeTypeException e) {
-        e.printStackTrace();
+          StoredFile storedFile = new StoredFile();
+          storedFile.setContent(pictureDecoded);
+          storedFile.setOrginalContent(pictureDecoded);
+          storedFile.setId(UUID.randomUUID().toString());
+          storedFile.setFilename(storedFile.getId() + fileExt);
+          storedFile.setFilesize((long) pictureDecoded.length);
+          storedFile.setMimeType(mimeType.toString());
+          result.setPicture(storedFile);
+        } catch (MimeTypeException e) {
+          e.printStackTrace();
+        }
       }
     }
     //result.setPicture(source.getAttributes().get("picture"));

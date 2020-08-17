@@ -133,8 +133,7 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
   }
 
   protected void addDocumentInList(StoredFile file) {
-    Image fileIcon = new Image(UIUtils.IMG_PATH + "mimetypes/" + file.getFilename()
-        .substring(file.getFilename().lastIndexOf(".") + 1) + "-icon-48x48.png", "");
+    Image fileIcon = new Image("images/filesExt/" + file.getFilename().substring(file.getFilename().lastIndexOf(".") + 1) + "-icon-48x48.png", file.getFilename());
     fileIcon.addClassName(IconSize.M.getClassName());
 
     ListItem item = new ListItem(fileIcon, file.getFilename());

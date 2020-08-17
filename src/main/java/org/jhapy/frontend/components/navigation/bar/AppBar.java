@@ -78,6 +78,7 @@ import org.jhapy.frontend.security.SecurityUtils2;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 
 @CssImport("./styles/components/app-bar.css")
 public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLogger {
@@ -216,6 +217,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
         avatar.setSrc(new StreamResource(userAvatar.getFilename(),
             () -> new ByteArrayInputStream(finalUserAvatar.getContent())));
       }
+
       Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
 
       ContextMenu contextMenu = new ContextMenu(avatar);
@@ -251,9 +253,11 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       arMenu.setCheckable(true);
       arMenu.setChecked(currentLocale.equals(new Locale("ar", "MA")));
 
-      Anchor userSettingsAnchor = new Anchor("http://onlineplantumleditor-keycloak:9080/auth/realms/onlinePlantUmlEditor/account",currentUserLogin.get());
-      userSettingsAnchor.setTarget("_blank");
-      contextMenu.addItem(userSettingsAnchor);
+      contextMenu.addItem( currentUserLogin.get(), event -> getUI().get()
+          .navigate(JHapyMainView3.get().getUserSettingsView()));
+      //Anchor userSettingsAnchor = new Anchor("http://onlineplantumleditor-keycloak:9080/auth/realms/onlinePlantUmlEditor/account",currentUserLogin.get());
+      //userSettingsAnchor.setTarget("_blank");
+      //contextMenu.addItem(userSettingsAnchor);
       contextMenu.addItem(new Anchor("logout", "Log Out"));
     }
   }
@@ -330,7 +334,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   public Component addActionItem(Component component) {
     String loggerPrefix = getLoggerPrefix("addActionItem", System.identityHashCode( this ));
-    logger().debug(loggerPrefix+"Add Action Item");
+    //logger().debug(loggerPrefix+"Add Action Item");
     actionItems.add(component);
     updateActionItemsVisibility();
     return component;
@@ -338,7 +342,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   public void removeActionItem(Component component) {
     String loggerPrefix = getLoggerPrefix("removeActionItem", System.identityHashCode( this ));
-    logger().debug(loggerPrefix+"Remove Action Item");
+    //logger().debug(loggerPrefix+"Remove Action Item");
     actionItems.remove(component);
     updateActionItemsVisibility();
   }

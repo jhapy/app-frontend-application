@@ -88,6 +88,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   private Tabs tabs;
   private Button newRecordButton;
   private Boolean initialFetch = Boolean.TRUE;
+private FlexBoxLayout content;
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider) {
@@ -229,11 +230,15 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   }
 
   private Component createContent() {
-    FlexBoxLayout content = new FlexBoxLayout(createGrid());
+    content = new FlexBoxLayout(createGrid());
     content.setBoxSizing(BoxSizing.BORDER_BOX);
     content.setHeightFull();
     content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
     return content;
+  }
+
+  protected void addToContent( Component component ) {
+    content.add( component );
   }
 
   protected abstract Grid createGrid();

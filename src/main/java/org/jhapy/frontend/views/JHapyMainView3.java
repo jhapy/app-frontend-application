@@ -91,7 +91,6 @@ import org.vaadin.tatu.Tree;
 @CssImport("./styles/misc/box-shadow-borders.css")
 @CssImport(value = "./styles/styles.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge")
-@Push
 public abstract class JHapyMainView3 extends FlexBoxLayout
     implements RouterLayout, PageConfigurator, AfterNavigationObserver, HasLogger {
 

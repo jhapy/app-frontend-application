@@ -227,6 +227,8 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
       initialImage.setMimeType(newPresentationValue.getMimeType());
       initialImage.setFilename(newPresentationValue.getFilename());
       initialImage.setContent(newPresentationValue.getContent());
+      if ( initialImage.getOrginalContent() == null )
+        initialImage.setOrginalContent(initialImage.getContent());
 
       image.setSrc(new StreamResource(newPresentationValue.getFilename(),
           () -> new ByteArrayInputStream(initialImage.getContent())));
