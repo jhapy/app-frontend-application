@@ -32,6 +32,9 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.QueryParameters;
@@ -42,10 +45,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.components.FlexBoxLayout;
+import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.Display;
@@ -72,8 +77,10 @@ public class NaviDrawerWithTreeMenu extends Div
   private Button railButton;
   private Tree<MenuEntry> menu;
   private MenuData menuData;
+private MenuHierarchicalDataProvider dataProvider;
 
-  public NaviDrawerWithTreeMenu(boolean showSearchMenu, String version, String environement) {
+  public NaviDrawerWithTreeMenu(MenuHierarchicalDataProvider menuDataProvider, boolean showSearchMenu, String version, String environement) {
+    this.dataProvider = menuDataProvider;
     setClassName(CLASS_NAME);
 
     initScrim();
@@ -147,8 +154,13 @@ public class NaviDrawerWithTreeMenu extends Div
   }
 
   public void refreshMenu() {
-    menu.setItems(menuData.getRootItems(),
-        menuData::getChildItems);
+    if ( dataProvider != null ) {
+      dataProvider.setRootMenu(menuData);
+      dataProvider.refreshAll();
+    } else {
+      menu.setItems(menuData.getRootItems(),
+          menuData::getChildItems);
+    }
   }
 
   public void addMenuEntry( MenuEntry menuEntry ) {
@@ -157,7 +169,11 @@ public class NaviDrawerWithTreeMenu extends Div
 
   private void initMenu() {
     menuData = new MenuData();
+
     menu = new Tree<>(MenuEntry::getTitle);
+    if ( dataProvider != null )
+      menu.setDataProvider(dataProvider);
+
     menu.setSizeFull();
     menu.setHeightByRows(true);
     menu.setMinWidth("400px");

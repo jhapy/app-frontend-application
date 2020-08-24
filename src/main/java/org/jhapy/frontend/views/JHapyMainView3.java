@@ -30,6 +30,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
@@ -49,6 +51,7 @@ import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
+import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.FontSize;
@@ -107,8 +110,11 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private Div appFooterOuter;
 
   private AppBar appBar;
+  protected MenuHierarchicalDataProvider menuProvider;
 
-  public JHapyMainView3(Environment environment) {
+  public JHapyMainView3(MenuHierarchicalDataProvider menuProvider, AppBar appBar, Environment environment) {
+    this.appBar = appBar;
+    this.menuProvider = menuProvider;
     VaadinSession.getCurrent()
         .setErrorHandler((ErrorHandler) errorEvent -> {
           logger().error("Uncaught UI exception",
@@ -134,7 +140,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     setSizeFull();
 
     // Initialise the UI building blocks
-    initStructure(false, environment.getProperty("APP_VERSION"),
+    initStructure(menuProvider, false, environment.getProperty("APP_VERSION"),
         environment.getProperty("info.tags.environment"));
 
     // Populate the navigation drawer
@@ -175,8 +181,8 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   /**
    * Initialise the required components and containers.
    */
-  private void initStructure(boolean showSearchMenu, String version, String environnement) {
-    naviDrawer = new NaviDrawerWithTreeMenu(showSearchMenu, version, environnement);
+  private void initStructure(MenuHierarchicalDataProvider menuProvider, boolean showSearchMenu, String version, String environnement) {
+    naviDrawer = new NaviDrawerWithTreeMenu(menuProvider, showSearchMenu, version, environnement);
 
     viewContainer = new FlexBoxLayout();
     viewContainer.addClassName(CLASS_NAME + "__view-container");
@@ -302,6 +308,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ACTIONS));
             subMenu.setTargetClass(ActionsView.class);
             subMenu.setParentMenuEntry(i18nSubmenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -312,6 +319,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ELEMENTS));
             subMenu.setTargetClass(ElementsView.class);
             subMenu.setParentMenuEntry(i18nSubmenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -322,6 +330,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MESSAGES));
             subMenu.setTargetClass(MessagesView.class);
             subMenu.setParentMenuEntry(i18nSubmenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -330,6 +339,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         /*
          * Reference
          */
+        /*
         boolean isReferenceMenuDisplay = hasReferencesMenuEntries() ||
             SecurityUtils.isAccessGranted(CountriesView.class);
 
@@ -341,7 +351,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           menuData.addMenuEntry(referenceSubMenu);
 
-          /*
+
           boolean isDisplayReference = false;
           if (SecurityUtils.isAccessGranted(CountriesView.class)) {
             isDisplayReference = true;
@@ -359,8 +369,9 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
               menuData.addMenuEntry(subMenu);
             }
           }
-           */
+
         }
+         */
         /*
          * Notification
          */
@@ -386,6 +397,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAIL_TEMPLATES_ADMIN));
             subMenu.setTargetClass(MailTemplatesAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -396,6 +408,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS_TEMPLATES_ADMIN));
             subMenu.setTargetClass(SmsTemplatesAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -406,6 +419,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS));
             subMenu.setTargetClass(SmsAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -416,6 +430,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAILS));
             subMenu.setTargetClass(MailAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -442,6 +457,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS));
             subMenu.setTargetClass(SecurityKeycloakUsersView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -452,6 +468,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES));
             subMenu.setTargetClass(SecurityKeycloakRolesView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -462,6 +479,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS));
             subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -472,6 +490,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SESSIONS_ADMIN));
             subMenu.setTargetClass(SessionView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -495,6 +514,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN));
             subMenu.setTargetClass(EurekaView.class);
             subMenu.setParentMenuEntry(monitoringSubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -504,6 +524,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN));
             subMenu.setTargetClass(CloudConfigView.class);
             subMenu.setParentMenuEntry(monitoringSubMenu);
+            subMenu.setHasChildNodes(false);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -522,7 +543,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
     // setAppFooterInner();
 
-    appBar = new AppBar();
+    //appBar = new AppBar();
     UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }

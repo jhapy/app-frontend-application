@@ -72,6 +72,10 @@ import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.tab.NaviTab;
 import org.jhapy.frontend.components.navigation.tab.NaviTabs;
+import org.jhapy.frontend.components.notification.DefaultNotificationHolder;
+import org.jhapy.frontend.components.notification.component.NotificationButton;
+import org.jhapy.frontend.components.notification.entity.DefaultNotification;
+import org.jhapy.frontend.components.notification.entity.Priority;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.SecurityUtils2;
@@ -81,6 +85,8 @@ import org.jhapy.frontend.views.JHapyMainView;
 import org.jhapy.frontend.views.JHapyMainView3;
 
 @CssImport("./styles/components/app-bar.css")
+@SpringComponent
+@UIScope
 public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLogger {
   private static final Set<String> rtlSet;
 
@@ -122,6 +128,8 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private TextField search;
   private ArrayList<Registration> searchValueChangedListeners;
 
+  private NotificationButton notificationButton;
+
   private Registration searchRegistration;
   private Registration searchEscRegistration;
 
@@ -129,6 +137,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     setClassName(CLASS_NAME);
     initMenuIcon();
     initContextIcon();
+    initNotification();
     initTitle("");
     initSearch();
     initAvatar();
@@ -167,6 +176,20 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private void initTitle(String title) {
     this.title = new H4(title);
     this.title.setClassName(CLASS_NAME + "__title");
+  }
+
+  private void initNotification() {
+    DefaultNotificationHolder notifications = new DefaultNotificationHolder();
+    notifications.addClickListener(notification -> {/* Use the listener to react on the click on the notification */});
+    notifications.add(
+        new DefaultNotification("Header1", "Very long description ..................", Priority.ERROR),
+        new DefaultNotification("Header2", "Very long description ..................", Priority.WARNING),
+        new DefaultNotification("Header3", "Very long description ..................", Priority.HIGH),
+        new DefaultNotification("Header4", "Very long description ..................", Priority.MEDIUM),
+    new DefaultNotification("Header5", "Very long description Low", Priority.LOW)
+    );
+
+    notificationButton = new NotificationButton<>(VaadinIcon.BELL, notifications);
   }
 
   private void initSearch() {
@@ -280,7 +303,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   private void initContainer() {
     container = new FlexBoxLayout(menuIcon, contextIcon, this.title, searchArea,
-        actionItems, avatar);
+        actionItems, notificationButton, avatar);
     container.addClassName(CLASS_NAME + "__container");
     container.setAlignItems(FlexComponent.Alignment.CENTER);
     container.setFlexGrow(1, searchArea);

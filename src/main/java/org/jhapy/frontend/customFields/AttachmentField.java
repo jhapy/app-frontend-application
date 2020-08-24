@@ -80,10 +80,11 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
   private final List<ValueChangeListener<? super AttachmentsFieldValueChangeEvent>> changeListeners = new ArrayList<>();
 
   public AttachmentField() {
-    this(null);
+    this(null, new String[]{"image/jpeg", "image/png", "image/gif", "image/tiff",
+        "application/pdf"},10 , 10  );
   }
 
-  public AttachmentField(String label) {
+  public AttachmentField(String label, String[] acceptedFileType, int maxFileSizeMb, int maxFiles) {
     setFlexDirection(FlexDirection.COLUMN);
 
     documentList = new Div();
@@ -101,11 +102,11 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
 
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     upload = new Upload(buffer);
-    upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif", "image/tiff",
-        "application/pdf");
+    if ( acceptedFileType != null && acceptedFileType.length > 0 )
+    upload.setAcceptedFileTypes(acceptedFileType);
     upload.setAutoUpload(true);
-    upload.setMaxFileSize(10485760);
-    upload.setMaxFiles(10);
+    upload.setMaxFileSize(maxFileSizeMb * 1024 * 124);
+    upload.setMaxFiles(maxFiles);
 
     upload.addSucceededListener(event -> {
       StoredFile storedFile = new StoredFile();

@@ -1,0 +1,43 @@
+package org.jhapy.frontend.dataproviders;
+
+import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
+import java.util.stream.Stream;
+import org.jhapy.frontend.views.JHapyMainView3;
+import org.jhapy.frontend.views.menu.MenuData;
+import org.jhapy.frontend.views.menu.MenuEntry;
+
+/**
+ * @author Alexandre Clavaud.
+ * @version 1.0
+ * @since 19/08/2020
+ */
+public abstract class MenuHierarchicalDataProvider extends
+    AbstractBackEndHierarchicalDataProvider<MenuEntry, Void> {
+
+  protected MenuData rootMenu;
+  protected JHapyMainView3 mainView;
+
+  public MenuHierarchicalDataProvider() {
+  }
+
+  public JHapyMainView3 getMainView() {
+    return mainView;
+  }
+
+  public void setMainView(JHapyMainView3 mainView) {
+    this.mainView = mainView;
+  }
+
+  public MenuHierarchicalDataProvider(MenuData rootMenu) {
+    this.rootMenu = rootMenu;
+  }
+
+  public MenuData getRootMenu() {
+    return rootMenu;
+  }
+
+  public void setRootMenu(MenuData rootMenu) {
+    this.rootMenu = rootMenu;
+  }
+}

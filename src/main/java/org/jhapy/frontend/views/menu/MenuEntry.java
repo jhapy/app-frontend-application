@@ -47,6 +47,7 @@ public class MenuEntry implements Serializable, HasLogger {
   private MenuEntry parentMenuEntry;
   private Boolean canCreateSubEntries =Boolean.FALSE;
   private List<MenuAction> contextMenu;
+  private Boolean hasChildNodes = Boolean.TRUE;
 
   public void setTargetClass(Class targetClass, Class routerLayout) {
     String loggerPrefix = getLoggerPrefix("setTargetClass");
