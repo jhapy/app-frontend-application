@@ -18,6 +18,7 @@
 
 package org.jhapy.frontend.utils.i18n;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.I18NProvider;
 import java.util.Arrays;
 import java.util.Collections;
@@ -125,6 +126,32 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
     }
   }
 
+  public String getTooltip(String s) {
+    String loggerPrefix = getLoggerPrefix("getTooltip", s);
+    String iso3Language = UI.getCurrent().getLocale().getLanguage();
+    if (StringUtils.isBlank(iso3Language)) {
+      iso3Language = AppConst.APP_LOCALE.getLanguage();
+    }
+
+    loadRemoteLocales(iso3Language);
+
+    if (s.startsWith("element.")) {
+      String val = getElementTooltip(s.substring(s.indexOf('.') + 1), iso3Language);
+      if ( StringUtils.isBlank(val))
+        return s;
+      else
+      return val;
+    } else if (s.startsWith("action.")) {
+      String val = getActionTooltip(s.substring(s.indexOf('.') + 1), iso3Language);
+      if ( StringUtils.isBlank(val))
+        return s;
+      else
+        return val;
+    } else {
+      logger().error(loggerPrefix + "Tooltip do not have a correct prefix : " + s);
+      return s;
+    }
+  }
   protected String getElementTranslation(String s, String iso3Language) {
     String loggerPrefix = getLoggerPrefix("getElementTranslation", s, iso3Language);
     ElementTrl elementTrl = getElementTrl(s, iso3Language);
@@ -138,14 +165,39 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
     }
   }
 
+  protected String getElementTooltip(String s, String iso3Language) {
+    String loggerPrefix = getLoggerPrefix("getElementTooltip", s, iso3Language);
+    ElementTrl elementTrl = getElementTrl(s, iso3Language);
+
+    if (elementTrl != null) {
+      return elementTrl.getTooltip();
+    } else {
+      logger().debug(loggerPrefix + "Tooltip for '" + s + "' in " + iso3Language + " not found");
+      return s;
+    }
+  }
+
   protected String getActionTranslation(String s, String iso3Language) {
     String loggerPrefix = getLoggerPrefix("getActionTranslation", s, iso3Language);
     ActionTrl actionTrl = getActionTrl(s, iso3Language);
 
-    if (actionTrl != null) {
+    if (actionTrl != null ) {
       return actionTrl.getValue();
     } else {
       logger().debug(loggerPrefix + "Translation for '" + s + "' in " + iso3Language
+          + " not found");
+      return s;
+    }
+  }
+
+  protected String getActionTooltip(String s, String iso3Language) {
+    String loggerPrefix = getLoggerPrefix("getActionTooltip", s, iso3Language);
+    ActionTrl actionTrl = getActionTrl(s, iso3Language);
+
+    if (actionTrl != null) {
+      return actionTrl.getTooltip();
+    } else {
+      logger().debug(loggerPrefix + "Tooltip for '" + s + "' in " + iso3Language
           + " not found");
       return s;
     }

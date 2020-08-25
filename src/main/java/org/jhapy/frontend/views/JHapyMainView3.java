@@ -28,6 +28,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
@@ -51,6 +52,8 @@ import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
+import org.jhapy.frontend.components.notification.entity.DefaultNotification;
+import org.jhapy.frontend.components.notification.entity.Priority;
 import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
@@ -613,6 +616,31 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     Icon icon = UIUtils.createIcon(IconSize.S, TextColor.SUCCESS, VaadinIcon.CHECK);
     Label label = UIUtils.createLabel(FontSize.XS, TextColor.BODY, message);
 
+    FlexLayout messageLayout = new FlexLayout(icon, label);
+
+    // Set the alignment
+    messageLayout.setAlignItems(Alignment.CENTER);
+
+    // Add spacing and padding
+    messageLayout.addClassNames(
+        LumoStyles.Spacing.Right.S,
+        LumoStyles.Padding.Wide.M
+    );
+
+    Notification notification = new Notification( messageLayout );
+    notification.setDuration(3000);
+    notification.setPosition(Position.TOP_CENTER);
+
+    UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, notification);
+    UIUtils.setShadow(Shadow.M, notification);
+
+    notification.open();
+
+    // getAppBar().addNotification(new DefaultNotification(getTranslation("message.global.info"), message, Priority.MEDIUM));
+    /*
+    Icon icon = UIUtils.createIcon(IconSize.S, TextColor.SUCCESS, VaadinIcon.CHECK);
+    Label label = UIUtils.createLabel(FontSize.XS, TextColor.BODY, message);
+
     FlexLayout footer = new FlexLayout(icon, label);
 
     // Set the alignment
@@ -629,9 +657,36 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     UIUtils.setShadow(Shadow.M, footer);
 
     setAppFooterInner(footer);
+
+     */
   }
 
   public void displayErrorMessage(String message) {
+    Icon icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
+    Label label = UIUtils.createLabel(FontSize.XS, TextColor.ERROR, message);
+
+    FlexLayout messageLayout = new FlexLayout(icon, label);
+
+    // Set the alignment
+    messageLayout.setAlignItems(Alignment.CENTER);
+
+    // Add spacing and padding
+    messageLayout.addClassNames(
+        LumoStyles.Spacing.Right.S,
+        LumoStyles.Padding.Wide.M
+    );
+
+    Notification notification = new Notification( messageLayout );
+    notification.setDuration(0);
+    notification.setPosition(Position.TOP_CENTER);
+
+    UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, notification);
+    UIUtils.setShadow(Shadow.M, notification);
+
+    notification.open();
+
+    //getAppBar().addNotification(new DefaultNotification(getTranslation("message.global.error"), message, Priority.ERROR));
+    /*
     Icon icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
     Label label = UIUtils.createLabel(FontSize.XS, TextColor.ERROR, message);
 
@@ -651,6 +706,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     UIUtils.setShadow(Shadow.M, footer);
 
     setAppFooterInner(footer);
+     */
   }
 
 

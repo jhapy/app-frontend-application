@@ -130,6 +130,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   private NotificationButton notificationButton;
 
+  private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
   private Registration searchRegistration;
   private Registration searchEscRegistration;
 
@@ -179,17 +180,20 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   private void initNotification() {
-    DefaultNotificationHolder notifications = new DefaultNotificationHolder();
     notifications.addClickListener(notification -> {/* Use the listener to react on the click on the notification */});
-    notifications.add(
+    /*notifications.add(
         new DefaultNotification("Header1", "Very long description ..................", Priority.ERROR),
         new DefaultNotification("Header2", "Very long description ..................", Priority.WARNING),
         new DefaultNotification("Header3", "Very long description ..................", Priority.HIGH),
         new DefaultNotification("Header4", "Very long description ..................", Priority.MEDIUM),
     new DefaultNotification("Header5", "Very long description Low", Priority.LOW)
     );
-
+*/
     notificationButton = new NotificationButton<>(VaadinIcon.BELL, notifications);
+  }
+
+  public void addNotification( DefaultNotification defaultNotification ) {
+    notifications.add(defaultNotification);
   }
 
   private void initSearch() {

@@ -66,8 +66,8 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
     }
 
     image = new Image(AppConst.NO_PICTURE, "");
-    image.setWidth("150px");
-    image.setHeight("150px");
+    image.setWidthFull();
+    //image.setHeight("150px");
     image.addClickListener(e -> addOrUpdateImage());
 
     croppieContent = new Div();

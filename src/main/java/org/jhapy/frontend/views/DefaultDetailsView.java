@@ -76,6 +76,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   private final Consumer<T> deleteHandler;
   private Tabs tabs;
   private final Class parentViewClassname;
+private AppBar appBar;
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname) {
     super();
@@ -89,6 +90,11 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
       Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
+    this( null, I18N_PREFIX, entityType, parentViewClassname, saveHandler, deleteHandler);
+  }
+
+  public DefaultDetailsView(AppBar appBar, String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
@@ -96,6 +102,11 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     this.saveHandler = saveHandler;
     this.deleteHandler = deleteHandler;
     this.parentViewClassname = parentViewClassname;
+    this.appBar = appBar;
+  }
+
+  protected AppBar getAppBar() {
+    return appBar;
   }
 
   @Override

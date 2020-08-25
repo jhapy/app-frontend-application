@@ -332,6 +332,11 @@
       <artifactId>language-select</artifactId>
       <version>1.0.8</version>
     </dependency>
+    <dependency>
+      <groupId>dev.mett.vaadin</groupId>
+      <artifactId>tooltip</artifactId>
+      <version>1.6.0</version>
+    </dependency>
     <!--dependency>
       <groupId>org.bklab</groupId>
       <artifactId>fluent-vaadin-flow</artifactId>
