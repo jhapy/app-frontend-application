@@ -219,6 +219,7 @@ private AppBar appBar;
     detailsDrawerFooter.addCancelListener(e -> {
       detailsDrawer.hide();
       currentEditing = null;
+      UI.getCurrent().getPage().getHistory().back();
     });
     if (saveHandler != null && canSave()) {
       detailsDrawerFooter.addSaveListener(e -> save(false));
