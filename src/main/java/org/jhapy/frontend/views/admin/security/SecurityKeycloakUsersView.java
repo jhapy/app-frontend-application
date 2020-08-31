@@ -42,6 +42,8 @@ import org.jhapy.commons.utils.OrikaBeanMapper;
 import org.jhapy.dto.domain.security.SecurityKeycloakGroup;
 import org.jhapy.dto.domain.security.SecurityKeycloakRole;
 import org.jhapy.dto.domain.security.SecurityKeycloakUser;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByStrIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
@@ -53,6 +55,7 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 import org.vaadin.gatanaso.MultiselectComboBox;
@@ -61,15 +64,15 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_USERS)
 @Secured(SecurityConst.ROLE_ADMIN)
 public class SecurityKeycloakUsersView extends
-    DefaultMasterDetailsView<SecurityKeycloakUser, DefaultFilter> {
+    DefaultMasterDetailsView<SecurityKeycloakUser, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   private final OrikaBeanMapper orikaBeanMapper;
 
-  public SecurityKeycloakUsersView(OrikaBeanMapper orikaBeanMapper) {
+  public SecurityKeycloakUsersView(OrikaBeanMapper orikaBeanMapper, MyI18NProvider myI18NProvider) {
     super("securityUser.", SecurityKeycloakUser.class, new SecurityUserKeycloakDataProvider(),
         false,
         (e) -> SecurityServices.getKeycloakClient().saveUser(new SaveQuery<>(e)),
-        e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())));
+        e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
     this.orikaBeanMapper = orikaBeanMapper;
   }
 

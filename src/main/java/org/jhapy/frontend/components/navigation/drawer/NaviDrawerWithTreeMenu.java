@@ -97,6 +97,10 @@ private MenuHierarchicalDataProvider dataProvider;
     initFooter(version, environement);
   }
 
+  public MenuHierarchicalDataProvider getDataProvider() {
+    return dataProvider;
+  }
+
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
@@ -180,30 +184,38 @@ private MenuHierarchicalDataProvider dataProvider;
     menu.setHeightByRows(true);
     menu.setId("treegridbasic");
     menu.getStyle().set("font-size", "0.8em");
-
-    menu.setItemIconProvider(item -> item.getIcon());
+    menu.setItemIconProvider(MenuEntry::getVaadinIcon);
     menu.setItemTitleProvider(MenuEntry::getTitle);
     menu.addItemClickListener(event -> {
-      if (event.getItem() != null && event.getItem().getTargetClass() != null) {
-        navigate( event.getItem());
+      MenuEntry selectedItem = getSelectedItem();
+      if ( selectedItem != null ) {
+        navigate( selectedItem);
       };
     });
     menu.addExpandListener(menuEntryTreeGridExpandEvent -> {
       Collection<MenuEntry> items = menuEntryTreeGridExpandEvent.getItems();
+
       if ( ! items.isEmpty()) {
         MenuEntry item = items.iterator().next();
         menu.select(item);
-        if (item.getTargetClass() != null)
+        if (item.getTargetClass() != null) {
           navigate(item);
+        }
       }
     });
     menu.addCollapseListener(menuEntryTreeGridCollapseEvent -> {
       Collection<MenuEntry> items = menuEntryTreeGridCollapseEvent.getItems();
+      MenuEntry selectedItem = getSelectedItem();
+      if ( selectedItem != null ) {
+        navigate( selectedItem);
+      };
+
       if ( ! items.isEmpty()) {
         MenuEntry item = items.iterator().next();
         menu.select(item);
-        if (item.getTargetClass() != null)
+        if (item.getTargetClass() != null) {
           navigate(item);
+        }
       }
     });
 
@@ -237,8 +249,13 @@ private MenuHierarchicalDataProvider dataProvider;
     scrollableArea.add(menu);
   }
 
+  private MenuEntry getSelectedItem() {
+    return menu.getSelectedItems().size() == 0 ? null : menu.getSelectedItems().iterator().next();
+  }
   private void navigate( MenuEntry menuEntry ) {
-    String loggerPrefix = getLoggerPrefix("navigate");
+    String loggerPrefix = getLoggerPrefix("navigate", menuEntry.getTitle());
+    if ( menuEntry.getTargetClass() == null )
+      return ;
 
     if ( menuEntry.getTargetParams() != null ) {
       logger().debug(loggerPrefix+"Navigate with Target Params" );

@@ -26,6 +26,8 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextField;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.audit.Session;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SessionDataProvider;
@@ -33,15 +35,16 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SESSIONS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SessionView extends DefaultMasterDetailsView<Session, DefaultFilter> {
+public class SessionView extends DefaultMasterDetailsView<Session, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  public SessionView() {
-    super("session.", Session.class, new SessionDataProvider());
+  public SessionView(MyI18NProvider myI18NProvider) {
+    super("session.", Session.class, new SessionDataProvider(), myI18NProvider);
   }
 
   protected Grid createGrid() {

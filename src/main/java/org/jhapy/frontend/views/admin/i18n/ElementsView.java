@@ -28,6 +28,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.i18n.Element;
 import org.jhapy.dto.domain.i18n.ElementTrl;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
@@ -54,7 +56,7 @@ import org.springframework.security.access.annotation.Secured;
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_ELEMENTS)
 @Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
-public class ElementsView extends DefaultMasterDetailsView<Element, DefaultFilter> {
+public class ElementsView extends DefaultMasterDetailsView<Element, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public ElementsView(MyI18NProvider myI18NProvider) {
     super("element.", Element.class, new ElementDataProvider(),
@@ -65,7 +67,7 @@ public class ElementsView extends DefaultMasterDetailsView<Element, DefaultFilte
           }
           return _elt;
         },
-        e -> I18NServices.getElementService().delete(new DeleteByIdQuery(e.getId())));
+        e -> I18NServices.getElementService().delete(new DeleteByIdQuery(e.getId())), myI18NProvider);
 
   }
 

@@ -20,6 +20,8 @@ package org.jhapy.frontend.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -30,9 +32,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
@@ -40,20 +39,20 @@ import com.vaadin.flow.server.ErrorHandler;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.Lumo;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
-import org.jhapy.frontend.components.notification.entity.DefaultNotification;
-import org.jhapy.frontend.components.notification.entity.Priority;
+import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
@@ -80,7 +79,6 @@ import org.jhapy.frontend.views.admin.security.SecurityKeycloakRolesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakUsersView;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.vaadin.tatu.Tree;
 
@@ -161,6 +159,8 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         .filter(component -> RouterLayout.class.isAssignableFrom(component.getClass()))
         .findFirst().orElse(null);
   }
+
+  public SearchOverlayButton<? extends SearchQueryResult, ? extends SearchQuery> getSearchButton() {return null; }
 
   public Class getHomePage() {
     return null;
@@ -281,7 +281,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
       if (isSettingsDisplayed) {
         MenuEntry settingsSubMenu = new MenuEntry(AppConst.PAGE_SETTINGS);
-        settingsSubMenu.setIcon(VaadinIcon.EDIT);
+        settingsSubMenu.setVaadinIcon(VaadinIcon.EDIT);
         settingsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SETTINGS));
 
         addToSettingsMenu(menuData, settingsSubMenu);
@@ -299,7 +299,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
         if (isDisplayI18n) {
           MenuEntry i18nSubmenu = new MenuEntry(AppConst.PAGE_I18N);
-          i18nSubmenu.setIcon(VaadinIcon.SITEMAP);
+          i18nSubmenu.setVaadinIcon(VaadinIcon.SITEMAP);
           i18nSubmenu.setTitle(currentUI.getTranslation(AppConst.TITLE_I18N));
           i18nSubmenu.setParentMenuEntry(settingsSubMenu);
 
@@ -307,7 +307,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(ActionsView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ACTIONS);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ACTIONS));
             subMenu.setTargetClass(ActionsView.class);
             subMenu.setParentMenuEntry(i18nSubmenu);
@@ -318,7 +318,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(ElementsView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ELEMENTS);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ELEMENTS));
             subMenu.setTargetClass(ElementsView.class);
             subMenu.setParentMenuEntry(i18nSubmenu);
@@ -329,7 +329,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(MessagesView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MESSAGES);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MESSAGES));
             subMenu.setTargetClass(MessagesView.class);
             subMenu.setParentMenuEntry(i18nSubmenu);
@@ -348,7 +348,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
         if (isReferenceMenuDisplay) {
           MenuEntry referenceSubMenu = new MenuEntry(AppConst.PAGE_REFERENCES);
-          referenceSubMenu.setIcon(VaadinIcon.SITEMAP);
+          referenceSubMenu.setVaadinIcon(VaadinIcon.SITEMAP);
           referenceSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_REFERENCES));
           referenceSubMenu.setParentMenuEntry(settingsSubMenu);
 
@@ -364,7 +364,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
             if (SecurityUtils.isAccessGranted(CountriesView.class)) {
               MenuEntry subMenu = new MenuEntry();
-              subMenu.setIcon(VaadinIcon.QUESTION);
+              subMenu.setVaadinIcon(VaadinIcon.QUESTION);
               subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_COUNTRIES));
               subMenu.setTargetClass(CountriesView.class);
               subMenu.setParentMenuEntry(referenceSubMenu);
@@ -388,7 +388,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
         if (isDisplayNotifications) {
           MenuEntry notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);
-          notificationsSubMenu.setIcon(VaadinIcon.SITEMAP);
+          notificationsSubMenu.setVaadinIcon(VaadinIcon.SITEMAP);
           notificationsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
           notificationsSubMenu.setParentMenuEntry(settingsSubMenu);
 
@@ -396,7 +396,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(MailTemplatesAdminView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MAIL_TEMPLATES_ADMIN);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAIL_TEMPLATES_ADMIN));
             subMenu.setTargetClass(MailTemplatesAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
@@ -407,7 +407,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SMS_TEMPLATES_ADMIN);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS_TEMPLATES_ADMIN));
             subMenu.setTargetClass(SmsTemplatesAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
@@ -418,7 +418,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(SmsAdminView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SMS_ADMIN);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS));
             subMenu.setTargetClass(SmsAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
@@ -429,7 +429,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(MailAdminView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MAILS_ADMIN);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAILS));
             subMenu.setTargetClass(MailAdminView.class);
             subMenu.setParentMenuEntry(notificationsSubMenu);
@@ -448,7 +448,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
         if (isDisplaySecurity) {
           MenuEntry securitySubMenu = new MenuEntry(AppConst.PAGE_SECURITY);
-          securitySubMenu.setIcon(VaadinIcon.KEY);
+          securitySubMenu.setVaadinIcon(VaadinIcon.KEY);
           securitySubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY));
           securitySubMenu.setParentMenuEntry(settingsSubMenu);
 
@@ -456,7 +456,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_USERS);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS));
             subMenu.setTargetClass(SecurityKeycloakUsersView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
@@ -467,7 +467,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ROLES);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES));
             subMenu.setTargetClass(SecurityKeycloakRolesView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
@@ -478,7 +478,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_GROUPS);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS));
             subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
@@ -489,7 +489,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(SessionView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SESSIONS);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SESSIONS_ADMIN));
             subMenu.setTargetClass(SessionView.class);
             subMenu.setParentMenuEntry(securitySubMenu);
@@ -505,7 +505,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
                 SecurityUtils.isAccessGranted(CloudConfigView.class);
         if (isDisplayMonitoring) {
           MenuEntry monitoringSubMenu = new MenuEntry(AppConst.PAGE_MONITORING);
-          monitoringSubMenu.setIcon(VaadinIcon.GLASSES);
+          monitoringSubMenu.setVaadinIcon(VaadinIcon.GLASSES);
           monitoringSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MONITORING));
           monitoringSubMenu.setParentMenuEntry(settingsSubMenu);
 
@@ -513,7 +513,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           if (SecurityUtils.isAccessGranted(EurekaView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_EUREKA_ADMIN);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN));
             subMenu.setTargetClass(EurekaView.class);
             subMenu.setParentMenuEntry(monitoringSubMenu);
@@ -523,7 +523,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           }
           if (SecurityUtils.isAccessGranted(CloudConfigView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_CLOUD_CONFIG_ADMIN);
-            subMenu.setIcon(VaadinIcon.QUESTION);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN));
             subMenu.setTargetClass(CloudConfigView.class);
             subMenu.setParentMenuEntry(monitoringSubMenu);
@@ -679,6 +679,16 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     Notification notification = new Notification( messageLayout );
     notification.setDuration(0);
     notification.setPosition(Position.TOP_CENTER);
+
+
+    Button closeButton = UIUtils.createSmallButton(getTranslation("action.global.close"));
+    closeButton.addThemeVariants( ButtonVariant.LUMO_ERROR);
+    closeButton.addClickListener(event -> notification.close());
+    FlexLayout footer = new FlexLayout(closeButton);
+    footer.setJustifyContentMode(JustifyContentMode.CENTER);
+    footer.setWidthFull();
+
+    notification.add(footer);
 
     UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, notification);
     UIUtils.setShadow(Shadow.M, notification);

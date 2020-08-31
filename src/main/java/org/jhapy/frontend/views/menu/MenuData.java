@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -30,5 +31,9 @@ public class MenuData implements Serializable {
     return menuList.stream().filter(
         menuEntry -> Objects.equals(menuEntry.getParentMenuEntry(), parent))
         .collect(Collectors.toList());
+  }
+
+  public Optional<MenuEntry> getFirstMenuByTargetId( String targetId ) {
+    return menuList.stream().filter( menuEntry -> menuEntry.getTargetId() != null && menuEntry.getTargetId().equalsIgnoreCase(targetId)).findFirst();
   }
 }

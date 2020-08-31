@@ -29,6 +29,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.notification.Mail;
 import org.jhapy.dto.domain.notification.MailStatusEnum;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.customFields.AttachmentField;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
@@ -37,15 +39,16 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_MAILS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class MailAdminView extends DefaultMasterDetailsView<Mail, DefaultFilter> {
+public class MailAdminView extends DefaultMasterDetailsView<Mail, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  public MailAdminView() {
-    super("mail.", Mail.class, new MailDataProvider());
+  public MailAdminView(MyI18NProvider myI18NProvider) {
+    super("mail.", Mail.class, new MailDataProvider(), myI18NProvider);
   }
 
   protected Grid createGrid() {

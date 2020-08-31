@@ -67,6 +67,8 @@ import org.apache.tika.mime.MimeTypeException;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.domain.user.BaseUser;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.AppContext;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.components.FlexBoxLayout;
@@ -76,6 +78,8 @@ import org.jhapy.frontend.components.notification.DefaultNotificationHolder;
 import org.jhapy.frontend.components.notification.component.NotificationButton;
 import org.jhapy.frontend.components.notification.entity.DefaultNotification;
 import org.jhapy.frontend.components.notification.entity.Priority;
+import org.jhapy.frontend.components.search.SearchButton;
+import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.SecurityUtils2;
@@ -129,6 +133,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private ArrayList<Registration> searchValueChangedListeners;
 
   private NotificationButton notificationButton;
+  private SearchOverlayButton<? extends SearchQueryResult, ? extends SearchQuery> searchButton;
 
   private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
   private Registration searchRegistration;
@@ -141,6 +146,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     initNotification();
     initTitle("");
     initSearch();
+    initSearch2();
     initAvatar();
     initActionItems();
     initContainer();
@@ -181,14 +187,6 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   private void initNotification() {
     notifications.addClickListener(notification -> {/* Use the listener to react on the click on the notification */});
-    /*notifications.add(
-        new DefaultNotification("Header1", "Very long description ..................", Priority.ERROR),
-        new DefaultNotification("Header2", "Very long description ..................", Priority.WARNING),
-        new DefaultNotification("Header3", "Very long description ..................", Priority.HIGH),
-        new DefaultNotification("Header4", "Very long description ..................", Priority.MEDIUM),
-    new DefaultNotification("Header5", "Very long description Low", Priority.LOW)
-    );
-*/
     notificationButton = new NotificationButton<>(VaadinIcon.BELL, notifications);
   }
 
@@ -205,10 +203,15 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     searchValueChangedListeners = new ArrayList<>();
 
     searchArea = new FlexBoxLayout(search);
+    searchArea.setVisible(false);
     searchArea.addClassName(CLASS_NAME + "__container");
     searchArea.setAlignItems(FlexComponent.Alignment.CENTER);
     searchArea.setSpacing(Right.S);
     searchArea.setFlexGrow(1, search);
+  }
+
+  private void initSearch2() {
+    searchButton = new SearchOverlayButton<>();
   }
 
   private void resetSearchArea() {
@@ -253,9 +256,9 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       Locale currentLocale = UI.getCurrent().getSession().getLocale();
       MenuItem languageMenu = contextMenu.addItem(getTranslation("action.settings.language"));
 
-      MenuItem frMenu= languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/fr.png", "French"), new Label("Francais")));
-      MenuItem enMenu = languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/us.png", "US"), new Label("English")));
-      MenuItem arMenu = languageMenu.getSubMenu().addItem( new HorizontalLayout(   new Image("images/languageflags/ma.png", "Arabic"), new Label("Arabic")));
+      MenuItem frMenu= languageMenu.getSubMenu().addItem(  new Label("Francais"));
+      MenuItem enMenu = languageMenu.getSubMenu().addItem( new Label("English"));
+      MenuItem arMenu = languageMenu.getSubMenu().addItem( new Label("Arabic"));
       frMenu.addClickListener( event -> {
         enMenu.setChecked(false);
         arMenu.setChecked(false);
@@ -307,7 +310,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   private void initContainer() {
     container = new FlexBoxLayout(menuIcon, contextIcon, this.title, searchArea,
-        actionItems, notificationButton, avatar);
+        actionItems, notificationButton, searchButton, avatar);
     container.addClassName(CLASS_NAME + "__container");
     container.setAlignItems(FlexComponent.Alignment.CENTER);
     container.setFlexGrow(1, searchArea);
@@ -360,6 +363,8 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   public Component addActionItem(Component component) {
+    if ( component == null )
+      return null;
     String loggerPrefix = getLoggerPrefix("addActionItem", System.identityHashCode( this ));
     //logger().debug(loggerPrefix+"Add Action Item");
     actionItems.add(component);
@@ -567,6 +572,14 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     } else {
       UI.getCurrent().setDirection(Direction.LEFT_TO_RIGHT);
     }
+  }
+
+  public SearchOverlayButton getSearchButton() {
+    return searchButton;
+  }
+
+  public void disableGlobalSearch() {
+    searchButton.setVisible(false);
   }
 
 

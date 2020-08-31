@@ -40,6 +40,8 @@ import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.security.SecurityRole;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.domain.security.SecurityUserTypeEnum;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByStrIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.utils.SecurityConst;
@@ -51,6 +53,7 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 import org.vaadin.gatanaso.MultiselectComboBox;
@@ -58,12 +61,12 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_USERS)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SecurityUsersView extends DefaultMasterDetailsView<SecurityUser, DefaultFilter> {
+public class SecurityUsersView extends DefaultMasterDetailsView<SecurityUser, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  public SecurityUsersView() {
+  public SecurityUsersView(MyI18NProvider myI18NProvider) {
     super("securityUser.", SecurityUser.class, new SecurityUserDataProvider(),
         (e) -> SecurityServices.getSecurityUserService().save(new SaveQuery<>(e)),
-        e -> SecurityServices.getSecurityUserService().delete(new DeleteByStrIdQuery(e.getId())));
+        e -> SecurityServices.getSecurityUserService().delete(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
   }
 
   protected Grid createGrid() {

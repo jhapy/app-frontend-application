@@ -87,4 +87,5 @@ public class ViewFrame extends Composite<Div> implements HasStyle {
     super.onAttach(attachEvent);
     JHapyMainView3.get().getAppBar().reset();
   }
+
 }

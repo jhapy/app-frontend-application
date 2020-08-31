@@ -38,6 +38,7 @@ import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Top;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
 /**
  * @author jHapy Lead Dev.
@@ -54,14 +55,16 @@ public abstract class   DefaultMasterView<T extends BaseEntity, F extends Defaul
   private Tabs tabs;
   private Button newRecordButton;
   private final Class entityViewClass;
+  protected final MyI18NProvider myI18NProvider;
 
   public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
-      DefaultDataProvider<T, F> dataProvider, Class entityViewClass) {
+      DefaultDataProvider<T, F> dataProvider, Class entityViewClass, MyI18NProvider myI18NProvider) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
     this.dataProvider = dataProvider;
     this.entityViewClass = entityViewClass;
+    this.myI18NProvider = myI18NProvider;
   }
 
   protected Class<T> getEntityType() {
@@ -103,6 +106,7 @@ public abstract class   DefaultMasterView<T extends BaseEntity, F extends Defaul
 
   protected void initSearchBar() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.disableGlobalSearch();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
     appBar.addSearchListener(event -> filter((String) event.getValue()));

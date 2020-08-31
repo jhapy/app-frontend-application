@@ -20,13 +20,17 @@ package org.jhapy.frontend.views;
 
 import ch.carnet.kasparscherrer.EmptyFormLayoutItem;
 import com.github.appreciated.app.layout.component.applayout.AppLayout;
+import com.github.appreciated.card.ClickableCard;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.ClickNotifier;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.tabs.Tab;
@@ -37,9 +41,13 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.BeforeLeaveEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
 import com.vaadin.flow.router.BeforeLeaveObserver;
+import dev.mett.vaadin.tooltip.Tooltips;
+import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
+import dev.mett.vaadin.tooltip.config.TooltipConfiguration;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -49,6 +57,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.jhapy.dto.domain.BaseEntity;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
@@ -56,8 +66,11 @@ import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerFooter;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.bar.AppBar.NaviMode;
+import org.jhapy.frontend.components.search.SearchButton;
+import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultSearchDataProvider;
 import org.jhapy.frontend.layout.SplitViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Top;
@@ -65,13 +78,14 @@ import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
 /**
  * @author jHapy Lead Dev.
  * @version 1.0
  * @since 8/27/19
  */
-public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends DefaultFilter> extends
+public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends DefaultFilter, Q extends SearchQuery, S extends SearchQueryResult > extends
     SplitViewFrame implements BeforeLeaveObserver {
 
   protected final String I18N_PREFIX;
@@ -89,21 +103,22 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   private Button newRecordButton;
   private Boolean initialFetch = Boolean.TRUE;
 private FlexBoxLayout content;
+  protected final MyI18NProvider myI18NProvider;
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
-      DefaultDataProvider<T, F> dataProvider) {
-    this(I18N_PREFIX, entityType, dataProvider, null, null);
+      DefaultDataProvider<T, F> dataProvider, MyI18NProvider myI18NProvider) {
+    this(I18N_PREFIX, entityType, dataProvider, null, null,myI18NProvider);
   }
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
-    this(I18N_PREFIX, entityType, dataProvider, true, saveHandler, deleteHandler);
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler, MyI18NProvider myI18NProvider) {
+    this(I18N_PREFIX, entityType, dataProvider, true, saveHandler, deleteHandler, myI18NProvider);
   }
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider, Boolean initialFetch,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler, MyI18NProvider myI18NProvider) {
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
     this.binder = new BeanValidationBinder<>(entityType);
@@ -111,6 +126,7 @@ private FlexBoxLayout content;
     this.initialFetch = initialFetch;
     this.saveHandler = saveHandler;
     this.deleteHandler = deleteHandler;
+    this.myI18NProvider = myI18NProvider;
   }
 
   @Override
@@ -165,11 +181,14 @@ private FlexBoxLayout content;
     initSearchBar();
 
     if (canCreateRecord() && saveHandler != null) {
-      newRecordButton = UIUtils
-          .createTertiaryButton(VaadinIcon.PLUS);
+      newRecordButton = UIUtils.createTertiaryButton(VaadinIcon.PLUS);
       newRecordButton.addClickListener(event -> showDetails());
       appBar.addActionItem(newRecordButton);
     }
+
+    Button refreshButton = UIUtils.createTertiaryButton(VaadinIcon.REFRESH);
+    refreshButton.addClickListener(buttonClickEvent -> dataProvider.refreshAll());
+    appBar.addActionItem(refreshButton);
   }
 
   protected void showDetails() {
@@ -194,11 +213,29 @@ private FlexBoxLayout content;
 
   protected void initSearchBar() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
-    Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
-    searchButton.addClickListener(event -> appBar.searchModeOn());
-    appBar.addSearchListener(event -> filter((String) event.getValue()));
-    appBar.setSearchPlaceholder(getTranslation("element.global.search"));
-    appBar.addActionItem(searchButton);
+    if ( ! isGlobalSearchEnabled() ) {
+      Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
+      searchButton.addClickListener(event -> appBar.searchModeOn());
+      appBar.addSearchListener(event -> filter((String) event.getValue()));
+      appBar.setSearchPlaceholder(getTranslation("element.global.search"));
+      appBar.addActionItem(searchButton);
+    } else {
+      appBar.addActionItem(JHapyMainView3.get().getSearchButton());
+    }
+  }
+
+  protected boolean isGlobalSearchEnabled() { return false; }
+
+  protected Function<S, ClickNotifier> getSearchResultDataProvider() {
+    return s -> new ClickableCard();
+  }
+
+  protected DefaultSearchDataProvider<S, Q> getSearchDataProvider() {
+    return null;
+  }
+
+  protected Function<String, Query<S, Q>> getSearchQueryProvider() {
+    return s -> new Query(DefaultFilter.getEmptyFilter());
   }
 
   public void enableCreateRecord() {
@@ -476,5 +513,62 @@ private FlexBoxLayout content;
         .setFilter((F) new DefaultFilter(
             StringUtils.isBlank(filter) ? null : filter,
             null));
+  }
+
+  protected Label getLabel(String element ){
+    Label label = new Label(getTranslation(element));
+    TooltipConfiguration ttconfig = new TooltipConfiguration( myI18NProvider.getTooltip(element));
+    ttconfig.setDelay(1000);
+    ttconfig.setHideOnClick(TC_HIDE_ON_CLICK.TRUE);
+    ttconfig.setShowOnCreate(false);
+
+    Tooltips.getCurrent().setTooltip(label,ttconfig);
+    return label;
+  }
+
+  protected Button getButton( String action ) {
+    return getButton(null, action, false, true);
+  }
+
+  protected Button getButton( String action,boolean isSmall ) {
+    return getButton(null, action, isSmall, true);
+  }
+
+  protected Button getButton(  VaadinIcon icon, String action ) {
+    return getButton(icon, action, false, false);
+  }
+
+  protected Button getButton( VaadinIcon icon, String action, boolean isSmall, boolean displayText ) {
+    Button button;
+    if ( isSmall ) {
+      if ( displayText ) {
+        if (icon == null) {
+          button = UIUtils.createSmallButton(getTranslation(action));
+        } else {
+          button = UIUtils.createSmallButton(getTranslation(action), icon);
+        }
+      }
+      else {
+        button = UIUtils.createSmallButton(icon);
+      }
+    } else
+    if ( displayText ) {
+      if (icon == null) {
+        button = UIUtils.createButton(getTranslation(action));
+      }else {
+        button = UIUtils.createButton(getTranslation(action), icon);
+      }
+    }
+    else {
+      button = UIUtils.createButton(icon);
+    }
+    TooltipConfiguration ttconfig = new TooltipConfiguration( myI18NProvider.getTooltip(action));
+    ttconfig.setDelay(1000);
+    ttconfig.setHideOnClick(TC_HIDE_ON_CLICK.TRUE);
+    ttconfig.setShowOnCreate(false);
+
+    Tooltips.getCurrent().setTooltip(button,ttconfig);
+
+    return button;
   }
 }

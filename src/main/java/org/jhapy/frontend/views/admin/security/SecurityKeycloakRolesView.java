@@ -26,6 +26,8 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextField;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.security.SecurityKeycloakRole;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByStrIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.utils.SecurityConst;
@@ -36,18 +38,19 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_ROLES)
 @Secured(SecurityConst.ROLE_ADMIN)
 public class SecurityKeycloakRolesView extends
-    DefaultMasterDetailsView<SecurityKeycloakRole, DefaultFilter> {
+    DefaultMasterDetailsView<SecurityKeycloakRole, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  public SecurityKeycloakRolesView() {
+  public SecurityKeycloakRolesView(MyI18NProvider myI18NProvider) {
     super("securityRole.", SecurityKeycloakRole.class, new SecurityRoleKeycloakDataProvider(),
         (e) -> SecurityServices.getKeycloakClient().saveRole(new SaveQuery<>(e)),
-        e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())));
+        e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
   }
 
   protected Grid createGrid() {

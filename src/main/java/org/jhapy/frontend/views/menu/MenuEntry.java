@@ -38,7 +38,7 @@ public class MenuEntry implements Serializable, HasLogger {
   }
 
   private String id;
-  private VaadinIcon icon;
+  private VaadinIcon vaadinIcon;
   private String title;
   private Class targetClass;
   private Object targetParams;

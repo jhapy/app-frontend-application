@@ -74,7 +74,7 @@ public class SmsTemplatesAdminView extends ViewFrame implements RouterLayout, Ha
   private void initHeader() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(NaviMode.MENU);
-
+    appBar.disableGlobalSearch();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
     appBar.addSearchListener(event -> filter((String) event.getValue()));

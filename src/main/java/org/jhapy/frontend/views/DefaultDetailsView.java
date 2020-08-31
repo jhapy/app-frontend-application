@@ -21,10 +21,13 @@ package org.jhapy.frontend.views;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -36,6 +39,9 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.RouterLayout;
+import dev.mett.vaadin.tooltip.Tooltips;
+import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
+import dev.mett.vaadin.tooltip.config.TooltipConfiguration;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -54,8 +60,10 @@ import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Top;
 import org.jhapy.frontend.utils.LumoStyles;
+import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
 /**
  * @author jHapy Lead Dev.
@@ -77,8 +85,9 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   private Tabs tabs;
   private final Class parentViewClassname;
 private AppBar appBar;
+  protected final MyI18NProvider myI18NProvider;
 
-  public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname) {
+  public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname, MyI18NProvider myI18NProvider) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
@@ -86,15 +95,16 @@ private AppBar appBar;
     this.saveHandler = null;
     this.deleteHandler = null;
     this.parentViewClassname = parentViewClassname;
+    this.myI18NProvider = myI18NProvider;
   }
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
-    this( null, I18N_PREFIX, entityType, parentViewClassname, saveHandler, deleteHandler);
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler, MyI18NProvider myI18NProvider) {
+    this( null, I18N_PREFIX, entityType, parentViewClassname, saveHandler, deleteHandler, myI18NProvider);
   }
 
   public DefaultDetailsView(AppBar appBar, String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler) {
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler, MyI18NProvider myI18NProvider) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
@@ -103,6 +113,7 @@ private AppBar appBar;
     this.deleteHandler = deleteHandler;
     this.parentViewClassname = parentViewClassname;
     this.appBar = appBar;
+    this.myI18NProvider = myI18NProvider;
   }
 
   protected AppBar getAppBar() {
@@ -388,5 +399,62 @@ private AppBar appBar;
 
   protected void goBack() {
     UI.getCurrent().navigate(parentViewClassname);
+  }
+
+  protected Label getLabel(String element ){
+    Label label = new Label(getTranslation(element));
+    TooltipConfiguration ttconfig = new TooltipConfiguration( myI18NProvider.getTooltip(element));
+    ttconfig.setDelay(1000);
+    ttconfig.setHideOnClick(TC_HIDE_ON_CLICK.TRUE);
+    ttconfig.setShowOnCreate(false);
+
+    Tooltips.getCurrent().setTooltip(label,ttconfig);
+    return label;
+  }
+
+  protected Button getButton( String action ) {
+    return getButton(null, action, false, true);
+  }
+
+  protected Button getButton( String action,boolean isSmall ) {
+    return getButton(null, action, isSmall, true);
+  }
+
+  protected Button getButton(  VaadinIcon icon, String action ) {
+    return getButton(icon, action, false, false);
+  }
+
+  protected Button getButton( VaadinIcon icon, String action, boolean isSmall, boolean displayText ) {
+    Button button;
+    if ( isSmall ) {
+      if ( displayText ) {
+        if (icon == null) {
+          button = UIUtils.createSmallButton(getTranslation(action));
+        } else {
+          button = UIUtils.createSmallButton(getTranslation(action), icon);
+        }
+      }
+      else {
+        button = UIUtils.createSmallButton(icon);
+      }
+    } else
+    if ( displayText ) {
+      if (icon == null) {
+        button = UIUtils.createButton(getTranslation(action));
+      }else {
+        button = UIUtils.createButton(getTranslation(action), icon);
+      }
+    }
+    else {
+      button = UIUtils.createButton(icon);
+    }
+    TooltipConfiguration ttconfig = new TooltipConfiguration( myI18NProvider.getTooltip(action));
+    ttconfig.setDelay(1000);
+    ttconfig.setHideOnClick(TC_HIDE_ON_CLICK.TRUE);
+    ttconfig.setShowOnCreate(false);
+
+    Tooltips.getCurrent().setTooltip(button,ttconfig);
+
+    return button;
   }
 }

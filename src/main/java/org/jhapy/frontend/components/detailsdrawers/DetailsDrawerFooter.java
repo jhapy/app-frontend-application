@@ -45,6 +45,7 @@ public class DetailsDrawerFooter extends FlexBoxLayout {
     setWidthFull();
 
     save = UIUtils.createPrimaryButton(getTranslation("action.global.save"));
+    save.setId("save");
     saveAndNew = UIUtils.createPrimaryButton(getTranslation("action.global.saveAndNew"));
     cancel = UIUtils.createTertiaryButton(getTranslation("action.global.cancel"));
     delete = UIUtils.createTertiaryButton(getTranslation("action.global.delete"));

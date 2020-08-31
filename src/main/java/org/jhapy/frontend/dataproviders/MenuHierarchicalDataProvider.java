@@ -2,7 +2,10 @@ package org.jhapy.frontend.dataproviders;
 
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.jhapy.dto.utils.Page;
 import org.jhapy.frontend.views.JHapyMainView3;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
@@ -17,6 +20,8 @@ public abstract class MenuHierarchicalDataProvider extends
 
   protected MenuData rootMenu;
   protected JHapyMainView3 mainView;
+
+  protected Consumer<MenuData> dataObserver;
 
   public MenuHierarchicalDataProvider() {
   }
@@ -39,5 +44,14 @@ public abstract class MenuHierarchicalDataProvider extends
 
   public void setRootMenu(MenuData rootMenu) {
     this.rootMenu = rootMenu;
+  }
+
+  public Consumer<MenuData> getDataObserver() {
+    return dataObserver;
+  }
+
+  public void setDataObserver(
+      Consumer<MenuData> dataObserver) {
+    this.dataObserver = dataObserver;
   }
 }

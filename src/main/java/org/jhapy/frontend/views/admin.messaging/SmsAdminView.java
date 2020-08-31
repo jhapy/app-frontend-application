@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.notification.Sms;
 import org.jhapy.dto.domain.notification.SmsActionEnum;
 import org.jhapy.dto.domain.notification.SmsStatusEnum;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SmsDataProvider;
@@ -37,15 +39,16 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SMS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SmsAdminView extends DefaultMasterDetailsView<Sms, DefaultFilter> {
+public class SmsAdminView extends DefaultMasterDetailsView<Sms, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  public SmsAdminView() {
-    super("sms.", Sms.class, new SmsDataProvider());
+  public SmsAdminView(MyI18NProvider myI18NProvider) {
+    super("sms.", Sms.class, new SmsDataProvider(), myI18NProvider);
   }
 
   protected Grid createGrid() {

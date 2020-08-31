@@ -40,6 +40,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.i18n.Action;
 import org.jhapy.dto.domain.i18n.ActionTrl;
 import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
@@ -69,7 +71,7 @@ import org.vaadin.olli.FileDownloadWrapper;
  */
 @I18NPageTitle(messageKey = AppConst.PAGE_ACTIONS)
 @Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
-public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter> {
+public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public ActionsView(MyI18NProvider myI18NProvider) {
     super("action.", Action.class, new ActionDataProvider(),
@@ -80,7 +82,7 @@ public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter>
           }
           return _elt;
         },
-        e -> I18NServices.getActionService().delete(new DeleteByIdQuery(e.getId())));
+        e -> I18NServices.getActionService().delete(new DeleteByIdQuery(e.getId())), myI18NProvider);
   }
 
   @Override

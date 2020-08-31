@@ -37,6 +37,8 @@ import org.jhapy.dto.domain.reference.RegionTrl;
 import org.jhapy.dto.domain.reference.SubRegion;
 import org.jhapy.dto.domain.reference.SubRegionTrl;
 import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
+import org.jhapy.dto.serviceQuery.SearchQuery;
+import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
 import org.jhapy.dto.serviceQuery.generic.GetByIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
@@ -54,6 +56,7 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
@@ -64,12 +67,12 @@ import org.springframework.security.access.annotation.Secured;
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_COUNTRIES)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class CountriesView extends DefaultMasterDetailsView<Country, DefaultFilter> {
+public class CountriesView extends DefaultMasterDetailsView<Country, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  public CountriesView() {
+  public CountriesView(MyI18NProvider myI18NProvider) {
     super("country.", Country.class, new CountryDataProvider(),
         (e) -> ReferenceServices.getCountryService().save(new SaveQuery<>(e)),
-        e -> ReferenceServices.getCountryService().delete(new DeleteByIdQuery(e.getId())));
+        e -> ReferenceServices.getCountryService().delete(new DeleteByIdQuery(e.getId())), myI18NProvider);
   }
 
   protected Grid createGrid() {
