@@ -48,7 +48,6 @@ public class PdfViewerDialog extends AbstractDialog implements HasLogger {
       if (_storedFile.getIsSuccess() && _storedFile.getData() != null) {
         storedFile.setContent(_storedFile.getData().getContent());
         storedFile.setPdfContent(_storedFile.getData().getPdfContent());
-        storedFile.setOrginalContent(_storedFile.getData().getOrginalContent());
       }
     }
   }

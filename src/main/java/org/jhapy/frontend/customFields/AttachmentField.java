@@ -121,7 +121,8 @@ private AppProperties appProperties;
       } catch (IOException e) {
         Notification.show(e.getLocalizedMessage());
       }
-      storedFile.setOrginalContent(storedFile.getContent());
+      if ( event.getMIMEType().contains("image"))
+        storedFile.setOrginalContent(storedFile.getContent());
       storedFile.setFilesize((long) storedFile.getContent().length);
       storedFile.setFilename(event.getFileName());
 
