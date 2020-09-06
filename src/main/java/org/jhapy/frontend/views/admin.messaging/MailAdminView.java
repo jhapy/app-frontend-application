@@ -32,6 +32,7 @@ import org.jhapy.dto.domain.notification.MailStatusEnum;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.SecurityConst;
+import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.customFields.AttachmentField;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.MailDataProvider;
@@ -46,9 +47,12 @@ import org.springframework.security.access.annotation.Secured;
 @I18NPageTitle(messageKey = AppConst.TITLE_MAILS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
 public class MailAdminView extends DefaultMasterDetailsView<Mail, DefaultFilter, SearchQuery, SearchQueryResult> {
+protected final AppProperties appProperties;
 
-  public MailAdminView(MyI18NProvider myI18NProvider) {
+  public MailAdminView(MyI18NProvider myI18NProvider,
+      AppProperties appProperties) {
     super("mail.", Mail.class, new MailDataProvider(), myI18NProvider);
+    this.appProperties = appProperties;
   }
 
   protected Grid createGrid() {
@@ -97,7 +101,7 @@ public class MailAdminView extends DefaultMasterDetailsView<Mail, DefaultFilter,
     TextArea bodyField = new TextArea();
     bodyField.setWidth("100%");
 
-    AttachmentField attachmentField = new AttachmentField();
+    AttachmentField attachmentField = new AttachmentField(appProperties);
     attachmentField.setWidth("100%");
 
     TextField mailActionField = new TextField();

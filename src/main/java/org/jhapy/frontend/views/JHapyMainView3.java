@@ -40,6 +40,7 @@ import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
+import de.codecamp.vaadin.components.messagedialog.MessageDialog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -663,6 +664,13 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
   public void displayErrorMessage(String message) {
     Icon icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
+    MessageDialog okDialog = new MessageDialog()
+        .setTitle(getTranslation("message.global.error"), icon)
+        .setMessage(message);
+    okDialog.addButton().text(getTranslation("action.global.close")).primary()
+        .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
+    okDialog.open();
+    /*
     Label label = UIUtils.createLabel(FontSize.XS, TextColor.ERROR, message);
 
     FlexLayout messageLayout = new FlexLayout(icon, label);
@@ -694,28 +702,6 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     UIUtils.setShadow(Shadow.M, notification);
 
     notification.open();
-
-    //getAppBar().addNotification(new DefaultNotification(getTranslation("message.global.error"), message, Priority.ERROR));
-    /*
-    Icon icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
-    Label label = UIUtils.createLabel(FontSize.XS, TextColor.ERROR, message);
-
-    FlexLayout footer = new FlexLayout(icon, label);
-
-    // Set the alignment
-    footer.setAlignItems(Alignment.CENTER);
-
-    // Add spacing and padding
-    footer.addClassNames(
-        LumoStyles.Spacing.Right.S,
-        LumoStyles.Padding.Wide.M
-    );
-
-    // Set background color and shadow
-    UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, footer);
-    UIUtils.setShadow(Shadow.M, footer);
-
-    setAppFooterInner(footer);
      */
   }
 

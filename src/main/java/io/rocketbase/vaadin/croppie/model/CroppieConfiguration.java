@@ -72,6 +72,9 @@ public class CroppieConfiguration {
   @Builder.Default
   private boolean enableZoom = true;
 
+  @Builder.Default
+  private boolean enableOrientation = true;
+
   /**
    * Enable or disable the ability to use the mouse wheel to zoom in and out on a croppie instance.
    * <p>
@@ -106,6 +109,7 @@ public class CroppieConfiguration {
       parameters.add(String.format("\"zoom\": %s", zoom));
     }
     parameters.add(String.format("\"enableResize\": %s", enableResize));
+    parameters.add(String.format("\"enableOrientation\": %s", enableOrientation));
     parameters.add(String.format("\"enableZoom\": %s", enableZoom));
     parameters.add(String.format("\"mouseWheelZoom\": %s", mouseWheelZoom));
     parameters.add(String.format("\"showZoomer\": %s", showZoomer));

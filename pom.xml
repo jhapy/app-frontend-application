@@ -251,7 +251,74 @@
       <artifactId>vaadin-spring</artifactId>
     </dependency>
 
+      <dependency>
+        <groupId>javaxt</groupId>
+        <artifactId>javaxt-core</artifactId>
+        <version>1.10.3</version>
+      </dependency>
+
+    <dependency>
+      <groupId>com.twelvemonkeys.common</groupId>
+      <artifactId>common-lang</artifactId>
+      <version>3.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.twelvemonkeys.common</groupId>
+      <artifactId>common-io</artifactId>
+      <version>3.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.twelvemonkeys.common</groupId>
+      <artifactId>common-image</artifactId>
+      <version>3.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.twelvemonkeys.imageio</groupId>
+      <artifactId>imageio-core</artifactId>
+      <version>3.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.twelvemonkeys.imageio</groupId>
+      <artifactId>imageio-metadata</artifactId>
+      <version>3.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.twelvemonkeys.imageio</groupId>
+      <artifactId>imageio-jpeg</artifactId>
+      <version>3.4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.twelvemonkeys.imageio</groupId>
+      <artifactId>imageio-tiff</artifactId>
+      <version>3.4.2</version>
+    </dependency>
     <!-- Vaadin Extension -->
+    <dependency>
+      <groupId>org.jhapy.frontend.component</groupId>
+      <artifactId>cropper-js</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.codecamp.vaadin</groupId>
+      <artifactId>vaadin-message-dialog</artifactId>
+      <version>1.0.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.vaadin.gatanaso</groupId>
+      <artifactId>multiselect-combo-box-flow</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.vaadin.tatu</groupId>
+      <artifactId>twincolselect</artifactId>
+      <version>1.4.1</version>
+    </dependency>
     <dependency>
       <groupId>org.vaadin.artur</groupId>
       <artifactId>spring-data-provider</artifactId>
@@ -706,6 +773,10 @@
     <repository>
       <id>vaadin-addons</id>
       <url>https://maven.vaadin.com/vaadin-addons</url>
+    </repository>
+    <repository>
+      <id>javaxt.com</id>
+      <url>http://www.javaxt.com/maven</url>
     </repository>
   </repositories>
 </project>

@@ -18,71 +18,80 @@
 
 package org.jhapy.frontend.customFields;
 
+import com.google.gson.Gson;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasStyle;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.customfield.CustomField;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.server.StreamResource;
-import io.rocketbase.vaadin.croppie.Croppie;
-import io.rocketbase.vaadin.croppie.model.ViewPortConfig;
-import io.rocketbase.vaadin.croppie.model.ViewPortType;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import javax.imageio.ImageIO;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
+import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.utils.StoredFile;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerFooter;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
+import org.jhapy.frontend.component.cropperjs.CropperConfiguration;
+import org.jhapy.frontend.component.cropperjs.CropperJs;
+import org.jhapy.frontend.component.cropperjs.model.Data;
+import org.jhapy.frontend.component.cropperjs.model.DragMode;
+import org.jhapy.frontend.component.cropperjs.model.ViewMode;
+import org.jhapy.frontend.components.AbstractDialog;
+import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.utils.AppConst;
+import org.jhapy.frontend.utils.UIUtils;
 
 /**
  * @author jHapy Lead Dev.
  * @version 1.0
  * @since 2019-05-13
  */
-public class ImageField extends CustomField<StoredFile> implements HasStyle, Serializable {
+public class ImageField extends CustomField<StoredFile> implements HasStyle, Serializable,
+    HasLogger {
 
   private final Image image;
   private StoredFile storedFile;
-  private StoredFile initialImage;
-  private final Div croppieContent;
-  private ViewPortType viewPortType = ViewPortType.CIRCLE;
+  private AbstractDialog uploadDialog;
+  private CropperJs cropperJs;
+  private int nbAddedFile = 0;
 
   public ImageField() {
     this(null);
   }
+
+  private FlexBoxLayout contentLayout;
 
   public ImageField(String label) {
     if (label != null) {
       setLabel(label);
     }
 
+    FlexBoxLayout contentLayout = new FlexBoxLayout();
+    contentLayout.setSizeFull();
+    contentLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+
     image = new Image(AppConst.NO_PICTURE, "");
-    image.setWidthFull();
-    //image.setHeight("150px");
+    image.setHeight("150px");
     image.addClickListener(e -> addOrUpdateImage());
 
-    croppieContent = new Div();
-    croppieContent.setWidth("200px");
-    croppieContent.setHeight("350px");
+    contentLayout.add(image);
 
-    add(image);
-  }
-
-  public void setViewPortType(ViewPortType viewPortType) {
-    this.viewPortType = viewPortType;
+    add(contentLayout);
   }
 
   private void addOrUpdateImage() {
-    Dialog uploadDialog = new Dialog();
+    String loggerPrefix = getLoggerPrefix("addOrUpdateImage");
 
     MemoryBuffer buffer = new MemoryBuffer();
     Upload upload = new Upload(buffer);
@@ -90,7 +99,177 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
     upload.setAutoUpload(true);
     upload.setMaxFiles(1);
 
-    final DetailsDrawer detailsDrawer = new DetailsDrawer(upload, croppieContent);
+    uploadDialog = new AbstractDialog() {
+
+      @Override
+      protected String getTitle() {
+        return getTranslation("element.global.addOrUpdate");
+      }
+
+      @Override
+      protected Component getContent() {
+        contentLayout = new FlexBoxLayout();
+        contentLayout.setWidthFull();
+        contentLayout.setHeightFull();
+        contentLayout.setFlexDirection(FlexDirection.COLUMN);
+
+        contentLayout.add(upload);
+
+        if (storedFile != null) {
+          buildCropper(storedFile.getOrginalContent(), storedFile.getFilename(),
+              storedFile != null ? storedFile.getCopperData() : null);
+        }
+
+        return contentLayout;
+      }
+
+      @Override
+      protected List<Component> getButtons() {
+        Button delete = UIUtils.createTertiaryButton(getTranslation("action.global.delete"));
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        delete.addClickListener(event -> {
+          storedFile = null;
+          image.setSrc(AppConst.NO_PICTURE);
+          updateValue();
+          close();
+        });
+        return Collections.singletonList(delete);
+      }
+
+      @Override
+      protected boolean onSave() {
+        cropperJs.getData(true, data -> {
+          String loggerPrefix = getLoggerPrefix("save");
+
+          logger().debug(loggerPrefix + "Data = " + data);
+
+          javaxt.io.Image imagext = new javaxt.io.Image(storedFile.getOrginalContent());
+          //dumpImageInfo(imagext, loggerPrefix);
+
+          if (data.getRotate() != 0) {
+            imagext.rotate(data.getRotate().intValue());
+          }
+
+          if (data.getScaleY() != 1 && data.getScaleY() != 1) {
+            imagext.flip();
+          }
+
+          imagext.crop(data.getX().intValue(), data.getY().intValue(), data.getWidth().intValue(),
+              data.getHeight().intValue());
+
+          storedFile.setCopperData(data.getJsonString());
+          storedFile.setContent(imagext.getByteArray());
+          storedFile.setFilename(storedFile.getFilename());
+          storedFile.setFilesize((long) storedFile.getContent().length);
+          storedFile.setHasChanged(true);
+
+          image.setSrc(new StreamResource(storedFile.getFilename(),
+              () -> new ByteArrayInputStream(storedFile.getContent())));
+          updateValue();
+          cropperJs.destroy();
+          close();
+
+        });
+        return false;
+      }
+
+      private void dumpImageInfo(javaxt.io.Image image, String loggerPrefix) {
+        java.util.HashMap<Integer, Object> exif = image.getExifTags();
+
+        logger().debug(loggerPrefix + "EXIF Fields: " + exif.size());
+        logger().debug(loggerPrefix + "-----------------------------");
+        logger().debug(loggerPrefix + "Date: " + exif.get(0x0132)); //0x9003
+        logger().debug(loggerPrefix + "Camera: " + exif.get(0x0110));
+        logger().debug(loggerPrefix + "Manufacturer: " + exif.get(0x010F));
+        logger().debug(loggerPrefix + "Focal Length: " + exif.get(0x920A));
+        logger().debug(loggerPrefix + "F-Stop: " + exif.get(0x829D));
+        logger().debug(loggerPrefix + "Exposure Time (1 / Shutter Speed): " + exif.get(0x829A));
+        logger().debug(loggerPrefix + "ISO Speed Ratings: " + exif.get(0x8827));
+        logger().debug(loggerPrefix + "Shutter Speed Value (APEX): " + exif.get(0x9201));
+        logger().debug(loggerPrefix + "Shutter Speed (Exposure Time): " + exif.get(0x9201));
+        logger().debug(loggerPrefix + "Aperture Value (APEX): " + exif.get(0x9202));
+
+        //Print Image Orientation
+        try {
+          int orientation = (Integer) exif.get(0x0112);
+          String desc = "";
+          switch (orientation) {
+            case 1:
+              desc = "Top, left side (Horizontal / normal)";
+              break;
+            case 2:
+              desc = "Top, right side (Mirror horizontal)";
+              break;
+            case 3:
+              desc = "Bottom, right side (Rotate 180)";
+              break;
+            case 4:
+              desc = "Bottom, left side (Mirror vertical)";
+              break;
+            case 5:
+              desc = "Left side, top (Mirror horizontal and rotate 270 CW)";
+              break;
+            case 6:
+              desc = "Right side, top (Rotate 90 CW)";
+              break;
+            case 7:
+              desc = "Right side, bottom (Mirror horizontal and rotate 90 CW)";
+              break;
+            case 8:
+              desc = "Left side, bottom (Rotate 270 CW)";
+              break;
+          }
+          logger().debug(loggerPrefix + "Orientation: " + orientation + " -- " + desc);
+        } catch (Exception e) {
+        }
+
+        //Print GPS Information
+        double[] coord = image.getGPSCoordinate();
+        if (coord != null) {
+          logger().debug(loggerPrefix + "GPS Coordinate: " + coord[0] + ", " + coord[1]);
+          logger().debug(loggerPrefix + "GPS Datum: " + image.getGPSDatum());
+        }
+
+        java.util.HashMap<Integer, Object> iptc = image.getIptcTags();
+        logger().debug(loggerPrefix + "IPTC Fields: " + iptc.size());
+        logger().debug(loggerPrefix + "-----------------------------");
+        logger().debug(loggerPrefix + "Date: " + iptc.get(0x0237));
+        logger().debug(loggerPrefix + "Caption: " + iptc.get(0x0278));
+        logger().debug(loggerPrefix + "Copyright: " + iptc.get(0x0274));
+
+      }
+
+      @Override
+      protected boolean onClose() {
+        if (storedFile != null) {
+          image.setSrc(new StreamResource(storedFile.getFilename(),
+              () -> new ByteArrayInputStream(storedFile.getContent())));
+        } else {
+          image.setSrc(AppConst.NO_PICTURE);
+        }
+        cropperJs.destroy();
+        return true;
+      }
+
+      @Override
+      protected void onDialogResized(DialogResizeEvent event) {
+        if (nbAddedFile > 0) {
+          int _height = Integer
+              .parseInt(event.getHeight().substring(0, event.getHeight().indexOf("px")).trim());
+          int _width = Integer
+              .parseInt(event.getWidth().substring(0, event.getWidth().indexOf("px")).trim());
+          cropperJs.resize(_height - 30, _width);
+        } else {
+          cropperJs.resize(event.getHeight(), event.getWidth());
+        }
+      }
+
+      @Override
+      public boolean canMaximize() {
+        return false;
+      }
+    };
+
     upload.addSucceededListener(event -> {
       storedFile = new StoredFile();
       storedFile.setMimeType(event.getMIMEType());
@@ -103,52 +282,17 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
       storedFile.setFilesize((long) storedFile.getContent().length);
       storedFile.setFilename(buffer.getFileName());
 
-      buildCropie(storedFile.getContent(), storedFile.getFilename(), null);
+      nbAddedFile++;
 
-    });
-    if (initialImage != null) {
-      buildCropie(initialImage.getOrginalContent(), initialImage.getFilename(),
-          storedFile != null ? storedFile.getZoom() : null);
-    }
-
-    DetailsDrawerHeader header = new DetailsDrawerHeader(
-        getTranslation("element.global.addOrUpdate"));
-    DetailsDrawerFooter footer = new DetailsDrawerFooter();
-    footer.setSaveAndNewButtonVisible(false);
-    footer.addCancelListener(cancelEvent -> {
-      if (storedFile != null) {
-        storedFile.setOrginalContent(initialImage.getOrginalContent());
-        storedFile.setFilesize(initialImage.getFilesize());
-        storedFile.setMimeType(initialImage.getMimeType());
-        storedFile.setFilename(initialImage.getFilename());
-        storedFile.setContent(initialImage.getContent());
-
-        image.setSrc(new StreamResource(storedFile.getFilename(),
-            () -> new ByteArrayInputStream(storedFile.getContent())));
+      if (cropperJs == null) {
+        buildCropper(storedFile.getContent(), storedFile.getFilename(), null);
       } else {
-        image.setSrc(AppConst.NO_PICTURE);
+        cropperJs.withSrc(new StreamResource(buffer.getFileName(),
+            () -> new ByteArrayInputStream(storedFile.getContent())));
       }
-      uploadDialog.setOpened(false);
     });
-    footer.addSaveListener(saveEvent -> {
-      image.setSrc(new StreamResource(storedFile.getFilename(),
-          () -> new ByteArrayInputStream(storedFile.getContent())));
-      updateValue();
-      uploadDialog.setOpened(false);
-    });
-    footer.addDeleteListener(deleteEvent -> {
-      storedFile = null;
-      initialImage = null;
-      image.setSrc(AppConst.NO_PICTURE);
-      updateValue();
-      uploadDialog.setOpened(false);
-    });
-    detailsDrawer.setHeader(header);
-    detailsDrawer.setFooter(footer);
 
-    uploadDialog.add(detailsDrawer);
-
-    uploadDialog.setOpened(true);
+    uploadDialog.open();
   }
 
   @Override
@@ -156,85 +300,89 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
     return storedFile;
   }
 
-  protected void buildCropie(byte[] content, String filename, Float zoom) {
+  protected void buildCropper(byte[] content, String filename, String cropperData) {
     StreamResource imageResource = new StreamResource(filename,
         () -> new ByteArrayInputStream(content));
 
-    Croppie croppie = new Croppie(imageResource);
-    croppie.setWidth("300px");
-    croppie.setHeight("300px");
+    cropperJs = new CropperJs(imageResource, true);
+    cropperJs.setWidthFull();
 
-    if (zoom != null) {
-      croppie.withViewport(new ViewPortConfig(150, 150, viewPortType))
-          .withShowZoomer(true).withEnableResize(false).withEnableZoom(true).withZoom(zoom);
-    } else {
-      croppie.withViewport(new ViewPortConfig(150, 150, viewPortType))
-          .withShowZoomer(true).withEnableResize(false).withEnableZoom(true);
+    CropperConfiguration cropperConfiguration = new CropperConfiguration();
+    cropperConfiguration.setAspectRatio(1f);
+    cropperConfiguration.setViewMode(ViewMode.RESTRICT_TO_CANVAS);
+
+    if (cropperData != null) {
+      cropperConfiguration.setData(new Gson().fromJson(cropperData, Data.class));
     }
 
-    croppie.addCropListener(e -> {
-      if (content != null && e.isFromClient()) {
-        try {
-          final String originalExtension = filename.substring(filename.lastIndexOf('.') + 1);
-          BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(content));
+    cropperJs.withConfig(cropperConfiguration);
 
-          int imgH = bufferedImage.getHeight();
-          int imgW = bufferedImage.getWidth();
+    contentLayout.add(cropperJs);
 
-          int topX = e.getPoints().getTopLeftX();
-          int topY = e.getPoints().getTopLeftY();
+    FlexBoxLayout toolsLayout = new FlexBoxLayout();
+    toolsLayout.setWidthFull();
+    toolsLayout.setFlexWrap(FlexWrap.WRAP);
+    toolsLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
+    toolsLayout.setFlexDirection(FlexDirection.ROW);
 
-          int botX = e.getPoints().getBottomRightX();
-          int botY = e.getPoints().getBottomRightY();
+    Button moveButton = UIUtils.createSmallButton(VaadinIcon.ARROWS);
+    moveButton.addClickListener(event -> cropperJs.setDragMode(DragMode.MOVE));
+    Button cropButton = UIUtils.createSmallButton(VaadinIcon.CROP);
+    cropButton.addClickListener(event -> cropperJs.setDragMode(DragMode.CROP));
 
-          int w = botX - topX;
-          int h = botY - topY;
+    Button zoomOutButton = UIUtils.createSmallButton(VaadinIcon.SEARCH_MINUS);
+    zoomOutButton.addClickListener(event -> cropperJs.zoom(-0.1f));
+    Button zoomInButton = UIUtils.createSmallButton(VaadinIcon.SEARCH_PLUS);
+    zoomInButton.addClickListener(event -> cropperJs.zoom(0.1f));
 
-          if ((topY + h) > imgH) {
-            h = topY - imgH;
-          }
+    Button moveLeftButton = UIUtils.createSmallButton(VaadinIcon.ARROW_LEFT);
+    moveLeftButton.addClickListener(event -> cropperJs.move(-10f, 0f));
+    Button moveRightButton = UIUtils.createSmallButton(VaadinIcon.ARROW_RIGHT);
+    moveRightButton.addClickListener(event -> cropperJs.move(10f, 0f));
+    Button moveUpButton = UIUtils.createSmallButton(VaadinIcon.ARROW_UP);
+    moveUpButton.addClickListener(event -> cropperJs.move(0f, -10f));
+    Button moveDownButton = UIUtils.createSmallButton(VaadinIcon.ARROW_DOWN);
+    moveDownButton.addClickListener(event -> cropperJs.move(0f, 10));
 
-          if ((topX + w) > imgW) {
-            w = topX - imgW;
-          }
+    Button rotateLeftButton = UIUtils.createSmallButton(VaadinIcon.ROTATE_LEFT);
+    rotateLeftButton.addClickListener(event -> cropperJs.rotate(-45));
+    Button rotateRightButton = UIUtils.createSmallButton(VaadinIcon.ROTATE_RIGHT);
+    rotateRightButton.addClickListener(event -> cropperJs.rotate(45));
 
-          BufferedImage dest = bufferedImage
-              .getSubimage(topX, topY,
-                  w,
-                  h);
-          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          ImageIO.write(dest, originalExtension, baos);
-          storedFile.setZoom(e.getZoom());
-          storedFile.setContent(baos.toByteArray());
-          storedFile.setFilesize((long) storedFile.getContent().length);
-          storedFile.setHasChanged(true);
-        } catch (IOException ex) {
-          Notification.show(ex.getLocalizedMessage());
-        }
-      }
+    final AtomicInteger scaleX = new AtomicInteger(-1);
+    final AtomicInteger scaleY = new AtomicInteger(-1);
+    Button flipHorizontalButton = UIUtils.createSmallButton(VaadinIcon.ARROWS_LONG_H);
+    flipHorizontalButton.addClickListener(event -> {
+      cropperJs.scaleX(scaleX.get());
+      scaleX.set(scaleX.get() * -1);
     });
-    croppieContent.removeAll();
-    croppieContent.add(croppie);
+    Button flipVerticalButton = UIUtils.createSmallButton(VaadinIcon.ARROWS_LONG_V);
+    flipVerticalButton.addClickListener(event -> {
+      cropperJs.scaleY(scaleY.get());
+      scaleY.set(scaleY.get() * -1);
+    });
+
+    Button resetButton = UIUtils.createSmallButton(VaadinIcon.REFRESH);
+    resetButton.addClickListener(event -> cropperJs.reset());
+
+    toolsLayout
+        .add(moveButton, cropButton, zoomOutButton, zoomInButton, moveLeftButton, moveRightButton,
+            moveUpButton, moveDownButton, rotateLeftButton, rotateRightButton, flipHorizontalButton,
+            flipVerticalButton,
+            resetButton);
+
+    contentLayout.add(toolsLayout);
   }
 
   @Override
   protected void setPresentationValue(StoredFile newPresentationValue) {
     if (newPresentationValue.getContent() != null) {
       storedFile = newPresentationValue;
-      initialImage = new StoredFile();
-      initialImage.setOrginalContent(newPresentationValue.getOrginalContent());
-      initialImage.setFilesize(newPresentationValue.getFilesize());
-      initialImage.setMimeType(newPresentationValue.getMimeType());
-      initialImage.setFilename(newPresentationValue.getFilename());
-      initialImage.setContent(newPresentationValue.getContent());
-      if ( initialImage.getOrginalContent() == null )
-        initialImage.setOrginalContent(initialImage.getContent());
 
       image.setSrc(new StreamResource(newPresentationValue.getFilename(),
-          () -> new ByteArrayInputStream(initialImage.getContent())));
+          () -> new ByteArrayInputStream(storedFile.getContent())));
     } else {
       storedFile = null;
-      initialImage = null;
       image.setSrc(AppConst.NO_PICTURE);
     }
   }

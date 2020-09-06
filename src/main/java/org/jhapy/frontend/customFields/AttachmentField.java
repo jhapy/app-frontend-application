@@ -41,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -49,13 +50,16 @@ import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.ResourceService;
 import org.jhapy.frontend.components.FlexBoxLayout;
+import org.jhapy.frontend.components.ImageViewerDialog;
 import org.jhapy.frontend.components.InputDialog;
 import org.jhapy.frontend.components.InputDialog.FluentButton;
 import org.jhapy.frontend.components.ListItem;
 import org.jhapy.frontend.components.PdfViewer;
+import org.jhapy.frontend.components.PdfViewerDialog;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.events.AttachmentsFieldValueChangeEvent;
+import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.layout.size.Vertical;
@@ -76,15 +80,16 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
   private List<StoredFile> storedFiles = new ArrayList<>();
   private final Upload upload;
   private final Div documentList;
-
+private AppProperties appProperties;
   private final List<ValueChangeListener<? super AttachmentsFieldValueChangeEvent>> changeListeners = new ArrayList<>();
 
-  public AttachmentField() {
-    this(null, new String[]{"image/jpeg", "image/png", "image/gif", "image/tiff",
+  public AttachmentField(AppProperties appProperties) {
+    this(appProperties, null, new String[]{"image/jpeg", "image/png", "image/gif", "image/tiff",
         "application/pdf"},10 , 10  );
   }
 
-  public AttachmentField(String label, String[] acceptedFileType, int maxFileSizeMb, int maxFiles) {
+  public AttachmentField(AppProperties appProperties, String label, String[] acceptedFileType, int maxFileSizeMb, int maxFiles) {
+    this.appProperties = appProperties;
     setFlexDirection(FlexDirection.COLUMN);
 
     documentList = new Div();
@@ -138,9 +143,21 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
     fileIcon.addClassName(IconSize.M.getClassName());
 
     ListItem item = new ListItem(fileIcon, file.getFilename());
-    item.setSuffix(createViewButton(file), createRemoveButton(file, item));
+    item.setSuffix(createDownloadButton(file), createViewButton(file), createRemoveButton(file, item));
 
     documentList.add(item);
+  }
+
+  private Component createDownloadButton(StoredFile item) {
+    Button downloadButton = UIUtils.createSmallButton(VaadinIcon.DOWNLOAD);
+    downloadButton.addClickListener( event -> {} );
+
+      Anchor downloadLink = new Anchor(new StreamResource(item.getFilename(), () -> new ByteArrayInputStream(item.getContent())), "");
+      downloadLink.getElement().setAttribute("download", true);
+
+      downloadLink.add(downloadButton);
+
+      return downloadLink;
   }
 
   private Button createViewButton(StoredFile item) {
@@ -148,57 +165,18 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
     infoButton.addClickListener(
         e -> {
           if (item != null && item.getId() != null) {
-            StreamResource streamResource = new StreamResource(
-                item.getFilename(),
-                () -> {
-                  if ( item.getContent() != null )
-                    return new ByteArrayInputStream(item.getContent());
-                  else {
-                    ServiceResult<StoredFile> _storedFile = BaseServices.getResourceService().getById(new GetByStrIdQuery(item.getId()));
-                    if ( _storedFile.getIsSuccess() && _storedFile.getData() != null ) {
-                      item.setContent(_storedFile.getData().getContent());
-                      item.setOrginalContent( _storedFile.getData().getOrginalContent());
-                      return new ByteArrayInputStream(item.getContent());
-                    } else {
-                      return null;
-                    }
-                  }
-                });
-
-            if (item.getMimeType().equals("application/pdf")) {
-
-              PdfViewer viewer = new PdfViewer(streamResource);
-              viewer.setHeight("600px");
-              createPopup(item, viewer);
+            if (item.getMimeType().startsWith("image") ) {
+              ImageViewerDialog imageViewerDialog = new ImageViewerDialog(item, false );
+              imageViewerDialog.open();
             } else {
-              createPopup(item, new Image(streamResource, item.getFilename()));
+              PdfViewerDialog pdfViewerDialog = new PdfViewerDialog(appProperties, item);
+              pdfViewerDialog.open();
+              pdfViewerDialog.setWidth("600px");
+              pdfViewerDialog.setHeight("800px");
             }
           }
         });
     return infoButton;
-  }
-
-  private void createPopup(StoredFile item, Component viewer) {
-    Dialog popupDialog = new Dialog();
-
-    DetailsDrawer popup = new DetailsDrawer();
-    DetailsDrawerHeader popupHeader = new DetailsDrawerHeader(item.getFilename());
-    popupHeader.addCloseListener(event -> popupDialog.close());
-
-    popup.setHeader(popupHeader);
-
-    CustomDetailsDrawerFooter popupFooter = new CustomDetailsDrawerFooter(
-        new StreamResource(item.getFilename(), () -> new ByteArrayInputStream(item.getContent())));
-    popupFooter.addCloseListener(event -> popupDialog.close());
-
-    popup.setFooter(popupFooter);
-
-    //popupDialog.setWidth("600px");
-
-    popup.setContent(viewer);
-
-    popupDialog.add(popup);
-    popupDialog.open();
   }
 
   private Button createRemoveButton(StoredFile item, ListItem listItem) {

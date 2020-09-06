@@ -80,6 +80,13 @@ public class ResourceServiceFallback implements ResourceService, HasLogger,
   }
 
   @Override
+  public ServiceResult<StoredFile> getByIdPdfContent(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getByIdPdfContent") + "Cannot connect to the server");
+
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
+
+  @Override
   public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
     logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 

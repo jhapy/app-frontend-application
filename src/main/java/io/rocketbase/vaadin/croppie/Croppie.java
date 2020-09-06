@@ -41,7 +41,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Tag("vaadin-croppie")
-@NpmPackage(value = "croppie", version = "2.6.4")
+@NpmPackage(value = "croppie", version = "2.6.5")
 @JsModule("./mycroppie/croppie.js")
 public class Croppie extends PolymerTemplate<CroppieModel> implements HasSize, HasStyle {
 
@@ -126,6 +126,12 @@ public class Croppie extends PolymerTemplate<CroppieModel> implements HasSize, H
   public Croppie withEnableResize(boolean enableResize) {
     getConfigInitialized();
     this.config.setEnableResize(enableResize);
+    return getAndUpdateConfig();
+  }
+
+  public Croppie withEnabledOrientation(boolean enabledOrientation) {
+    getConfigInitialized();
+    this.config.setEnableOrientation(enabledOrientation);
     return getAndUpdateConfig();
   }
 

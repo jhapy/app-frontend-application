@@ -46,6 +46,9 @@ public interface ResourceService {
   @PostMapping(value = "/getByIdNoContent")
   ServiceResult<StoredFile> getByIdNoContent(@RequestBody GetByStrIdQuery query);
 
+  @PostMapping(value = "/getByIdPdfContent")
+  ServiceResult<StoredFile> getByIdPdfContent(@RequestBody GetByStrIdQuery query);
+
   @PostMapping(value = "/delete")
   ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 }

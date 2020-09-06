@@ -83,7 +83,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   private Function<T, ServiceResult<T>> saveHandler;
   private final Consumer<T> deleteHandler;
   private Tabs tabs;
-  private final Class parentViewClassname;
+  private Class parentViewClassname;
 private AppBar appBar;
   protected final MyI18NProvider myI18NProvider;
 
@@ -127,6 +127,10 @@ private AppBar appBar;
     initHeader();
 
     setViewContent(createContent());
+  }
+
+  protected void setParentViewClassname( Class parentViewClassname ) {
+    this.parentViewClassname = parentViewClassname;
   }
 
   protected void setSaveHandler(Function<T, ServiceResult<T>> saveHandler) {
