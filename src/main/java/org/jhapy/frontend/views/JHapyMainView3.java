@@ -601,8 +601,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     settings.addMetaTag("apple-mobile-web-app-capable", "yes");
     settings.addMetaTag("apple-mobile-web-app-status-bar-style", "black");
 
-    settings.addFavIcon("icon", "frontend/styles/favicons/favicon.ico",
-        "256x256");
+    settings.addFavIcon("icon", "icons/icon-192x192.png", "192x192");
   }
 
   public NaviDrawerWithTreeMenu getNaviDrawer() {
