@@ -80,16 +80,14 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
   private List<StoredFile> storedFiles = new ArrayList<>();
   private final Upload upload;
   private final Div documentList;
-private AppProperties appProperties;
   private final List<ValueChangeListener<? super AttachmentsFieldValueChangeEvent>> changeListeners = new ArrayList<>();
 
-  public AttachmentField(AppProperties appProperties) {
-    this(appProperties, null, new String[]{"image/jpeg", "image/png", "image/gif", "image/tiff",
-        "application/pdf"},10 , 10  );
+  public AttachmentField() {
+    this(null, new String[]{"image/jpeg", "image/png", "image/gif", "image/tiff",
+        "application/pdf"}, 10, 10);
   }
 
-  public AttachmentField(AppProperties appProperties, String label, String[] acceptedFileType, int maxFileSizeMb, int maxFiles) {
-    this.appProperties = appProperties;
+  public AttachmentField(String label, String[] acceptedFileType, int maxFileSizeMb, int maxFiles) {
     setFlexDirection(FlexDirection.COLUMN);
 
     documentList = new Div();
@@ -170,7 +168,7 @@ private AppProperties appProperties;
               ImageViewerDialog imageViewerDialog = new ImageViewerDialog(item, false );
               imageViewerDialog.open();
             } else {
-              PdfViewerDialog pdfViewerDialog = new PdfViewerDialog(appProperties, item);
+              PdfViewerDialog pdfViewerDialog = new PdfViewerDialog(item);
               pdfViewerDialog.open();
               pdfViewerDialog.setWidth("600px");
               pdfViewerDialog.setHeight("800px");

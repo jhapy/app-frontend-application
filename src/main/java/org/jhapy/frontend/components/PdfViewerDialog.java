@@ -37,11 +37,9 @@ public class PdfViewerDialog extends AbstractDialog implements HasLogger {
   private FlexBoxLayout contentLayout;
   private final StoredFile storedFile;
   private PdfViewer pdfViewer;
-  private final AppProperties appProperties;
 
-  public PdfViewerDialog(AppProperties appProperties, StoredFile storedFile) {
+  public PdfViewerDialog(StoredFile storedFile) {
     this.storedFile = storedFile;
-    this.appProperties = appProperties;
     if (storedFile != null && storedFile.getId() != null) {
       ServiceResult<StoredFile> _storedFile = BaseServices
           .getResourceService().getById(new GetByStrIdQuery(storedFile.getId()));

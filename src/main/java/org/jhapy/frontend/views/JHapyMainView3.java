@@ -242,14 +242,14 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     return false;
   }
 
-  protected void addToReferencesMenu(MenuEntry referenceMenu) {
+  protected void addToReferencesMenu(MenuData menuData, MenuEntry referenceMenu) {
   }
 
   protected boolean hasReferencesMenuEntries() {
     return false;
   }
 
-  protected void addToSecurityMenu(MenuEntry securityMenu) {
+  protected void addToSecurityMenu(MenuData menuData, MenuEntry securityMenu) {
   }
 
   protected boolean hasSecurityMenuEntries() {
@@ -499,7 +499,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             menuData.addMenuEntry(subMenu);
           }
 
-          addToSecurityMenu( securitySubMenu);
+          addToSecurityMenu(menuData, securitySubMenu);
         }
         boolean isDisplayMonitoring =
             SecurityUtils.isAccessGranted(EurekaView.class) ||

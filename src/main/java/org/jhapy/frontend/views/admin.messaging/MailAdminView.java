@@ -101,7 +101,7 @@ protected final AppProperties appProperties;
     TextArea bodyField = new TextArea();
     bodyField.setWidth("100%");
 
-    AttachmentField attachmentField = new AttachmentField(appProperties);
+    AttachmentField attachmentField = new AttachmentField();
     attachmentField.setWidth("100%");
 
     TextField mailActionField = new TextField();

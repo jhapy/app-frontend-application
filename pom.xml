@@ -66,7 +66,7 @@
     <jjwt.version>0.5.1</jjwt.version>
     <emptyformlayoutitem.version>1.0.2</emptyformlayoutitem.version>
     <vaadin-fullcalendar.version>2.0.0</vaadin-fullcalendar.version>
-    <logstash-gelf.version>1.13.0</logstash-gelf.version>
+    <logstash-gelf.version>1.14.1</logstash-gelf.version>
     <smack.version>4.3.4</smack.version>
     <file-download-wrapper.version>3.0.1</file-download-wrapper.version>
     <error-window-vaadin.version>3.0.2</error-window-vaadin.version>
