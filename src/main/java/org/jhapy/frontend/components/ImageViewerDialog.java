@@ -72,7 +72,7 @@ public class ImageViewerDialog extends AbstractDialog implements HasLogger {
 
     if (storedFile != null && ! isReadOnly) {
       buildCropper(storedFile.getOrginalContent(), storedFile.getFilename(),
-          storedFile != null ? storedFile.getCopperData() : null);
+          storedFile != null ? storedFile.getMetadata().get("copperData") : null);
     } else {
       contentLayout.add(new Image(new StreamResource(
           storedFile.getFilename(),() -> new ByteArrayInputStream(storedFile.getContent())), storedFile.getFilename()));
@@ -102,7 +102,7 @@ public class ImageViewerDialog extends AbstractDialog implements HasLogger {
       imagext.crop(data.getX().intValue(), data.getY().intValue(), data.getWidth().intValue(),
           data.getHeight().intValue());
 
-      storedFile.setCopperData(data.getJsonString());
+      storedFile.getMetadata().put("cropperData", data.getJsonString());
       storedFile.setContent(imagext.getByteArray());
       storedFile.setFilename(storedFile.getFilename());
       storedFile.setFilesize((long) storedFile.getContent().length);

@@ -147,8 +147,8 @@ public class CroppieDialog extends Dialog {
     croppie.withViewport(new ViewPortConfig(150, 150, ViewPortType.SQUARE))
         .withShowZoomer(true).withEnableResize(false).withEnableZoom(true);
 
-    if (storedFile.getZoom() != null) {
-      croppie.withZoom(storedFile.getZoom());
+    if (storedFile.getMetadata().containsKey("zoom") ) {
+      croppie.withZoom(Float.valueOf(storedFile.getMetadata().get("zoom")));
     }
 
     croppie.addCropListener(e -> {
@@ -187,7 +187,7 @@ public class CroppieDialog extends Dialog {
         ImageIO.write(dest, originalExtension, baos);
         storedFile.setContent(baos.toByteArray());
         storedFile.setFilesize((long) storedFile.getContent().length);
-        storedFile.setZoom(e.getZoom());
+        storedFile.getMetadata().put("zoom", Float.toString(e.getZoom()));
         storedFile.setHasChanged(true);
       } catch (IOException ex) {
         Notification.show(ex.getLocalizedMessage());

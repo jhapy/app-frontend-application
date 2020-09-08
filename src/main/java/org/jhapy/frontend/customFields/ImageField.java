@@ -117,7 +117,7 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
 
         if (storedFile != null) {
           buildCropper(storedFile.getOrginalContent(), storedFile.getFilename(),
-              storedFile != null ? storedFile.getCopperData() : null);
+              storedFile != null ? storedFile.getMetadata().get("copperData") : null);
         }
 
         return contentLayout;
@@ -157,7 +157,7 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
           imagext.crop(data.getX().intValue(), data.getY().intValue(), data.getWidth().intValue(),
               data.getHeight().intValue());
 
-          storedFile.setCopperData(data.getJsonString());
+          storedFile.getMetadata().put("copperData", data.getJsonString());
           storedFile.setContent(imagext.getByteArray());
           storedFile.setFilename(storedFile.getFilename());
           storedFile.setFilesize((long) storedFile.getContent().length);
