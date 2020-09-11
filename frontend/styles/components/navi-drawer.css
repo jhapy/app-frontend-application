@@ -68,7 +68,7 @@
   width: var(--navi-drawer-rail-width);
 }
 
-.navi-drawer[rail]:not([open]):hover .navi-drawer__content {
+.navi-drawer[rail]:not([open]):hover .navi-drawer__content .dragger {
   width: var(--navi-drawer-width);
 }
 

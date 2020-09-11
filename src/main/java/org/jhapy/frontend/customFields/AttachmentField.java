@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.GetByStrIdQuery;
 import org.jhapy.dto.utils.StoredFile;
@@ -63,6 +64,7 @@ import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.layout.size.Vertical;
+import org.jhapy.frontend.utils.FileExtLookup;
 import org.jhapy.frontend.utils.IconSize;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
@@ -75,7 +77,7 @@ import org.jhapy.frontend.utils.css.Shadow;
  * @since 2019-05-13
  */
 public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
-    HasValue<AttachmentsFieldValueChangeEvent, StoredFile[]> {
+    HasValue<AttachmentsFieldValueChangeEvent, StoredFile[]>, HasLogger {
 
   private List<StoredFile> storedFiles = new ArrayList<>();
   private final Upload upload;
@@ -112,6 +114,9 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
     upload.setMaxFiles(maxFiles);
 
     upload.addSucceededListener(event -> {
+      String loggerPrefix = getLoggerPrefix("upload.succeeded");
+      logger().debug(loggerPrefix+"Start");
+
       StoredFile storedFile = new StoredFile();
       storedFile.setMimeType(event.getMIMEType());
       try {
@@ -127,9 +132,13 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
       List<StoredFile> oldValues = new ArrayList<>(storedFiles);
       storedFiles.add(storedFile);
 
+      logger().debug(loggerPrefix+"Notify listeners, " + changeListeners.size() + " listeners");
+
       changeListeners.forEach(listener -> listener
           .valueChanged(new AttachmentsFieldValueChangeEvent(oldValues.toArray(new StoredFile[0]),
               storedFiles.toArray(new StoredFile[0]), this)));
+
+      logger().debug(loggerPrefix+"End");
     });
 
     add(upload);
@@ -138,7 +147,13 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
   }
 
   protected void addDocumentInList(StoredFile file) {
-    Image fileIcon = new Image("images/filesExt/" + file.getFilename().substring(file.getFilename().lastIndexOf(".") + 1) + "-icon-48x48.png", file.getFilename());
+    String iconFile = file.getFilename()
+        .substring(file.getFilename().lastIndexOf(".") + 1) + "-icon-48x48.png";
+    if (!FileExtLookup.getInstance().doesExtExists(iconFile))
+      iconFile = "unknown-48x48.png";
+    Image fileIcon = new Image("images/filesExt/" + iconFile,
+        file.getFilename());
+
     fileIcon.addClassName(IconSize.M.getClassName());
 
     ListItem item = new ListItem(fileIcon, file.getFilename());

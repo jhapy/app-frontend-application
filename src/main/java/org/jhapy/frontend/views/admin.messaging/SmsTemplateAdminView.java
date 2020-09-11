@@ -20,6 +20,7 @@ package org.jhapy.frontend.views.admin.messaging;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -34,6 +35,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.shared.Registration;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.notification.SmsTemplate;
@@ -72,6 +74,7 @@ public class SmsTemplateAdminView extends ViewFrame implements RouterLayout, Has
   private final Binder<SmsTemplate> binder = new Binder<>();
   private SmsTemplate smsTemplate;
   private DefaultDataProvider<SmsTemplate, DefaultFilter> securityUserDataProvider;
+  private Registration contextIconRegistration = null;
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
@@ -85,10 +88,17 @@ public class SmsTemplateAdminView extends ViewFrame implements RouterLayout, Has
     setViewFooter(getFooter());
   }
 
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    if ( contextIconRegistration != null )
+      contextIconRegistration.remove();
+  }
+
   private AppBar initAppBar() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-    appBar.getContextIcon().addClickListener(event -> goBack());
+    if ( contextIconRegistration == null )
+    contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
     return appBar;
   }
 

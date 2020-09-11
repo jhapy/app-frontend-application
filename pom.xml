@@ -52,7 +52,7 @@
     <problem-spring-web.version>0.25.0</problem-spring-web.version>
     <spring-data-provider.version>2.1.0</spring-data-provider.version>
 
-    <vaadin.version>14.3.4</vaadin.version>
+    <vaadin.version>14.3.5</vaadin.version>
 
     <confirm-dialog.versîon>2.0.0</confirm-dialog.versîon>
     <multiselect-combo-box-flow.version>3.0.2</multiselect-combo-box-flow.version>
@@ -310,11 +310,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.vaadin.gatanaso</groupId>
-      <artifactId>multiselect-combo-box-flow</artifactId>
-      <version>3.0.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.vaadin.tatu</groupId>
       <artifactId>twincolselect</artifactId>
       <version>1.4.1</version>
@@ -339,17 +334,6 @@
       <groupId>org.rapidpm</groupId>
       <artifactId>rapidpm-functional-reactive</artifactId>
       <version>${rapidpm-functional-reactive.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.vaadin</groupId>
-      <artifactId>textfieldformatter</artifactId>
-      <version>${textfieldformatter.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>vaadin-core</artifactId>
-          <groupId>com.vaadin</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.vaadin.olli</groupId>
@@ -403,6 +387,11 @@
       <groupId>dev.mett.vaadin</groupId>
       <artifactId>tooltip</artifactId>
       <version>1.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin.componentfactory</groupId>
+      <artifactId>togglebutton</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <!--dependency>
       <groupId>org.bklab</groupId>

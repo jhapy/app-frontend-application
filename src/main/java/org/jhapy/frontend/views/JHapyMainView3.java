@@ -51,6 +51,7 @@ import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
+import org.jhapy.frontend.components.dragger.Dragger;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
 import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
@@ -110,12 +111,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private Div appFooterInner;
   private Environment environment;
   private Div appFooterOuter;
-
   private AppBar appBar;
   protected MenuHierarchicalDataProvider menuProvider;
 
-  public JHapyMainView3(MenuHierarchicalDataProvider menuProvider, AppBar appBar, Environment environment) {
-    this.appBar = appBar;
+  public JHapyMainView3(MenuHierarchicalDataProvider menuProvider, Environment environment) {
     this.menuProvider = menuProvider;
     VaadinSession.getCurrent()
         .setErrorHandler((ErrorHandler) errorEvent -> {
@@ -186,7 +185,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
    * Initialise the required components and containers.
    */
   private void initStructure(MenuHierarchicalDataProvider menuProvider, boolean showSearchMenu, String version, String environnement) {
-    naviDrawer = new NaviDrawerWithTreeMenu(menuProvider, showSearchMenu, version, environnement);
+    naviDrawer = new NaviDrawerWithTreeMenu( menuProvider, showSearchMenu, version, environnement);
 
     viewContainer = new FlexBoxLayout();
     viewContainer.addClassName(CLASS_NAME + "__view-container");
@@ -230,6 +229,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
       appBar.reset();
       appBar.rebuildMenu();
     }
+  }
+
+  public AppBar getAppBar() {
+    return appBar;
   }
 
   protected void addToMainMenu(MenuData menuData) {
@@ -547,7 +550,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
     // setAppFooterInner();
 
-    //appBar = new AppBar();
+    appBar = new AppBar();
     UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }
@@ -606,10 +609,6 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
   public NaviDrawerWithTreeMenu getNaviDrawer() {
     return naviDrawer;
-  }
-
-  public AppBar getAppBar() {
-    return appBar;
   }
 
   public void displayInfoMessage(String message) {
@@ -709,7 +708,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   public void afterNavigation(AfterNavigationEvent event) {
     MenuEntry active = getActiveItem(event);
     if (active != null) {
-      getAppBar().setTitle(active.getTitle());
+      appBar.setTitle(active.getTitle());
     }
   }
 

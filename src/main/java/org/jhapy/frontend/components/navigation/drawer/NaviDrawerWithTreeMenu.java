@@ -31,6 +31,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
@@ -50,6 +51,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.components.FlexBoxLayout;
+import org.jhapy.frontend.components.dragger.Dragger;
 import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.UIUtils;
@@ -61,7 +63,7 @@ import org.vaadin.tatu.Tree;
 
 @CssImport("./styles/components/navi-drawer.css")
 @JsModule("./swipe-away.js")
-public class NaviDrawerWithTreeMenu extends Div
+public class NaviDrawerWithTreeMenu extends HorizontalLayout
     implements AfterNavigationObserver, HasLogger {
 
   private final String CLASS_NAME = "navi-drawer";
@@ -78,10 +80,15 @@ public class NaviDrawerWithTreeMenu extends Div
   private Tree<MenuEntry> menu;
   private MenuData menuData;
 private MenuHierarchicalDataProvider dataProvider;
+private String lastContentWidth = null;
+private Dragger dragger;
+private Div main = new Div();
 
-  public NaviDrawerWithTreeMenu(MenuHierarchicalDataProvider menuDataProvider, boolean showSearchMenu, String version, String environement) {
+  public NaviDrawerWithTreeMenu(MenuHierarchicalDataProvider menuDataProvider, boolean showSearchMenu, String version,
+      String environement) {
     this.dataProvider = menuDataProvider;
     setClassName(CLASS_NAME);
+    getElement().getThemeList().remove("spacing");
 
     initScrim();
     initMainContent();
@@ -95,6 +102,10 @@ private MenuHierarchicalDataProvider dataProvider;
     initMenu();
 
     initFooter(version, environement);
+    add( main );
+    dragger = new Dragger(getMainContent());
+    dragger.setClassName(CLASS_NAME+"__dragger");
+    add(dragger);
   }
 
   public MenuHierarchicalDataProvider getDataProvider() {
@@ -120,13 +131,17 @@ private MenuHierarchicalDataProvider dataProvider;
     scrim = new Div();
     scrim.addClassName(CLASS_NAME + "__scrim");
     scrim.addClickListener(event -> close());
-    add(scrim);
+    main.add(scrim);
   }
 
   private void initMainContent() {
     mainContent = new Div();
     mainContent.addClassName(CLASS_NAME + "__content");
-    add(mainContent);
+    main.add(mainContent);
+  }
+
+  public Div getMainContent() {
+    return mainContent;
   }
 
   private void initHeader() {
@@ -171,6 +186,8 @@ private MenuHierarchicalDataProvider dataProvider;
     menuData.addMenuEntry( menuEntry );
   }
 
+  private MenuEntry lastMenuEntry = null;
+
   private void initMenu() {
     menuData = new MenuData();
 
@@ -180,7 +197,7 @@ private MenuHierarchicalDataProvider dataProvider;
 
     menu.setSizeFull();
     menu.setHeightByRows(true);
-    menu.setMinWidth("400px");
+    //menu.setMinWidth("400px");
     menu.setHeightByRows(true);
     menu.setId("treegridbasic");
     menu.getStyle().set("font-size", "0.8em");
@@ -188,32 +205,37 @@ private MenuHierarchicalDataProvider dataProvider;
     menu.setItemTitleProvider(MenuEntry::getTitle);
     menu.addItemClickListener(event -> {
       MenuEntry selectedItem = getSelectedItem();
-      if ( selectedItem != null ) {
+      if ( selectedItem != null && ! selectedItem.equals(lastMenuEntry)) {
         navigate( selectedItem);
       };
     });
     menu.addExpandListener(menuEntryTreeGridExpandEvent -> {
+      if ( ! menuEntryTreeGridExpandEvent.isFromClient())
+        return;
+
       Collection<MenuEntry> items = menuEntryTreeGridExpandEvent.getItems();
 
       if ( ! items.isEmpty()) {
         MenuEntry item = items.iterator().next();
         menu.select(item);
-        if (item.getTargetClass() != null) {
+        if (item.getTargetClass() != null && ! item.equals(lastMenuEntry)) {
           navigate(item);
         }
       }
     });
     menu.addCollapseListener(menuEntryTreeGridCollapseEvent -> {
+      if ( ! menuEntryTreeGridCollapseEvent.isFromClient())
+        return;
       Collection<MenuEntry> items = menuEntryTreeGridCollapseEvent.getItems();
       MenuEntry selectedItem = getSelectedItem();
-      if ( selectedItem != null ) {
+     /* if ( selectedItem != null  && ! selectedItem.equals(lastMenuEntry)) {
         navigate( selectedItem);
       };
-
+      */
       if ( ! items.isEmpty()) {
         MenuEntry item = items.iterator().next();
         menu.select(item);
-        if (item.getTargetClass() != null) {
+        if (item.getTargetClass() != null && ! item.equals(lastMenuEntry)) {
           navigate(item);
         }
       }
@@ -249,9 +271,17 @@ private MenuHierarchicalDataProvider dataProvider;
     scrollableArea.add(menu);
   }
 
-  private MenuEntry getSelectedItem() {
+  public MenuEntry getSelectedItem() {
     return menu.getSelectedItems().size() == 0 ? null : menu.getSelectedItems().iterator().next();
   }
+
+  public boolean isSelected( String targetId ) {
+    MenuEntry selected = getSelectedItem();
+    if ( selected == null || StringUtils.isBlank(selected.getTargetId() ))
+      return false;
+    return selected.getTargetId().equalsIgnoreCase(targetId);
+  }
+
   private void navigate( MenuEntry menuEntry ) {
     String loggerPrefix = getLoggerPrefix("navigate", menuEntry.getTitle());
     if ( menuEntry.getTargetClass() == null )
@@ -275,6 +305,7 @@ private MenuHierarchicalDataProvider dataProvider;
       logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass());
       UI.getCurrent().navigate(menuEntry.getTargetClass());
     }
+    lastMenuEntry = menuEntry;
   }
 
   private void initFooter(String version, String environement) {
@@ -357,4 +388,7 @@ private MenuHierarchicalDataProvider dataProvider;
     close();
   }
 
+  public void setDragger(Dragger dragger) {
+    this.dragger = dragger;
+  }
 }

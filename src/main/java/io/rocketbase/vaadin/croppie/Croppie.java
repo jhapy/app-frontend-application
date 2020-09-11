@@ -42,7 +42,7 @@ import lombok.Setter;
 
 @Tag("vaadin-croppie")
 @NpmPackage(value = "croppie", version = "2.6.5")
-@JsModule("./mycroppie/croppie.js")
+//@JsModule("./mycroppie/croppie.js")
 public class Croppie extends PolymerTemplate<CroppieModel> implements HasSize, HasStyle {
 
   private static final PropertyDescriptor<String, String> srcDescriptor = PropertyDescriptors

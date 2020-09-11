@@ -20,6 +20,8 @@ package org.jhapy.frontend.views;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
+import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -29,6 +31,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
@@ -39,6 +42,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.shared.Registration;
 import dev.mett.vaadin.tooltip.Tooltips;
 import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
 import dev.mett.vaadin.tooltip.config.TooltipConfiguration;
@@ -56,12 +60,18 @@ import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerFooter;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
+import org.jhapy.frontend.components.navigation.tab.NaviTab;
+import org.jhapy.frontend.components.navigation.tab.NaviTabs;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
+import org.jhapy.frontend.layout.size.Left;
+import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.layout.size.Top;
+import org.jhapy.frontend.layout.size.Vertical;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
+import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
@@ -70,22 +80,20 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
  * @version 1.0
  * @since 8/27/19
  */
-public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame implements
-    RouterLayout, HasLogger, HasUrlParameter<String> {
+public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame implements HasLogger, HasUrlParameter<String> {
 
   protected final String I18N_PREFIX;
-  protected DetailsDrawer detailsDrawer;
-  protected DetailsDrawerHeader detailsDrawerHeader;
   protected DetailsDrawerFooter detailsDrawerFooter;
   protected Binder<T> binder;
   protected T currentEditing;
   private final Class<T> entityType;
   private Function<T, ServiceResult<T>> saveHandler;
   private final Consumer<T> deleteHandler;
-  private Tabs tabs;
   private Class parentViewClassname;
-private AppBar appBar;
+  private AppBar appBar;
   protected final MyI18NProvider myI18NProvider;
+protected Registration contextIconRegistration = null;
+  protected DefaultDetailsContent detailsDrawer;
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname, MyI18NProvider myI18NProvider) {
     super();
@@ -117,8 +125,9 @@ private AppBar appBar;
   }
 
   protected AppBar getAppBar() {
-    return appBar;
+    return JHapyMainView3.get().getAppBar();
   }
+
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
@@ -127,6 +136,12 @@ private AppBar appBar;
     initHeader();
 
     setViewContent(createContent());
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    if ( contextIconRegistration != null )
+      contextIconRegistration.remove();
   }
 
   protected void setParentViewClassname( Class parentViewClassname ) {
@@ -147,8 +162,13 @@ private AppBar appBar;
   protected void initHeader() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-    appBar.getContextIcon().addClickListener(event -> goBack());
+    if ( contextIconRegistration == null ) {
+      contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
+    }
     appBar.setTitle(getTitle(currentEditing));
+
+    if ( isShowTabs() )
+      buildTabs();
   }
 
   protected void checkForDetailsChanges(Runnable action) {
@@ -170,82 +190,69 @@ private AppBar appBar;
   protected abstract Component createDetails(T entity);
 
   private Component createContent() {
-    FlexBoxLayout content = new FlexBoxLayout(getContentTab());
-    content.setBoxSizing(BoxSizing.BORDER_BOX);
-    content.setHeightFull();
-    content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
-    return content;
+    return getContentTab();
   }
 
   protected Component buildContent() {
     return new Div();
   }
 
-  protected Tabs buildTabs() {
-    Tab details = new Tab(getTranslation("element.title.details"));
-    Tab audit = new Tab(getTranslation("element.title.audit"));
+  protected void buildTabs() {
+    Tab details = getAppBar().addTab(getTranslation("element.title.details"));
+    Tab audit = getAppBar().addTab(getTranslation("element.title.audit"));
 
-    tabs = new Tabs(details, audit);
-    tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
-    tabs.addSelectedChangeListener(e -> {
-      Tab selectedTab = tabs.getSelectedTab();
+    getAppBar().addTabSelectionListener(selectedChangeEvent -> {
+      Tab selectedTab = selectedChangeEvent.getSelectedTab();
       if (selectedTab.equals(details)) {
-        detailsDrawer
-            .setContent(createDetails(currentEditing));
+        detailsDrawer.setContent(createDetails(currentEditing));
       } else if (selectedTab.equals(audit)) {
-        detailsDrawer
-            .setContent(createAudit(currentEditing));
+        detailsDrawer.setContent(createAudit(currentEditing));
       }
     });
-
-    return tabs;
   }
 
+  protected boolean isShowTabs() {
+    return true;
+  }
+
+  protected boolean isShowFooter() { return true; }
+
   private Component getContentTab() {
-    detailsDrawer = new DetailsDrawer();
-    detailsDrawer.setWidthFull();
-    // Header
+    detailsDrawer = new DefaultDetailsContent(createDetails(currentEditing));
 
-    tabs = buildTabs();
 
-    if  ( tabs == null )
-      detailsDrawer.setContent( buildContent());
-    else
-    detailsDrawer
-        .setContent(createDetails(currentEditing));
+    FlexBoxLayout contentTab = new FlexBoxLayout();
+    contentTab.add(detailsDrawer);
+    contentTab.setFlexGrow(1, detailsDrawer);
+    contentTab.setSizeFull();
+    contentTab.setFlexDirection(FlexDirection.COLUMN);
 
-    if ( tabs != null )
-    detailsDrawerHeader = new DetailsDrawerHeader("", tabs, false, false);
-    else
-      detailsDrawerHeader = new DetailsDrawerHeader("", false, false);
+    if ( isShowFooter() ) {
+      detailsDrawerFooter = new DetailsDrawerFooter();
+      detailsDrawerFooter.setWidth("");
+      if (saveHandler == null || !canSave()) {
+        detailsDrawerFooter.setSaveButtonVisible(false);
+        detailsDrawerFooter.setSaveAndNewButtonVisible(false);
+      }
+      if (deleteHandler == null || !canDelete()) {
+        detailsDrawerFooter.setDeleteButtonVisible(false);
+      }
 
-    detailsDrawer.setHeader(detailsDrawerHeader);
+      detailsDrawerFooter.addCancelListener(e -> {
+        currentEditing = null;
+        UI.getCurrent().getPage().getHistory().back();
+      });
+      if (saveHandler != null && canSave()) {
+        detailsDrawerFooter.addSaveListener(e -> save(false));
+        detailsDrawerFooter.addSaveAndNewListener(e -> save(true));
+      }
+      if (deleteHandler != null && canDelete()) {
+        detailsDrawerFooter.addDeleteListener(e -> delete());
+      }
 
-    // Footer
-    detailsDrawerFooter = new DetailsDrawerFooter();
-    if (saveHandler == null || !canSave()) {
-      detailsDrawerFooter.setSaveButtonVisible(false);
-      detailsDrawerFooter.setSaveAndNewButtonVisible(false);
+      contentTab.add(detailsDrawerFooter);
     }
-    if (deleteHandler == null || !canDelete()) {
-      detailsDrawerFooter.setDeleteButtonVisible(false);
-    }
-
-    detailsDrawerFooter.addCancelListener(e -> {
-      detailsDrawer.hide();
-      currentEditing = null;
-      UI.getCurrent().getPage().getHistory().back();
-    });
-    if (saveHandler != null && canSave()) {
-      detailsDrawerFooter.addSaveListener(e -> save(false));
-      detailsDrawerFooter.addSaveAndNewListener(e -> save(true));
-    }
-    if (deleteHandler != null && canDelete()) {
-      detailsDrawerFooter.addDeleteListener(e -> delete());
-    }
-    detailsDrawer.setFooter(detailsDrawerFooter);
-
-    return detailsDrawer;
+    return contentTab;
   }
 
   protected boolean canSave() {
@@ -258,10 +265,10 @@ private AppBar appBar;
 
   protected void showDetails(T entity) {
     this.binder = new BeanValidationBinder<>(entityType);
-
     currentEditing = entity;
     detailsDrawer.setContent(createDetails(entity));
-    tabs.setSelectedIndex(0);
+    if ( appBar.getTabCount() > 0 )
+    appBar.setSelectedTabIndex(0);
   }
 
   protected Component createAudit(T entity) {

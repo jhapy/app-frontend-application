@@ -20,17 +20,20 @@ package org.jhapy.frontend.components.navigation.bar;
 
 
 import ch.carnet.kasparscherrer.LanguageSelect;
+import com.vaadin.componentfactory.ToggleButton;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
@@ -41,7 +44,9 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
@@ -51,6 +56,7 @@ import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import com.vaadin.flow.theme.lumo.Lumo;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -135,7 +141,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private NotificationButton notificationButton;
   private SearchOverlayButton<? extends SearchQueryResult, ? extends SearchQuery> searchButton;
 
-  private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
+  private DefaultNotificationHolder notifications;
   private Registration searchRegistration;
   private Registration searchEscRegistration;
 
@@ -151,6 +157,10 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     initActionItems();
     initContainer();
     initTabs();
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
   }
 
   public void setNaviMode(NaviMode mode) {
@@ -186,6 +196,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   private void initNotification() {
+    notifications = new DefaultNotificationHolder();
     notifications.addClickListener(notification -> {/* Use the listener to react on the click on the notification */});
     notificationButton = new NotificationButton<>(VaadinIcon.BELL, notifications);
   }
@@ -253,8 +264,9 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       ContextMenu contextMenu = new ContextMenu(avatar);
       contextMenu.setOpenOnClick(true);
 
+      Button languageButton = UIUtils.createButton(getTranslation("action.settings.language"), VaadinIcon.GLOBE, ButtonVariant.LUMO_TERTIARY_INLINE);
       Locale currentLocale = UI.getCurrent().getSession().getLocale();
-      MenuItem languageMenu = contextMenu.addItem(getTranslation("action.settings.language"));
+      MenuItem languageMenu = contextMenu.addItem(languageButton);
 
       MenuItem frMenu= languageMenu.getSubMenu().addItem(  new Label("Francais"));
       MenuItem enMenu = languageMenu.getSubMenu().addItem( new Label("English"));
@@ -283,12 +295,26 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       arMenu.setCheckable(true);
       arMenu.setChecked(currentLocale.equals(new Locale("ar", "MA")));
 
-      contextMenu.addItem( currentUserLogin.get(), event -> getUI().get()
+      Button settingsButton = UIUtils.createButton(currentUserLogin.get(), VaadinIcon.USER, ButtonVariant.LUMO_TERTIARY_INLINE);
+      contextMenu.addItem(settingsButton, event -> getUI().get()
           .navigate(JHapyMainView3.get().getUserSettingsView()));
-      //Anchor userSettingsAnchor = new Anchor("http://onlineplantumleditor-keycloak:9080/auth/realms/onlinePlantUmlEditor/account",currentUserLogin.get());
-      //userSettingsAnchor.setTarget("_blank");
-      //contextMenu.addItem(userSettingsAnchor);
-      contextMenu.addItem(new Anchor("logout", "Log Out"));
+
+      ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+      Button switchDarkThemeButton = UIUtils.createButton(getTranslation("action.global.darkTheme"), VaadinIcon.CIRCLE_THIN, ButtonVariant.LUMO_TERTIARY_INLINE);
+      if (themeList.contains(Lumo.DARK))
+        switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
+
+      contextMenu.addItem(switchDarkThemeButton, event -> {
+        if (themeList.contains(Lumo.DARK)) {
+          themeList.remove(Lumo.DARK);
+          switchDarkThemeButton.setIcon(VaadinIcon.CIRCLE_THIN.create());
+        } else {
+          themeList.add(Lumo.DARK);
+          switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
+        }
+      });
+      Button exitButton = UIUtils.createButton(getTranslation("action.global.logout"), VaadinIcon.EXIT, ButtonVariant.LUMO_TERTIARY_INLINE);
+      contextMenu.addItem(new Anchor("logout", exitButton));
     }
   }
 
@@ -408,6 +434,9 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     tabs.addClassName(LumoStyles.Margin.Horizontal.AUTO);
   }
 
+  public void dispatchTabs() {
+    tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
+  }
   private void configureTab(Tab tab) {
     tab.addClassName(CLASS_NAME + "__tab");
     updateTabsVisibility();
@@ -567,14 +596,20 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
+    /*
     if (rtlSet.contains(event.getLocale().getLanguage())) {
       UI.getCurrent().setDirection(Direction.RIGHT_TO_LEFT);
     } else {
       UI.getCurrent().setDirection(Direction.LEFT_TO_RIGHT);
     }
+     */
   }
 
   public SearchOverlayButton getSearchButton() {
+    if ( searchButton == null ) {
+      searchButton = new SearchOverlayButton<>();
+      addActionItem(searchButton);
+    }
     return searchButton;
   }
 
