@@ -116,6 +116,8 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
         contentLayout.add(upload);
 
         if (storedFile != null) {
+          if ( storedFile.getOrginalContent() == null )
+            storedFile.setOrginalContent( storedFile.getContent() );
           buildCropper(storedFile.getOrginalContent(), storedFile.getFilename(),
               storedFile != null ? storedFile.getMetadata().get("copperData") : null);
         }

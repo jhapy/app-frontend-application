@@ -298,6 +298,7 @@ protected Registration contextIconRegistration = null;
             FormLayout.ResponsiveStep.LabelsPosition.TOP),
         new FormLayout.ResponsiveStep("26em", 2,
             FormLayout.ResponsiveStep.LabelsPosition.TOP));
+    auditForm.setWidthFull();
 
     auditForm.addFormItem(id, getTranslation("element.baseEntity.id"));
     auditForm.addFormItem(isActive, getTranslation("element.baseEntity.isActive"));

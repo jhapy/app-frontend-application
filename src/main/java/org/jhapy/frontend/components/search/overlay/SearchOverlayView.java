@@ -9,10 +9,13 @@ import com.vaadin.flow.component.ClickNotifier;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -40,6 +43,7 @@ import org.jhapy.frontend.utils.css.BorderRadius;
 import org.jhapy.frontend.utils.css.Overflow;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
+@CssImport("./styles/components/search.css")
 public class SearchOverlayView<T extends SearchQueryResult, F extends SearchQuery> extends
     IronOverlay {
 
@@ -65,7 +69,7 @@ public class SearchOverlayView<T extends SearchQueryResult, F extends SearchQuer
     search.create().addClassNames("size-l");
 
     Button searchIcon = new Button(
-        UIUtils.createIcon(IconSize.L, TextColor.PRIMARY, VaadinIcon.SEARCH));
+        UIUtils.createIcon(IconSize.M, TextColor.PRIMARY, VaadinIcon.SEARCH));
     searchIcon.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 
     filter = new MultiselectComboBox<>();
@@ -77,21 +81,22 @@ public class SearchOverlayView<T extends SearchQueryResult, F extends SearchQuer
     searchField.setPlaceholder(getTranslation("element.search.placeholder"));
     searchField.setValueChangeMode(ValueChangeMode.LAZY);
     Button closeButton = new Button(
-        UIUtils.createIcon(IconSize.L, TextColor.TERTIARY, VaadinIcon.CLOSE));
+        UIUtils.createIcon(IconSize.M, TextColor.TERTIARY, VaadinIcon.CLOSE));
     closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 
     FlexBoxLayout searchFieldWrapper = new FlexBoxLayout(searchIcon, filter, searchField,
         closeButton);
+    searchFieldWrapper.setClassName("search-layout");
     searchFieldWrapper.setFlex("1", searchField);
     searchFieldWrapper.setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
     searchFieldWrapper.setSpacing(Right.M);
+    searchFieldWrapper.setFlexWrap(FlexWrap.WRAP);
+    searchFieldWrapper.setJustifyContentMode(JustifyContentMode.EVENLY);
     searchFieldWrapper.setMargin(Top.M);
     searchFieldWrapper.setBorderRadius(BorderRadius.M);
     searchFieldWrapper.setBackgroundColor("var(--lumo-base-color)");
-    searchFieldWrapper.setWidth("60%");
 
-    searchResult.setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
-    searchResult.setWidth("60%");
+    searchResult.setClassName("search-result");
     searchResult.setFlexDirection(FlexDirection.COLUMN);
     searchResult.setOverflow(Overflow.AUTO);
 
@@ -99,7 +104,7 @@ public class SearchOverlayView<T extends SearchQueryResult, F extends SearchQuer
       doSearch(event.getValue(), filter.getValue());
     });
     searchField.setMinWidth("50%");
-    searchField.setWidthFull();
+
 
     closeButton.addClickListener(event -> {
       searchField.clear();
