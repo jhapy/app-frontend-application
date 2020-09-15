@@ -35,6 +35,8 @@ public abstract class AbstractDialog extends Dialog {
   private Footer footer;
   private H2 titleField;
 
+  protected Button saveButton = null;
+
   public AbstractDialog() {
   }
 
@@ -87,7 +89,6 @@ public abstract class AbstractDialog extends Dialog {
       }
     });
 
-    Button saveButton = null;
     if ( hasSaveButton() ) {
        saveButton = new Button(getSaveButtonLabel());
       saveButton.addClickListener(event -> {

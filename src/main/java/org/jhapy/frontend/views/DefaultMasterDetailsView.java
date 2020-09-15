@@ -422,6 +422,8 @@ private FlexBoxLayout content;
         activityDisplay -> entity.getModifiedBy(),
         null);
 
+    binder.readBean(entity);
+
     return auditForm;
   }
 

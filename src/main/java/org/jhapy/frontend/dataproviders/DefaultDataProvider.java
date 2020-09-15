@@ -18,6 +18,7 @@
 
 package org.jhapy.frontend.dataproviders;
 
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.QuerySortOrderBuilder;
 import java.io.Serializable;
@@ -39,6 +40,7 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
 
   private List<QuerySortOrder> defaultSortOrder;
   private Consumer<Page<T>> pageObserver;
+  private Query<T, F> currentQuery;
 
   public DefaultDataProvider(DirectionEnum defaultSortDirection, String[] defaultSortFields) {
     setSortOrder(defaultSortDirection, defaultSortFields);
@@ -54,6 +56,15 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
       }
     }
     defaultSortOrder = builder.build();
+  }
+
+  public Query<T, F> getCurrentQuery() {
+    return currentQuery;
+  }
+
+  public void setCurrentQuery(
+      Query<T, F> currentQuery) {
+    this.currentQuery = currentQuery;
   }
 
   @Override

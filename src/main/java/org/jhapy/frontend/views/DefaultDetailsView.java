@@ -160,15 +160,32 @@ protected Registration contextIconRegistration = null;
   }
 
   protected void initHeader() {
-    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-    if ( contextIconRegistration == null ) {
+    if (contextIconRegistration == null) {
       contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
     }
     appBar.setTitle(getTitle(currentEditing));
 
-    if ( isShowTabs() )
+    if (canCreateRecord() && saveHandler != null) {
+      Button newRecordButton = UIUtils.createTertiaryButton(VaadinIcon.PLUS);
+      newRecordButton.addClickListener(event -> {
+        try {
+          showDetails(entityType.getDeclaredConstructor().newInstance());
+          appBar.setTitle(getTitle(currentEditing));
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        }
+      });
+      appBar.addActionItem(newRecordButton);
+    }
+
+    if (isShowTabs()) {
       buildTabs();
+    }
+  }
+
+  protected boolean canCreateRecord() {
+    return true;
   }
 
   protected void checkForDetailsChanges(Runnable action) {
@@ -267,8 +284,9 @@ protected Registration contextIconRegistration = null;
     this.binder = new BeanValidationBinder<>(entityType);
     currentEditing = entity;
     detailsDrawer.setContent(createDetails(entity));
-    if ( appBar.getTabCount() > 0 )
-    appBar.setSelectedTabIndex(0);
+    if (appBar != null && appBar.getTabCount() > 0) {
+      appBar.setSelectedTabIndex(0);
+    }
   }
 
   protected Component createAudit(T entity) {

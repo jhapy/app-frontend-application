@@ -44,6 +44,7 @@ import de.codecamp.vaadin.components.messagedialog.MessageDialog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.serviceQuery.SearchQuery;
@@ -116,15 +117,6 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
   public JHapyMainView3(MenuHierarchicalDataProvider menuProvider, Environment environment) {
     this.menuProvider = menuProvider;
-    VaadinSession.getCurrent()
-        .setErrorHandler((ErrorHandler) errorEvent -> {
-          logger().error("Uncaught UI exception",
-              errorEvent.getThrowable());
-          getUI().ifPresent(ui -> ui.accessLater(() -> {
-            Notification.show("We are sorry, but an internal error occurred");
-          }, () -> {
-          }));
-        });
 
     afterLogin();
 
@@ -160,7 +152,9 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         .findFirst().orElse(null);
   }
 
-  public SearchOverlayButton<? extends SearchQueryResult, ? extends SearchQuery> getSearchButton() {return null; }
+  public SearchOverlayButton<? extends SearchQueryResult, ? extends SearchQuery> getSearchButton() {
+    return null;
+  }
 
   public Class getHomePage() {
     return null;
@@ -170,11 +164,21 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     return null;
   }
 
+  public boolean hasLanguageSelect() {
+    return true;
+  }
+
+  public boolean hasGlobalSearch() {
+    return true;
+  }
+
   public StoredFile getLoggedUserAvatar(SecurityUser securityUser) {
     return null;
   }
 
-  protected String getCurrentUser() { return org.jhapy.commons.security.SecurityUtils.getCurrentUserLogin().get(); }
+  protected String getCurrentUser() {
+    return org.jhapy.commons.security.SecurityUtils.getCurrentUserLogin().get();
+  }
 
   public void afterLogin() {
     //JHapyMainView.get().rebuildNaviItems();
@@ -346,7 +350,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         /*
          * Reference
          */
-        /*
+
         boolean isReferenceMenuDisplay = hasReferencesMenuEntries() ||
             SecurityUtils.isAccessGranted(CountriesView.class);
 
@@ -358,27 +362,12 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
           menuData.addMenuEntry(referenceSubMenu);
 
-
-          boolean isDisplayReference = false;
-          if (SecurityUtils.isAccessGranted(CountriesView.class)) {
-            isDisplayReference = true;
-          }
-
-          if (isDisplayReference) {
-
-            if (SecurityUtils.isAccessGranted(CountriesView.class)) {
-              MenuEntry subMenu = new MenuEntry();
-              subMenu.setVaadinIcon(VaadinIcon.QUESTION);
-              subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_COUNTRIES));
-              subMenu.setTargetClass(CountriesView.class);
-              subMenu.setParentMenuEntry(referenceSubMenu);
-
-              menuData.addMenuEntry(subMenu);
-            }
+          if (hasReferencesMenuEntries()) {
+            addToReferencesMenu(menuData, referenceSubMenu);
           }
 
         }
-         */
+
         /*
          * Notification
          */
@@ -707,7 +696,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
     MenuEntry active = getActiveItem(event);
-    if (active != null) {
+    if (active != null && StringUtils.isBlank(appBar.getTitle())) {
       appBar.setTitle(active.getTitle());
     }
   }

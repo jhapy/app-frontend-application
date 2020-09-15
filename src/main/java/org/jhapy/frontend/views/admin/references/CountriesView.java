@@ -51,6 +51,7 @@ import org.jhapy.frontend.client.reference.ReferenceServices;
 import org.jhapy.frontend.customFields.CountryTrlListField;
 import org.jhapy.frontend.dataproviders.CountryDataProvider;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.renderer.BooleanOkRenderer;
 import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
@@ -89,7 +90,7 @@ public class CountriesView extends DefaultMasterDetailsView<Country, DefaultFilt
         .setSortProperty("name." + AppContext.getInstance().getCurrentIso3Language() + ".value");
     grid.addColumn(Country::getIso2).setKey("iso2").setSortProperty("iso3");
     grid.addColumn(Country::getIso3).setKey("iso3").setSortProperty("iso3");
-    grid.addColumn(new BooleanRenderer<>(Country::getIsEU)).setKey("isEU");
+    grid.addColumn(new BooleanOkRenderer<>(Country::getIsEU)).setKey("isEU");
 
     grid.addColumn(e -> (e.getRegion() != null) ? e.getRegion().getName() : "").setKey("region")
         .setSortProperty(

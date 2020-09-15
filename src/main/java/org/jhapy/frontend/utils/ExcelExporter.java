@@ -37,7 +37,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang.WordUtils;
 import org.jhapy.commons.utils.HasLogger;
+import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.StoredFile;
+import org.jhapy.frontend.dataproviders.DefaultDataProvider;
+import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.views.JHapyMainView;
 
 /**
@@ -45,24 +48,26 @@ import org.jhapy.frontend.views.JHapyMainView;
  * @version 1.0
  * @since 09/04/2020
  */
-public class ExcelExporter<T> implements HasLogger {
+public class ExcelExporter<T extends BaseEntity, F extends DefaultFilter> implements HasLogger {
 
   private static final String TMP_FILE_NAME = "tmp";
 
   private File file;
-  private DataProvider dataProvider;
+  private final DefaultDataProvider<T, F> dataProvider;
   private final Grid<T> grid;
   private final Class<T> entityType;
 
   private PropertySet<T> propertySet;
 
-  public ExcelExporter(Grid<T> grid, Class<T> entityType) {
-    this(grid, entityType, null);
+  public ExcelExporter(Grid<T> grid, DefaultDataProvider<T, F> dataProvider, Class<T> entityType) {
+    this(grid, dataProvider, entityType, null);
   }
 
-  public ExcelExporter(Grid<T> grid, Class<T> entityType, List<String> excludedColumns) {
-    this.grid = grid;
+  public ExcelExporter(Grid<T> grid, DefaultDataProvider<T, F> dataProvider, Class<T> entityType,
+      List<String> excludedColumns) {
+    this.dataProvider = dataProvider;
     this.entityType = entityType;
+    this.grid = grid;
   }
 
   public InputStream build() {
@@ -106,7 +111,8 @@ public class ExcelExporter<T> implements HasLogger {
       if (method.getName().startsWith("get")
           && !Collection.class.isAssignableFrom(method.getReturnType())
           && !method.getReturnType().isArray()
-          && !method.getReturnType().equals(StoredFile.class)) {
+          && !method.getReturnType().equals(StoredFile.class)
+          && !BaseEntity.class.isAssignableFrom(method.getReturnType())) {
         onNewCell();
         String attrName = WordUtils.uncapitalize(method.getName().substring(3));
         buildColumnHeaderCell("element." + className + "." + attrName);
@@ -125,17 +131,11 @@ public class ExcelExporter<T> implements HasLogger {
   private void buildRows() {
     String loggerPrefix = getLoggerPrefix("buildRows");
     Object filter = null;
-    try {
-      Method method = DataCommunicator.class.getDeclaredMethod("getFilter");
-      method.setAccessible(true);
-      filter = method.invoke(grid.getDataCommunicator());
-    } catch (Exception e) {
-      logger().error("Unable to get filter from DataCommunicator");
-    }
 
-    Query streamQuery = new Query(0, grid.getDataProvider().size(new Query(filter)),
+    Query<T, F> streamQuery = new Query(0, dataProvider.size(dataProvider.getCurrentQuery()),
         grid.getDataCommunicator().getBackEndSorting(),
-        grid.getDataCommunicator().getInMemorySorting(), null);
+        grid.getDataCommunicator().getInMemorySorting(),
+        dataProvider.getCurrentQuery().getFilter());
     Stream<T> dataStream = getDataStream(streamQuery);
 
     dataStream.forEach(t -> {

@@ -48,6 +48,7 @@ import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityUserDataProvider;
+import org.jhapy.frontend.renderer.BooleanOkRenderer;
 import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
@@ -81,11 +82,11 @@ public class SecurityUsersView extends DefaultMasterDetailsView<SecurityUser, De
 
     grid.addColumn(SecurityUser::getUsername).setKey("username");
 
-    grid.addColumn(new BooleanRenderer<>(SecurityUser::getIsAccountLocked))
+    grid.addColumn(new BooleanOkRenderer<>(SecurityUser::getIsAccountLocked))
         .setKey("isAccountLocked");
-    grid.addColumn(new BooleanRenderer<>(SecurityUser::getIsAccountExpired))
+    grid.addColumn(new BooleanOkRenderer<>(SecurityUser::getIsAccountExpired))
         .setKey("isAccountExpired");
-    grid.addColumn(new BooleanRenderer<>(BaseEntity::getIsActive)).setKey("isActive");
+    grid.addColumn(new BooleanOkRenderer<>(BaseEntity::getIsActive)).setKey("isActive");
 
     grid.addColumn(new TextRenderer<>(
         securityUser -> securityUser.getRoles() == null ? ""

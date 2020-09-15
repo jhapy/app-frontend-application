@@ -35,6 +35,7 @@ import com.vaadin.flow.data.renderer.TextRenderer;
 import java.io.Serializable;
 import java.util.Locale;
 import org.jhapy.dto.domain.i18n.ElementTrl;
+import org.jhapy.frontend.renderer.BooleanOkRenderer;
 import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
@@ -88,7 +89,7 @@ public class ElementTrlListField extends
             : (new Locale(row.getIso3Language())).getDisplayLanguage(getLocale())))
         .setHeader(getTranslation("element." + i18nPrefix + "language"));
 
-    grid.addColumn(new BooleanRenderer<>(ElementTrl::getIsDefault))
+    grid.addColumn(new BooleanOkRenderer<>(ElementTrl::getIsDefault))
         .setHeader(getTranslation("element." + i18nPrefix + "isDefault"));
 
     newButton = new Button(getTranslation("action.global.addButton"));

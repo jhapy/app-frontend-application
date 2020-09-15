@@ -50,6 +50,7 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
@@ -59,6 +60,7 @@ import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import com.vaadin.flow.theme.lumo.Lumo;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,6 +68,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.http.Cookie;
 import org.apache.tika.Tika;
 import org.apache.tika.config.TikaConfig;
@@ -145,6 +148,8 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private Registration searchRegistration;
   private Registration searchEscRegistration;
 
+  private MenuItem languageMenu;
+
   public AppBar() {
     setClassName(CLASS_NAME);
     initMenuIcon();
@@ -161,6 +166,17 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
+    if (!JHapyMainView3.get().hasGlobalSearch()) {
+      searchButton.setVisible(false);
+    }
+    if (!JHapyMainView3.get().hasLanguageSelect()) {
+      languageMenu.setVisible(false);
+    }
+
+    if (VaadinSession.getCurrent().getAttribute("Theme") != null) {
+      ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+      themeList.add(Lumo.DARK);
+    }
   }
 
   public void setNaviMode(NaviMode mode) {
@@ -264,53 +280,61 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       ContextMenu contextMenu = new ContextMenu(avatar);
       contextMenu.setOpenOnClick(true);
 
-      Button languageButton = UIUtils.createButton(getTranslation("action.settings.language"), VaadinIcon.GLOBE, ButtonVariant.LUMO_TERTIARY_INLINE);
+      Button languageButton = UIUtils
+          .createButton(getTranslation("action.settings.language"), VaadinIcon.GLOBE,
+              ButtonVariant.LUMO_TERTIARY_INLINE);
       Locale currentLocale = UI.getCurrent().getSession().getLocale();
-      MenuItem languageMenu = contextMenu.addItem(languageButton);
+      languageMenu = contextMenu.addItem(languageButton);
 
-      MenuItem frMenu= languageMenu.getSubMenu().addItem(  new Label("Francais"));
-      MenuItem enMenu = languageMenu.getSubMenu().addItem( new Label("English"));
-      MenuItem arMenu = languageMenu.getSubMenu().addItem( new Label("Arabic"));
-      frMenu.addClickListener( event -> {
+      MenuItem frMenu = languageMenu.getSubMenu().addItem(new Label("Francais"));
+      MenuItem enMenu = languageMenu.getSubMenu().addItem(new Label("English"));
+      MenuItem arMenu = languageMenu.getSubMenu().addItem(new Label("Arabic"));
+      frMenu.addClickListener(event -> {
         enMenu.setChecked(false);
         arMenu.setChecked(false);
-        setLanguage( Locale.FRENCH);
+        setLanguage(Locale.FRENCH);
       });
       frMenu.setCheckable(true);
       frMenu.setChecked(currentLocale.equals(Locale.FRENCH));
 
-      enMenu.addClickListener( event -> {
+      enMenu.addClickListener(event -> {
         frMenu.setChecked(false);
         arMenu.setChecked(false);
-        setLanguage( Locale.ENGLISH);
+        setLanguage(Locale.ENGLISH);
       });
       enMenu.setCheckable(true);
       enMenu.setChecked(currentLocale.equals(Locale.ENGLISH));
 
-      arMenu.addClickListener( event -> {
+      arMenu.addClickListener(event -> {
         enMenu.setChecked(false);
         frMenu.setChecked(false);
-        setLanguage( new Locale("ar", "MA"));
+        setLanguage(new Locale("ar", "MA"));
       });
       arMenu.setCheckable(true);
       arMenu.setChecked(currentLocale.equals(new Locale("ar", "MA")));
 
-      Button settingsButton = UIUtils.createButton(currentUserLogin.get(), VaadinIcon.USER, ButtonVariant.LUMO_TERTIARY_INLINE);
+      Button settingsButton = UIUtils.createButton(currentUserLogin.get(), VaadinIcon.USER,
+          ButtonVariant.LUMO_TERTIARY_INLINE);
       contextMenu.addItem(settingsButton, event -> getUI().get()
           .navigate(JHapyMainView3.get().getUserSettingsView()));
 
       ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-      Button switchDarkThemeButton = UIUtils.createButton(getTranslation("action.global.darkTheme"), VaadinIcon.CIRCLE_THIN, ButtonVariant.LUMO_TERTIARY_INLINE);
-      if (themeList.contains(Lumo.DARK))
+      Button switchDarkThemeButton = UIUtils
+          .createButton(getTranslation("action.global.darkTheme"), VaadinIcon.CIRCLE_THIN,
+              ButtonVariant.LUMO_TERTIARY_INLINE);
+      if (VaadinSession.getCurrent().getAttribute("Theme") != null) {
         switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
+      }
 
       contextMenu.addItem(switchDarkThemeButton, event -> {
         if (themeList.contains(Lumo.DARK)) {
           themeList.remove(Lumo.DARK);
           switchDarkThemeButton.setIcon(VaadinIcon.CIRCLE_THIN.create());
+          VaadinSession.getCurrent().setAttribute("Theme", null);
         } else {
           themeList.add(Lumo.DARK);
           switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
+          VaadinSession.getCurrent().setAttribute("Theme", Lumo.DARK);
         }
       });
       Button exitButton = UIUtils.createButton(getTranslation("action.global.logout"), VaadinIcon.EXIT, ButtonVariant.LUMO_TERTIARY_INLINE);

@@ -29,6 +29,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.theme.lumo.Lumo;
@@ -47,6 +48,8 @@ import org.jhapy.frontend.utils.css.Shadow;
 import org.jhapy.frontend.utils.css.TextAlign;
 import org.jhapy.frontend.utils.css.TextOverflow;
 import org.jhapy.frontend.utils.css.WhiteSpace;
+import org.vaadin.textfieldformatter.CustomStringBlockFormatter;
+import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 public class UIUtils {
 
@@ -361,6 +364,13 @@ public class UIUtils {
     Label label = createH5Label(formatAmount(amount));
     label.addClassName(LumoStyles.FontFamily.MONOSPACE);
     return label;
+  }
+
+  public static TextField createAmountField() {
+    TextField field = new TextField();
+    field.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+    new NumeralFieldFormatter("'", ".", 2).extend(field);
+    return field;
   }
 
   public static String formatUnits(int units) {

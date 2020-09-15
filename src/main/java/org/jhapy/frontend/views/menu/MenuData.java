@@ -2,6 +2,7 @@ package org.jhapy.frontend.views.menu;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,13 +14,16 @@ import java.util.stream.Collectors;
  * @since 28/07/2020
  */
 public class MenuData implements Serializable {
+
   private List<MenuEntry> menuList = new ArrayList<>();
 
-  public void addMenuEntry( MenuEntry menuEntry ) {
-    menuList.add( menuEntry );
+  public void addMenuEntry(MenuEntry... menuEntries) {
+    menuList.addAll(Arrays.asList(menuEntries));
   }
 
-  public List<MenuEntry> getMenuList() { return menuList; }
+  public List<MenuEntry> getMenuList() {
+    return menuList;
+  }
 
   public List<MenuEntry> getRootItems() {
     return menuList.stream()

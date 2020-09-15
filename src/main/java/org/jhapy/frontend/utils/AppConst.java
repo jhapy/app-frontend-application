@@ -133,12 +133,14 @@ public class AppConst {
   public static final String[] DEFAULT_ASSET_TYPE_FIELDS = {"displayName"};
   public static final String[] DEFAULT_USER_SORT_FIELDS = {"u.lastName"};
   public static final String[] DEFAULT_GROUP_SORT_FIELDS = {"n.name"};
+  public static final String[] DEFAULT_RECORD_STATUS_SORT_FIELDS = {"seq"};
   public static final String[] DEFAULT_ASSET_SORT_FIELDS = {"a.name", "a.id"};
   public static final String[] COUNTRY_SORT_FIELDS = {"m.name"};
   public static final String[] PLACE_TYPE_SORT_FIELDS = {"t.name"};
   public static final String[] POST_SORT_FIELDS = {"created"};
 
   public static final DirectionEnum DEFAULT_SORT_DIRECTION = DirectionEnum.ASC;
+  public static final DirectionEnum DEFAULT_INSURANCE_POLICIES_SORT_DIRECTION = DirectionEnum.DESC;
   public static final DirectionEnum POST_SORT_DIRECTION = DirectionEnum.DESC;
 
   public static final String ICON_OK = "/images/iconfinder_ok.png";

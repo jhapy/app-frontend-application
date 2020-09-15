@@ -34,6 +34,7 @@ import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityRoleDataProvider;
+import org.jhapy.frontend.renderer.BooleanOkRenderer;
 import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
@@ -64,7 +65,7 @@ public class SecurityRolesView extends DefaultMasterDetailsView<SecurityRole, De
     grid.setHeight("100%");
 
     grid.addColumn(SecurityRole::getName).setKey("name");
-    grid.addColumn(new BooleanRenderer<>(SecurityRole::getCanLogin)).setKey("canLogin");
+    grid.addColumn(new BooleanOkRenderer<>(SecurityRole::getCanLogin)).setKey("canLogin");
 
     grid.getColumns().forEach(column -> {
       if (column.getKey() != null) {
