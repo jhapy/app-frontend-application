@@ -22,7 +22,6 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
@@ -30,33 +29,18 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
-import com.vaadin.flow.router.QueryParameters;
 import elemental.json.JsonObject;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.dragger.Dragger;
 import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.UIUtils;
-import org.jhapy.frontend.utils.css.Display;
-import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
 import org.vaadin.tatu.Tree;
@@ -79,12 +63,13 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
   private Button railButton;
   private Tree<MenuEntry> menu;
   private MenuData menuData;
-private MenuHierarchicalDataProvider dataProvider;
-private String lastContentWidth = null;
-private Dragger dragger;
-private Div main = new Div();
+  private final MenuHierarchicalDataProvider dataProvider;
+  private final String lastContentWidth = null;
+  private Dragger dragger;
+  private final Div main = new Div();
 
-  public NaviDrawerWithTreeMenu(MenuHierarchicalDataProvider menuDataProvider, boolean showSearchMenu, String version,
+  public NaviDrawerWithTreeMenu(MenuHierarchicalDataProvider menuDataProvider,
+      boolean showSearchMenu, String version,
       String environement) {
     this.dataProvider = menuDataProvider;
     setClassName(CLASS_NAME);
@@ -102,9 +87,9 @@ private Div main = new Div();
     initMenu();
 
     initFooter(version, environement);
-    add( main );
+    add(main);
     dragger = new Dragger(getMainContent());
-    dragger.setClassName(CLASS_NAME+"__dragger");
+    dragger.setClassName(CLASS_NAME + "__dragger");
     add(dragger);
   }
 
@@ -151,7 +136,7 @@ private Div main = new Div();
   private void initSearch() {
     search = new TextField();
     search.addValueChangeListener(e -> menu.getDataProvider().withConvertedFilter(
-        filterValue -> item -> item.getTitle().startsWith( e.getValue())) );
+        filterValue -> item -> item.getTitle().startsWith(e.getValue())));
     search.setClearButtonVisible(true);
     search.setPlaceholder("Search");
     search.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
@@ -173,7 +158,7 @@ private Div main = new Div();
   }
 
   public void refreshMenu() {
-    if ( dataProvider != null ) {
+    if (dataProvider != null) {
       dataProvider.setRootMenu(menuData);
       dataProvider.refreshAll();
     } else {
@@ -182,8 +167,8 @@ private Div main = new Div();
     }
   }
 
-  public void addMenuEntry( MenuEntry menuEntry ) {
-    menuData.addMenuEntry( menuEntry );
+  public void addMenuEntry(MenuEntry menuEntry) {
+    menuData.addMenuEntry(menuEntry);
   }
 
   private MenuEntry lastMenuEntry = null;
@@ -192,8 +177,9 @@ private Div main = new Div();
     menuData = new MenuData();
 
     menu = new Tree<>(MenuEntry::getTitle);
-    if ( dataProvider != null )
+    if (dataProvider != null) {
       menu.setDataProvider(dataProvider);
+    }
 
     menu.setSizeFull();
     menu.setHeightByRows(true);
@@ -205,53 +191,56 @@ private Div main = new Div();
     menu.setItemTitleProvider(MenuEntry::getTitle);
     menu.addItemClickListener(event -> {
       MenuEntry selectedItem = getSelectedItem();
-      if ( selectedItem != null && ! selectedItem.equals(lastMenuEntry)) {
-        navigate( selectedItem);
-      };
+      if (selectedItem != null && !selectedItem.equals(lastMenuEntry)) {
+        navigate(selectedItem);
+      }
     });
     menu.addExpandListener(menuEntryTreeGridExpandEvent -> {
-      if ( ! menuEntryTreeGridExpandEvent.isFromClient())
+      if (!menuEntryTreeGridExpandEvent.isFromClient()) {
         return;
+      }
 
       Collection<MenuEntry> items = menuEntryTreeGridExpandEvent.getItems();
 
-      if ( ! items.isEmpty()) {
+      if (!items.isEmpty()) {
         MenuEntry item = items.iterator().next();
         menu.select(item);
-        if (item.getTargetClass() != null && ! item.equals(lastMenuEntry)) {
+        if (item.getTargetClass() != null && !item.equals(lastMenuEntry)) {
           navigate(item);
         }
       }
     });
     menu.addCollapseListener(menuEntryTreeGridCollapseEvent -> {
-      if ( ! menuEntryTreeGridCollapseEvent.isFromClient())
+      if (!menuEntryTreeGridCollapseEvent.isFromClient()) {
         return;
+      }
       Collection<MenuEntry> items = menuEntryTreeGridCollapseEvent.getItems();
       MenuEntry selectedItem = getSelectedItem();
      /* if ( selectedItem != null  && ! selectedItem.equals(lastMenuEntry)) {
         navigate( selectedItem);
       };
       */
-      if ( ! items.isEmpty()) {
+      if (!items.isEmpty()) {
         MenuEntry item = items.iterator().next();
         menu.select(item);
-        if (item.getTargetClass() != null && ! item.equals(lastMenuEntry)) {
+        if (item.getTargetClass() != null && !item.equals(lastMenuEntry)) {
           navigate(item);
         }
       }
     });
 
-    GridContextMenu<MenuEntry> contextMenu=  menu.addContextMenu();
+    GridContextMenu<MenuEntry> contextMenu = menu.addContextMenu();
     contextMenu.setDynamicContentHandler(menuEntry -> {
-      if (menuEntry == null ) {
+      if (menuEntry == null) {
         return false;
       }
-      if (menuEntry.getContextMenu() == null )
+      if (menuEntry.getContextMenu() == null) {
         return false;
+      }
 
       contextMenu.removeAll();
 
-      menuEntry.getContextMenu().forEach( menuItem -> {
+      menuEntry.getContextMenu().forEach(menuItem -> {
         if (menuItem.getClickListener() == null) {
           if (menuItem.getComponent() != null) {
             contextMenu.add(menuItem.getComponent());
@@ -260,13 +249,15 @@ private Div main = new Div();
           }
         } else {
           if (menuItem.getComponent() != null) {
-            contextMenu.addItem(menuItem.getComponent(), menu -> menuItem.getClickListener().accept(menu));
+            contextMenu
+                .addItem(menuItem.getComponent(), menu -> menuItem.getClickListener().accept(menu));
           } else {
-            contextMenu.addItem(menuItem.getTitle(), menu -> menuItem.getClickListener().accept(menu));
+            contextMenu
+                .addItem(menuItem.getTitle(), menu -> menuItem.getClickListener().accept(menu));
           }
         }
-      } );
-      return  true;
+      });
+      return true;
     });
     scrollableArea.add(menu);
   }
@@ -275,34 +266,38 @@ private Div main = new Div();
     return menu.getSelectedItems().size() == 0 ? null : menu.getSelectedItems().iterator().next();
   }
 
-  public boolean isSelected( String targetId ) {
+  public boolean isSelected(String targetId) {
     MenuEntry selected = getSelectedItem();
-    if ( selected == null || StringUtils.isBlank(selected.getTargetId() ))
+    if (selected == null || StringUtils.isBlank(selected.getTargetId())) {
       return false;
+    }
     return selected.getTargetId().equalsIgnoreCase(targetId);
   }
 
-  private void navigate( MenuEntry menuEntry ) {
+  private void navigate(MenuEntry menuEntry) {
     String loggerPrefix = getLoggerPrefix("navigate", menuEntry.getTitle());
-    if ( menuEntry.getTargetClass() == null )
-      return ;
+    if (menuEntry.getTargetClass() == null) {
+      return;
+    }
 
-    if ( menuEntry.getTargetParams() != null ) {
-      logger().debug(loggerPrefix+"Navigate with Target Params" );
+    if (menuEntry.getTargetParams() != null) {
+      logger().debug(loggerPrefix + "Navigate with Target Params");
       String params = menuEntry.getTargetParams().toString();
-      logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass()+", Parameter = " + params);
-      UI.getCurrent().navigate(menuEntry.getTargetClass(), params );
-    } else
-    if ( menuEntry.getTargetId() != null ) {
-      logger().debug(loggerPrefix+"Navigate with Target ID");
+      logger().debug(
+          loggerPrefix + "Target Class = " + menuEntry.getTargetClass() + ", Parameter = "
+              + params);
+      UI.getCurrent().navigate(menuEntry.getTargetClass(), params);
+    } else if (menuEntry.getTargetId() != null) {
+      logger().debug(loggerPrefix + "Navigate with Target ID");
       String targetId = menuEntry.getTargetId();
 
-      logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass()+", Parameter = " + targetId);
-        UI.getCurrent().navigate(menuEntry.getTargetClass(),targetId);
-    }
-    else {
-      logger().debug(loggerPrefix+"Navigate without Target Params or Target ID");
-      logger().debug(loggerPrefix+"Target Class = " + menuEntry.getTargetClass());
+      logger().debug(
+          loggerPrefix + "Target Class = " + menuEntry.getTargetClass() + ", Parameter = "
+              + targetId);
+      UI.getCurrent().navigate(menuEntry.getTargetClass(), targetId);
+    } else {
+      logger().debug(loggerPrefix + "Navigate without Target Params or Target ID");
+      logger().debug(loggerPrefix + "Target Class = " + menuEntry.getTargetClass());
       UI.getCurrent().navigate(menuEntry.getTargetClass());
     }
     lastMenuEntry = menuEntry;

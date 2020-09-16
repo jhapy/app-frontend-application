@@ -133,22 +133,27 @@ public class KeycloakClient implements HasLogger {
     }
   }
 
-  public ServiceResult<Boolean> userExists( String username ) {
-    return new ServiceResult<>(true, null, ! getKeycloakRealmInstance().users().search(username, true).isEmpty() );
+  public ServiceResult<Boolean> userExists(String username) {
+    return new ServiceResult<>(true, null,
+        !getKeycloakRealmInstance().users().search(username, true).isEmpty());
   }
 
-  public ServiceResult<Boolean> isValidated( String username ) {
+  public ServiceResult<Boolean> isValidated(String username) {
     List<UserRepresentation> users = getKeycloakRealmInstance().users().search(username, true);
-    if (  users.isEmpty() )return new ServiceResult<>(true, null , Boolean.FALSE);
-    else return new ServiceResult<>(true, null, users.get(0).isEmailVerified());
+    if (users.isEmpty()) {
+      return new ServiceResult<>(true, null, Boolean.FALSE);
+    } else {
+      return new ServiceResult<>(true, null, users.get(0).isEmailVerified());
+    }
   }
 
   public ServiceResult<String> registerUser(String username) {
-    String loggerPrefix = getLoggerPrefix("registerUser", username );
-    List<UserRepresentation> existingUser = getKeycloakRealmInstance().users().search(username, true);
-    if ( ! existingUser.isEmpty())
+    String loggerPrefix = getLoggerPrefix("registerUser", username);
+    List<UserRepresentation> existingUser = getKeycloakRealmInstance().users()
+        .search(username, true);
+    if (!existingUser.isEmpty()) {
       return new ServiceResult<>(true, null, existingUser.get(0).getUsername());
-    else {
+    } else {
       UserRepresentation userRepresentation = new UserRepresentation();
       userRepresentation.setUsername(username);
 
@@ -169,6 +174,7 @@ public class KeycloakClient implements HasLogger {
       }
     }
   }
+
   public ServiceResult<SecurityKeycloakUser> saveUser(SaveQuery<SecurityKeycloakUser> query) {
     String loggerPrefix = getLoggerPrefix("saveUser");
 

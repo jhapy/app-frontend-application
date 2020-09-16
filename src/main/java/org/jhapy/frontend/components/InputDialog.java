@@ -21,8 +21,6 @@ import com.vaadin.flow.component.icon.IconFactory;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.util.function.Consumer;
-import org.jhapy.frontend.utils.css.Display;
-import org.jhapy.frontend.utils.css.Overflow;
 
 
 public class InputDialog extends Dialog {
@@ -124,7 +122,7 @@ public class InputDialog extends Dialog {
     return this;
   }
 
-  public InputDialog setContent(Component ... content) {
+  public InputDialog setContent(Component... content) {
     getContent().removeAll();
 
     getContent().add(content);
@@ -218,7 +216,7 @@ public class InputDialog extends Dialog {
 
     @Override
     protected FlexBoxLayout initContent() {
-      FlexBoxLayout content  = new FlexBoxLayout();
+      FlexBoxLayout content = new FlexBoxLayout();
       content.setFlexDirection(FlexDirection.ROW);
       content.setWidthFull();
       leftSpacer.setMinWidth("var(--lumo-space-m)");

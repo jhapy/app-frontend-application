@@ -112,7 +112,7 @@ public class NaviMenu extends Div {
   }
 
   public List<NaviItem> getNaviItems() {
-    List<NaviItem> items = (List)getChildren()
+    List<NaviItem> items = (List) getChildren()
         .collect(Collectors.toList());
     return items;
   }

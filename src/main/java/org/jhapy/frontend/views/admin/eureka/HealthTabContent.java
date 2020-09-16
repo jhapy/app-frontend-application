@@ -263,10 +263,10 @@ public class HealthTabContent extends ActuatorBaseView {
               result.append("<span style=\"color:#e83e8c;\">Validation Query : </span>");
               result.append(details.getValidationQuery());
 
-              if ( details.getResult() != null ) {
+              if (details.getResult() != null) {
                 result.append("<br/>");
-              result.append("<span style=\"color:#e83e8c;\">Result : </span>");
-              result.append(details.getResult());
+                result.append("<span style=\"color:#e83e8c;\">Result : </span>");
+                result.append(details.getResult());
               }
 
               return result.toString();
@@ -289,12 +289,11 @@ public class HealthTabContent extends ActuatorBaseView {
               result.append("<span style=\"color:#e83e8c;\">Version : </span>");
               result.append(details.getVersion());
 
-              if ( details.getNodes() != null ) {
+              if (details.getNodes() != null) {
                 result.append("<br/>");
                 result.append("<span style=\"color:#e83e8c;\">Nodes : </span>");
                 result.append(details.getNodes());
               }
-
 
               return result.toString();
             } else if (t instanceof LdapHealthIndicator) {

@@ -32,7 +32,6 @@ import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
 import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
 import org.jhapy.frontend.security.SecurityUtils;
-import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -242,77 +241,77 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
     return new KeycloakLogoutHandler(new RestTemplate());
   }
 
-/*
-  @Override
-  public void configure(HttpSecurity http) throws Exception {
-      // @formatter:off
-      http
-          .csrf()
-          .disable()
-          .exceptionHandling()
-              .authenticationEntryPoint(problemSupport)
-              .accessDeniedHandler(problemSupport)
-      .and()
-          .headers()
-          .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
-      .and()
-          .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-      .and()
-          .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
-      .and()
-          .frameOptions()
-          .deny()
-      .and()
-          .requestCache().requestCache(new CustomRequestCache())
-      .and()
-          .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
-          .authorizeRequests()
-          .accessDecisionManager(accessDecisionManager())
-          .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-          .antMatchers("/VAADIN/**").permitAll()
-          .antMatchers(        "/manifest.webmanifest").permitAll()
-          .antMatchers("/sw.js").permitAll()
-          .antMatchers("/icons/**").permitAll()
-          .antMatchers("/images/**").permitAll()
-          .antMatchers("/frontend/**").permitAll()
-          .antMatchers("/webjars/**").permitAll()
-          .antMatchers("/frontend-es5/**", "/frontend-es6/**").permitAll()
-          .antMatchers("/offline-page.html").permitAll()
-          .antMatchers("/api/auth-info").permitAll()
-          .antMatchers("/api/**").authenticated()
-          .antMatchers("/management/health").permitAll()
-          .antMatchers("/management/info").permitAll()
-          .antMatchers("/management/prometheus").permitAll()
-          .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-          .anyRequest().authenticated()
-      .and()
-          .oauth2Login();
-      // @formatter:on
-  }
+  /*
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
+        http
+            .csrf()
+            .disable()
+            .exceptionHandling()
+                .authenticationEntryPoint(problemSupport)
+                .accessDeniedHandler(problemSupport)
+        .and()
+            .headers()
+            .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
+        .and()
+            .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+        .and()
+            .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
+        .and()
+            .frameOptions()
+            .deny()
+        .and()
+            .requestCache().requestCache(new CustomRequestCache())
+        .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+            .authorizeRequests()
+            .accessDecisionManager(accessDecisionManager())
+            .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+            .antMatchers("/VAADIN/**").permitAll()
+            .antMatchers(        "/manifest.webmanifest").permitAll()
+            .antMatchers("/sw.js").permitAll()
+            .antMatchers("/icons/**").permitAll()
+            .antMatchers("/images/**").permitAll()
+            .antMatchers("/frontend/**").permitAll()
+            .antMatchers("/webjars/**").permitAll()
+            .antMatchers("/frontend-es5/**", "/frontend-es6/**").permitAll()
+            .antMatchers("/offline-page.html").permitAll()
+            .antMatchers("/api/auth-info").permitAll()
+            .antMatchers("/api/**").authenticated()
+            .antMatchers("/management/health").permitAll()
+            .antMatchers("/management/info").permitAll()
+            .antMatchers("/management/prometheus").permitAll()
+            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .anyRequest().authenticated()
+        .and()
+            .oauth2Login();
+        // @formatter:on
+    }
 
 
-  Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
-      JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-      jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
-      return jwtAuthenticationConverter;
-  }
+    Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
+        return jwtAuthenticationConverter;
+    }
 
-  //@Bean
-  JwtDecoder jwtDecoder() {
-      NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
+    //@Bean
+    JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
-      OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(appProperties.getSecurity().getOauth2().getAudience());
-      OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-      OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+        OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(appProperties.getSecurity().getOauth2().getAudience());
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
-      jwtDecoder.setJwtValidator(withAudience);
+        jwtDecoder.setJwtValidator(withAudience);
 
-      return jwtDecoder;
-  }
+        return jwtDecoder;
+    }
 
-*/
+  */
   @Bean
   public AccessDecisionManager accessDecisionManager() {
     List<AccessDecisionVoter<?>> decisionVoters

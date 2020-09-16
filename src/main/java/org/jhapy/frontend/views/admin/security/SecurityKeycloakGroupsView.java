@@ -64,7 +64,8 @@ public class SecurityKeycloakGroupsView extends
   public SecurityKeycloakGroupsView(MyI18NProvider myI18NProvider) {
     super("securityGroup.", SecurityKeycloakGroup.class, new SecurityGroupKeycloakDataProvider(),
         (e) -> SecurityServices.getKeycloakClient().saveGroup(new SaveQuery<>(e)),
-        e -> SecurityServices.getKeycloakClient().deleteGroup(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
+        e -> SecurityServices.getKeycloakClient().deleteGroup(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   protected Grid createGrid() {

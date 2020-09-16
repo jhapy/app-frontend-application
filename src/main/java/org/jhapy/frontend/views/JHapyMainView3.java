@@ -20,8 +20,6 @@ package org.jhapy.frontend.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -35,15 +33,12 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.server.ErrorHandler;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
-import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.codecamp.vaadin.components.messagedialog.MessageDialog;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
@@ -52,7 +47,6 @@ import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
-import org.jhapy.frontend.components.dragger.Dragger;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
 import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
@@ -188,8 +182,9 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   /**
    * Initialise the required components and containers.
    */
-  private void initStructure(MenuHierarchicalDataProvider menuProvider, boolean showSearchMenu, String version, String environnement) {
-    naviDrawer = new NaviDrawerWithTreeMenu( menuProvider, showSearchMenu, version, environnement);
+  private void initStructure(MenuHierarchicalDataProvider menuProvider, boolean showSearchMenu,
+      String version, String environnement) {
+    naviDrawer = new NaviDrawerWithTreeMenu(menuProvider, showSearchMenu, version, environnement);
 
     viewContainer = new FlexBoxLayout();
     viewContainer.addClassName(CLASS_NAME + "__view-container");
@@ -216,18 +211,19 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   public void rebuildNaviItems(boolean resetAppBar) {
     List<MenuEntry> expandedMenus = new ArrayList<>();
 
-    naviDrawer.getMenu().getMenuList().forEach( menuEntry -> {
-    if ( naviDrawer.getMenuComponent().isExpanded(menuEntry) ) {
-      expandedMenus.add( menuEntry);
-    }}
-        );
+    naviDrawer.getMenu().getMenuList().forEach(menuEntry -> {
+          if (naviDrawer.getMenuComponent().isExpanded(menuEntry)) {
+            expandedMenus.add(menuEntry);
+          }
+        }
+    );
 
-   // naviDrawer.refreshMenu();
+    // naviDrawer.refreshMenu();
 
     naviDrawer.toogleSearch();
     initNaviItems();
 
-    UI.getCurrent().access(() -> naviDrawer.getMenuComponent().expand( expandedMenus ));
+    UI.getCurrent().access(() -> naviDrawer.getMenuComponent().expand(expandedMenus));
 
     if (resetAppBar) {
       appBar.reset();
@@ -266,6 +262,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   protected void postNaviItems(Tree<MenuEntry> menu) {
 
   }
+
   /**
    * Initialise the navigation items.
    */
@@ -294,7 +291,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
         addToSettingsMenu(menuData, settingsSubMenu);
 
-        menuData.addMenuEntry( settingsSubMenu );
+        menuData.addMenuEntry(settingsSubMenu);
         /*
          * i18N
          */
@@ -382,7 +379,8 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         if (isDisplayNotifications) {
           MenuEntry notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);
           notificationsSubMenu.setVaadinIcon(VaadinIcon.SITEMAP);
-          notificationsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
+          notificationsSubMenu
+              .setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
           notificationsSubMenu.setParentMenuEntry(settingsSubMenu);
 
           menuData.addMenuEntry(notificationsSubMenu);
@@ -615,7 +613,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         LumoStyles.Padding.Wide.M
     );
 
-    Notification notification = new Notification( messageLayout );
+    Notification notification = new Notification(messageLayout);
     notification.setDuration(3000);
     notification.setPosition(Position.TOP_CENTER);
 

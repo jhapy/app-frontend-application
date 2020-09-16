@@ -46,8 +46,10 @@ import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_MAILS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class MailAdminView extends DefaultMasterDetailsView<Mail, DefaultFilter, SearchQuery, SearchQueryResult> {
-protected final AppProperties appProperties;
+public class MailAdminView extends
+    DefaultMasterDetailsView<Mail, DefaultFilter, SearchQuery, SearchQueryResult> {
+
+  protected final AppProperties appProperties;
 
   public MailAdminView(MyI18NProvider myI18NProvider,
       AppProperties appProperties) {

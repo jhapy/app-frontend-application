@@ -13,49 +13,52 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 public class SearchView extends IronOverlay {
-    private static final long serialVersionUID = 1L;
 
-    private final TextField searchField = new TextField();
-    private final Button closeButton = new Button(VaadinIcon.ARROW_LEFT.create());
-    private HorizontalLayout searchFieldWrapper = new HorizontalLayout(closeButton, searchField);
+  private static final long serialVersionUID = 1L;
 
-    public SearchView() {
-        getElement().getStyle().set("width", "100%");
-        setVerticalAlign(VerticalOrientation.TOP);
-        setWithBackdrop(false);
-        searchFieldWrapper.getStyle()
-                .set("background", "var(--app-layout-bar-background-base-color)")
-                .set("height", "var(--app-bar-height)")
-                .set("box-shadow", "var(--app-layout-bar-shadow)")
-                .set("padding", "var(--app-layout-bar-padding)")
-                .set("z-index", "1");
-        searchFieldWrapper.setWidthFull();
-        searchFieldWrapper.setAlignItems(FlexComponent.Alignment.CENTER);
-        searchFieldWrapper.setSpacing(false);
-        searchField.getStyle().set("--lumo-contrast-10pct", "transparent");
-        searchField.setValueChangeMode(ValueChangeMode.EAGER);
-        searchField.setWidthFull();
-        closeButton.setWidth("var(--app-bar-height)");
-        closeButton.setHeight("var(--app-bar-height)");
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        closeButton.addClickListener(event -> {
-            searchField.clear();
-            close();
-        });
-        add(searchFieldWrapper);
-    }
+  private final TextField searchField = new TextField();
+  private final Button closeButton = new Button(VaadinIcon.ARROW_LEFT.create());
+  private final HorizontalLayout searchFieldWrapper = new HorizontalLayout(closeButton,
+      searchField);
 
-    @Override
-    public void open() {
-        super.open();
-        searchField.focus();
-    }
+  public SearchView() {
+    getElement().getStyle().set("width", "100%");
+    setVerticalAlign(VerticalOrientation.TOP);
+    setWithBackdrop(false);
+    searchFieldWrapper.getStyle()
+        .set("background", "var(--app-layout-bar-background-base-color)")
+        .set("height", "var(--app-bar-height)")
+        .set("box-shadow", "var(--app-layout-bar-shadow)")
+        .set("padding", "var(--app-layout-bar-padding)")
+        .set("z-index", "1");
+    searchFieldWrapper.setWidthFull();
+    searchFieldWrapper.setAlignItems(FlexComponent.Alignment.CENTER);
+    searchFieldWrapper.setSpacing(false);
+    searchField.getStyle().set("--lumo-contrast-10pct", "transparent");
+    searchField.setValueChangeMode(ValueChangeMode.EAGER);
+    searchField.setWidthFull();
+    closeButton.setWidth("var(--app-bar-height)");
+    closeButton.setHeight("var(--app-bar-height)");
+    closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+    closeButton.addClickListener(event -> {
+      searchField.clear();
+      close();
+    });
+    add(searchFieldWrapper);
+  }
 
-    public TextField getSearchField() {
-        return searchField;
-    }
+  @Override
+  public void open() {
+    super.open();
+    searchField.focus();
+  }
 
-    public void addValueChangeListener(HasValue.ValueChangeListener<? super AbstractField.ComponentValueChangeEvent<TextField, String>> listener) {
-        searchField.addValueChangeListener(listener);
-    }
+  public TextField getSearchField() {
+    return searchField;
+  }
+
+  public void addValueChangeListener(
+      HasValue.ValueChangeListener<? super AbstractField.ComponentValueChangeEvent<TextField, String>> listener) {
+    searchField.addValueChangeListener(listener);
+  }
 }

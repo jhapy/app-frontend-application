@@ -62,7 +62,6 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.jhapy.frontend.views.JHapyMainView;
 import org.springframework.security.access.annotation.Secured;
-import org.vaadin.olli.FileDownloadWrapper;
 
 /**
  * @author jHapy Lead Dev.
@@ -71,7 +70,8 @@ import org.vaadin.olli.FileDownloadWrapper;
  */
 @I18NPageTitle(messageKey = AppConst.PAGE_ACTIONS)
 @Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
-public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class ActionsView extends
+    DefaultMasterDetailsView<Action, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public ActionsView(MyI18NProvider myI18NProvider) {
     super("action.", Action.class, new ActionDataProvider(),
@@ -82,7 +82,8 @@ public class ActionsView extends DefaultMasterDetailsView<Action, DefaultFilter,
           }
           return _elt;
         },
-        e -> I18NServices.getActionService().delete(new DeleteByIdQuery(e.getId())), myI18NProvider);
+        e -> I18NServices.getActionService().delete(new DeleteByIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   @Override

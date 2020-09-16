@@ -86,11 +86,11 @@ public class SecurityUserConverter extends
     }
     result.setIsLocal(source.getFederationLink() != null || (source.getSocialLinks() != null
         && source.getSocialLinks().size() > 0));
-    if (source.getAttributes() != null && source.getAttributes().get("picture") != null ) {
+    if (source.getAttributes() != null && source.getAttributes().get("picture") != null) {
       String pictureStr = source.getAttributes().get("picture").get(0);
-      if (pictureStr.startsWith("http"))
+      if (pictureStr.startsWith("http")) {
         result.getAttributes().put("picture", pictureStr);
-      else {
+      } else {
         byte[] pictureDecoded = java.util.Base64.getDecoder().decode(pictureStr);
         try {
           MimeType mimeType = TikaConfig.getDefaultConfig().getMimeRepository()

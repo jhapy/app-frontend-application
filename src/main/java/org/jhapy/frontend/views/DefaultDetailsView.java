@@ -21,7 +21,6 @@ package org.jhapy.frontend.views;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.DetachEvent;
-import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -33,15 +32,12 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.shared.Registration;
 import dev.mett.vaadin.tooltip.Tooltips;
 import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
@@ -56,22 +52,11 @@ import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.frontend.components.FlexBoxLayout;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerFooter;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
-import org.jhapy.frontend.components.navigation.tab.NaviTab;
-import org.jhapy.frontend.components.navigation.tab.NaviTabs;
 import org.jhapy.frontend.layout.ViewFrame;
-import org.jhapy.frontend.layout.size.Horizontal;
-import org.jhapy.frontend.layout.size.Left;
-import org.jhapy.frontend.layout.size.Right;
-import org.jhapy.frontend.layout.size.Top;
-import org.jhapy.frontend.layout.size.Vertical;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
-import org.jhapy.frontend.utils.css.BoxSizing;
-import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
@@ -80,7 +65,8 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
  * @version 1.0
  * @since 8/27/19
  */
-public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame implements HasLogger, HasUrlParameter<String> {
+public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame implements
+    HasLogger, HasUrlParameter<String> {
 
   protected final String I18N_PREFIX;
   protected DetailsDrawerFooter detailsDrawerFooter;
@@ -92,10 +78,11 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   private Class parentViewClassname;
   private AppBar appBar;
   protected final MyI18NProvider myI18NProvider;
-protected Registration contextIconRegistration = null;
+  protected Registration contextIconRegistration = null;
   protected DefaultDetailsContent detailsDrawer;
 
-  public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname, MyI18NProvider myI18NProvider) {
+  public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
+      MyI18NProvider myI18NProvider) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
@@ -107,12 +94,16 @@ protected Registration contextIconRegistration = null;
   }
 
   public DefaultDetailsView(String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler, MyI18NProvider myI18NProvider) {
-    this( null, I18N_PREFIX, entityType, parentViewClassname, saveHandler, deleteHandler, myI18NProvider);
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler,
+      MyI18NProvider myI18NProvider) {
+    this(null, I18N_PREFIX, entityType, parentViewClassname, saveHandler, deleteHandler,
+        myI18NProvider);
   }
 
-  public DefaultDetailsView(AppBar appBar, String I18N_PREFIX, Class<T> entityType, Class parentViewClassname,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler, MyI18NProvider myI18NProvider) {
+  public DefaultDetailsView(AppBar appBar, String I18N_PREFIX, Class<T> entityType,
+      Class parentViewClassname,
+      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler,
+      MyI18NProvider myI18NProvider) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
@@ -140,17 +131,19 @@ protected Registration contextIconRegistration = null;
 
   @Override
   protected void onDetach(DetachEvent detachEvent) {
-    if ( contextIconRegistration != null )
+    if (contextIconRegistration != null) {
       contextIconRegistration.remove();
+    }
   }
 
-  protected void setParentViewClassname( Class parentViewClassname ) {
+  protected void setParentViewClassname(Class parentViewClassname) {
     this.parentViewClassname = parentViewClassname;
   }
 
   protected void setSaveHandler(Function<T, ServiceResult<T>> saveHandler) {
     this.saveHandler = saveHandler;
   }
+
   protected T getCurrentEditing() {
     return currentEditing;
   }
@@ -232,11 +225,12 @@ protected Registration contextIconRegistration = null;
     return true;
   }
 
-  protected boolean isShowFooter() { return true; }
+  protected boolean isShowFooter() {
+    return true;
+  }
 
   private Component getContentTab() {
     detailsDrawer = new DefaultDetailsContent(createDetails(currentEditing));
-
 
     FlexBoxLayout contentTab = new FlexBoxLayout();
     contentTab.add(detailsDrawer);
@@ -244,7 +238,7 @@ protected Registration contextIconRegistration = null;
     contentTab.setSizeFull();
     contentTab.setFlexDirection(FlexDirection.COLUMN);
 
-    if ( isShowFooter() ) {
+    if (isShowFooter()) {
       detailsDrawerFooter = new DetailsDrawerFooter();
       detailsDrawerFooter.setWidth("");
       if (saveHandler == null || !canSave()) {
@@ -335,7 +329,7 @@ protected Registration contextIconRegistration = null;
         activityDisplay -> entity.getCreatedBy(),
         null);
     binder.bind(updated, entity1 -> entity1.getModified() == null ? ""
-        : DateTimeFormatter.format(entity1.getModified(), getLocale()),null);
+        : DateTimeFormatter.format(entity1.getModified(), getLocale()), null);
     binder.bind(updatedBy,
         activityDisplay -> entity.getModifiedBy(),
         null);
@@ -387,8 +381,7 @@ protected Registration contextIconRegistration = null;
       }
 
       if (isNew) {
-        UI.getCurrent()
-            .navigate(getClass(), currentEditing.getId().toString());
+        redirectAfterNewRecordSave(currentEditing);
       } else {
         showDetails(currentEditing);
       }
@@ -404,6 +397,10 @@ protected Registration contextIconRegistration = null;
           .show(getTranslation("message.global.validationErrorMessage", errorText), 3000,
               Notification.Position.BOTTOM_CENTER);
     }
+  }
+
+  protected void redirectAfterNewRecordSave(T entity) {
+    UI.getCurrent().navigate(getClass(), entity.getId().toString());
   }
 
   public void delete() {
@@ -431,59 +428,56 @@ protected Registration contextIconRegistration = null;
     UI.getCurrent().navigate(parentViewClassname);
   }
 
-  protected Label getLabel(String element ){
+  protected Label getLabel(String element) {
     Label label = new Label(getTranslation(element));
-    TooltipConfiguration ttconfig = new TooltipConfiguration( myI18NProvider.getTooltip(element));
+    TooltipConfiguration ttconfig = new TooltipConfiguration(myI18NProvider.getTooltip(element));
     ttconfig.setDelay(1000);
     ttconfig.setHideOnClick(TC_HIDE_ON_CLICK.TRUE);
     ttconfig.setShowOnCreate(false);
 
-    Tooltips.getCurrent().setTooltip(label,ttconfig);
+    Tooltips.getCurrent().setTooltip(label, ttconfig);
     return label;
   }
 
-  protected Button getButton( String action ) {
+  protected Button getButton(String action) {
     return getButton(null, action, false, true);
   }
 
-  protected Button getButton( String action,boolean isSmall ) {
+  protected Button getButton(String action, boolean isSmall) {
     return getButton(null, action, isSmall, true);
   }
 
-  protected Button getButton(  VaadinIcon icon, String action ) {
+  protected Button getButton(VaadinIcon icon, String action) {
     return getButton(icon, action, false, false);
   }
 
-  protected Button getButton( VaadinIcon icon, String action, boolean isSmall, boolean displayText ) {
+  protected Button getButton(VaadinIcon icon, String action, boolean isSmall, boolean displayText) {
     Button button;
-    if ( isSmall ) {
-      if ( displayText ) {
+    if (isSmall) {
+      if (displayText) {
         if (icon == null) {
           button = UIUtils.createSmallButton(getTranslation(action));
         } else {
           button = UIUtils.createSmallButton(getTranslation(action), icon);
         }
-      }
-      else {
+      } else {
         button = UIUtils.createSmallButton(icon);
       }
-    } else
-    if ( displayText ) {
+    } else if (displayText) {
       if (icon == null) {
         button = UIUtils.createButton(getTranslation(action));
-      }else {
+      } else {
         button = UIUtils.createButton(getTranslation(action), icon);
       }
-    }
-    else {
+    } else {
       button = UIUtils.createButton(icon);
     }
-    TooltipConfiguration ttconfig = new TooltipConfiguration( myI18NProvider.getTooltip(action));
+    TooltipConfiguration ttconfig = new TooltipConfiguration(myI18NProvider.getTooltip(action));
     ttconfig.setDelay(1000);
     ttconfig.setHideOnClick(TC_HIDE_ON_CLICK.TRUE);
     ttconfig.setShowOnCreate(false);
 
-    Tooltips.getCurrent().setTooltip(button,ttconfig);
+    Tooltips.getCurrent().setTooltip(button, ttconfig);
 
     return button;
   }

@@ -89,8 +89,8 @@ public abstract class AbstractDialog extends Dialog {
       }
     });
 
-    if ( hasSaveButton() ) {
-       saveButton = new Button(getSaveButtonLabel());
+    if (hasSaveButton()) {
+      saveButton = new Button(getSaveButtonLabel());
       saveButton.addClickListener(event -> {
         if (onSave()) {
           close();
@@ -103,8 +103,9 @@ public abstract class AbstractDialog extends Dialog {
     if (buttons != null && buttons.size() > 0) {
       footer.add(getButtons().toArray(new Component[0]));
     }
-    if ( hasSaveButton() )
+    if (hasSaveButton()) {
       footer.add(saveButton);
+    }
     add(footer);
 
     // Button theming
@@ -119,7 +120,9 @@ public abstract class AbstractDialog extends Dialog {
     afterOpen();
   }
 
-  protected boolean hasSaveButton() { return true; }
+  protected boolean hasSaveButton() {
+    return true;
+  }
 
   protected void afterOpen() {
   }

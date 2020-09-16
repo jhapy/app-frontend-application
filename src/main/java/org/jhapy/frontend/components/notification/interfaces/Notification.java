@@ -1,56 +1,57 @@
 package org.jhapy.frontend.components.notification.interfaces;
 
-import org.jhapy.frontend.components.notification.DefaultNotificationHolder;
-import org.jhapy.frontend.components.notification.entity.Priority;
 import com.github.appreciated.app.layout.component.appbar.ComponentBadgeWrapper;
 import java.time.LocalDateTime;
+import org.jhapy.frontend.components.notification.DefaultNotificationHolder;
+import org.jhapy.frontend.components.notification.entity.Priority;
 
 /**
- * A notification is a entity which holds data about certain event which can be raised by the application.
- * A Notification can be displayed in the application menu bar via {@link DefaultNotificationHolder} and {@link ComponentBadgeWrapper}
+ * A notification is a entity which holds data about certain event which can be raised by the
+ * application. A Notification can be displayed in the application menu bar via {@link
+ * DefaultNotificationHolder} and {@link ComponentBadgeWrapper}
  */
 public interface Notification extends Comparable<Notification> {
 
-    String getTitle();
+  String getTitle();
 
-    String getDescription();
+  String getDescription();
 
-    boolean isDismissable();
+  boolean isDismissable();
 
-    void setDismissable(boolean sticky);
+  void setDismissable(boolean sticky);
 
-    String getImage();
+  String getImage();
 
-    @Override
-    default int compareTo(Notification o) {
-        if (o == this) {
-            return 0;
-        }
-        if (this.getPriority().getValue() > 2 || o.getPriority().getValue() > 2) {
-            return getPriority().getValue().compareTo(o.getPriority().getValue());
-        } else if (this.isSticky() != o.isSticky()) {
-            return !isSticky() ? -1 : 1;
-        } else if (getPriority() != o.getPriority()) {
-            return getPriority().getValue().compareTo(o.getPriority().getValue());
-        } else if (isRead() != o.isRead()) {
-            return !isRead() ? -1 : 1;
-        } else {
-            return this.getCreationTime().compareTo(o.getCreationTime());
-        }
+  @Override
+  default int compareTo(Notification o) {
+    if (o == this) {
+      return 0;
     }
+    if (this.getPriority().getValue() > 2 || o.getPriority().getValue() > 2) {
+      return getPriority().getValue().compareTo(o.getPriority().getValue());
+    } else if (this.isSticky() != o.isSticky()) {
+      return !isSticky() ? -1 : 1;
+    } else if (getPriority() != o.getPriority()) {
+      return getPriority().getValue().compareTo(o.getPriority().getValue());
+    } else if (isRead() != o.isRead()) {
+      return !isRead() ? -1 : 1;
+    } else {
+      return this.getCreationTime().compareTo(o.getCreationTime());
+    }
+  }
 
-    Priority getPriority();
+  Priority getPriority();
 
-    boolean isSticky();
+  boolean isSticky();
 
-    boolean isRead();
+  boolean isRead();
 
-    void setRead(boolean isRead);
+  void setRead(boolean isRead);
 
-    LocalDateTime getCreationTime();
+  LocalDateTime getCreationTime();
 
-    void setCreationTime(LocalDateTime creationTime);
+  void setCreationTime(LocalDateTime creationTime);
 
-    void setSticky(boolean sticky);
+  void setSticky(boolean sticky);
 
 }

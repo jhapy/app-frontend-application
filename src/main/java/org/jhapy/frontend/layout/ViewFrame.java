@@ -25,9 +25,7 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.views.JHapyMainView3;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A view frame that establishes app design guidelines. It consists of three parts:
@@ -40,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @CssImport("./styles/components/view-frame.css")
 @SpringComponent
 public class ViewFrame extends Composite<Div> implements HasStyle {
+
   private final String CLASS_NAME = "view-frame";
   private final Div header;
   private final Div content;

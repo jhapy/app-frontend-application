@@ -72,7 +72,8 @@ public class SecurityKeycloakUsersView extends
     super("securityUser.", SecurityKeycloakUser.class, new SecurityUserKeycloakDataProvider(),
         false,
         (e) -> SecurityServices.getKeycloakClient().saveUser(new SaveQuery<>(e)),
-        e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
+        e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
     this.orikaBeanMapper = orikaBeanMapper;
   }
 

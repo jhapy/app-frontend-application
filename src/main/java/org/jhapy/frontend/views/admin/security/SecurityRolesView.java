@@ -35,7 +35,6 @@ import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityRoleDataProvider;
 import org.jhapy.frontend.renderer.BooleanOkRenderer;
-import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
@@ -46,12 +45,14 @@ import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_ROLES)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SecurityRolesView extends DefaultMasterDetailsView<SecurityRole, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class SecurityRolesView extends
+    DefaultMasterDetailsView<SecurityRole, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public SecurityRolesView(MyI18NProvider myI18NProvider) {
     super("securityRole.", SecurityRole.class, new SecurityRoleDataProvider(),
         (e) -> SecurityServices.getSecurityRoleService().save(new SaveQuery<>(e)),
-        e -> SecurityServices.getSecurityRoleService().delete(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
+        e -> SecurityServices.getSecurityRoleService().delete(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   protected Grid createGrid() {

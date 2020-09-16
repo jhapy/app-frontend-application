@@ -147,7 +147,7 @@ public class CroppieDialog extends Dialog {
     croppie.withViewport(new ViewPortConfig(150, 150, ViewPortType.SQUARE))
         .withShowZoomer(true).withEnableResize(false).withEnableZoom(true);
 
-    if (storedFile.getMetadata().containsKey("zoom") ) {
+    if (storedFile.getMetadata().containsKey("zoom")) {
       croppie.withZoom(Float.valueOf(storedFile.getMetadata().get("zoom")));
     }
 

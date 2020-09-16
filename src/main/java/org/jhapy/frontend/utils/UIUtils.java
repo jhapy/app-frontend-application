@@ -29,7 +29,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.theme.lumo.Lumo;
@@ -48,7 +47,6 @@ import org.jhapy.frontend.utils.css.Shadow;
 import org.jhapy.frontend.utils.css.TextAlign;
 import org.jhapy.frontend.utils.css.TextOverflow;
 import org.jhapy.frontend.utils.css.WhiteSpace;
-import org.vaadin.textfieldformatter.CustomStringBlockFormatter;
 import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 public class UIUtils {

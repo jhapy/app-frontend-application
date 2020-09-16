@@ -57,7 +57,8 @@ import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_MESSAGES)
 @Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
-public class MessagesView extends DefaultMasterDetailsView<Message, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class MessagesView extends
+    DefaultMasterDetailsView<Message, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public MessagesView(MyI18NProvider myI18NProvider) {
     super("message.", Message.class, new MessageDataProvider(),
@@ -68,7 +69,8 @@ public class MessagesView extends DefaultMasterDetailsView<Message, DefaultFilte
           }
           return _elt;
         },
-        e -> I18NServices.getMessageService().delete(new DeleteByIdQuery(e.getId())), myI18NProvider);
+        e -> I18NServices.getMessageService().delete(new DeleteByIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   @Override

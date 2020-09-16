@@ -45,7 +45,7 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
  * @version 1.0
  * @since 8/27/19
  */
-public abstract class   DefaultMasterView<T extends BaseEntity, F extends DefaultFilter> extends
+public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultFilter> extends
     ViewFrame {
 
   protected final String I18N_PREFIX;
@@ -58,7 +58,8 @@ public abstract class   DefaultMasterView<T extends BaseEntity, F extends Defaul
   protected final MyI18NProvider myI18NProvider;
 
   public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
-      DefaultDataProvider<T, F> dataProvider, Class entityViewClass, MyI18NProvider myI18NProvider) {
+      DefaultDataProvider<T, F> dataProvider, Class entityViewClass,
+      MyI18NProvider myI18NProvider) {
     super();
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;

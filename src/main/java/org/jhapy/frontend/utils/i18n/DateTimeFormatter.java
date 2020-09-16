@@ -46,7 +46,8 @@ public class DateTimeFormatter {
     if (localDate == null) {
       return "";
     } else {
-      return java.time.format.DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(currentLocal).format(localDate);
+      return java.time.format.DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+          .withLocale(currentLocal).format(localDate);
     }
   }
 
@@ -73,8 +74,9 @@ public class DateTimeFormatter {
     if (date == null) {
       return "";
     } else {
-    return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(currentLocal)
-        .withZone(ZoneId.systemDefault()).format(date.toInstant());
+      return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+          .withLocale(currentLocal)
+          .withZone(ZoneId.systemDefault()).format(date.toInstant());
     }
   }
 }

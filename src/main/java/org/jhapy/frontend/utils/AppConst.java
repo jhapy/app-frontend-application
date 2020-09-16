@@ -57,8 +57,8 @@ public class AppConst {
   public static final String PAGE_SECURITY = "security";
   public static final String PAGE_USERS = "security/users";
   public static final String PAGE_ROLES = "security/roles";
-  public static final String PAGE_GROUPS= "security/groups";
-  public static final String PAGE_SESSIONS= "security/sessions";
+  public static final String PAGE_GROUPS = "security/groups";
+  public static final String PAGE_SESSIONS = "security/sessions";
   public static final String PAGE_ELEMENTS = "settings/i18n/elements";
   public static final String PAGE_REFERENCES = "settings/reference";
   public static final String PAGE_LANGUAGES = "settings/reference/languages";

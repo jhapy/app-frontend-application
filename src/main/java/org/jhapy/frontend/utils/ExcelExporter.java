@@ -20,8 +20,6 @@ package org.jhapy.frontend.utils;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.binder.PropertySet;
-import com.vaadin.flow.data.provider.DataCommunicator;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
 import java.io.File;
 import java.io.FileInputStream;

@@ -29,7 +29,6 @@ import org.jhapy.dto.serviceQuery.i18n.GetByNameAndIso3Query;
 import org.jhapy.dto.serviceQuery.i18n.elementTrl.CountByElementQuery;
 import org.jhapy.dto.serviceQuery.i18n.elementTrl.FindByElementQuery;
 import org.jhapy.frontend.client.AuthorizedFeignClient;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

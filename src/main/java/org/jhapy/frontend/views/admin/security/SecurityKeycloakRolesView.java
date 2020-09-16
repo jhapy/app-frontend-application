@@ -50,7 +50,8 @@ public class SecurityKeycloakRolesView extends
   public SecurityKeycloakRolesView(MyI18NProvider myI18NProvider) {
     super("securityRole.", SecurityKeycloakRole.class, new SecurityRoleKeycloakDataProvider(),
         (e) -> SecurityServices.getKeycloakClient().saveRole(new SaveQuery<>(e)),
-        e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
+        e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   protected Grid createGrid() {

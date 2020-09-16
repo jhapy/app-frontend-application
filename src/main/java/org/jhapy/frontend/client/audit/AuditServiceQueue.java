@@ -20,8 +20,8 @@ package org.jhapy.frontend.client.audit;
 
 import org.jhapy.dto.messageQueue.EndSession;
 import org.jhapy.dto.messageQueue.NewSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,6 +40,6 @@ public class AuditServiceQueue {
   }
 
   public void endSession(final EndSession endSession) {
-    jmsTemplate.convertAndSend("endSession",endSession);
+    jmsTemplate.convertAndSend("endSession", endSession);
   }
 }

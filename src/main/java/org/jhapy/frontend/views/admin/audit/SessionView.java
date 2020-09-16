@@ -41,7 +41,8 @@ import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SESSIONS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SessionView extends DefaultMasterDetailsView<Session, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class SessionView extends
+    DefaultMasterDetailsView<Session, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public SessionView(MyI18NProvider myI18NProvider) {
     super("session.", Session.class, new SessionDataProvider(), myI18NProvider);

@@ -45,7 +45,8 @@ import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SMS_ADMIN)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SmsAdminView extends DefaultMasterDetailsView<Sms, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class SmsAdminView extends
+    DefaultMasterDetailsView<Sms, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public SmsAdminView(MyI18NProvider myI18NProvider) {
     super("sms.", Sms.class, new SmsDataProvider(), myI18NProvider);

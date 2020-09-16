@@ -58,8 +58,9 @@ public class SessionCountGaugeServiceInitListener implements VaadinServiceInitLi
       String loggerPrefix = getLoggerPrefix("sessionDestroy");
       logger().info(loggerPrefix + "Vaadin session destroyed. Current count is: " + sessionsCount
           .decrementAndGet());
-      if ( e.getSession() != null && e.getSession().getSession() != null )
+      if (e.getSession() != null && e.getSession().getSession() != null) {
         SecurityUtils.endSession(e.getSession().getSession().getId());
+      }
     });
   }
 }

@@ -116,8 +116,9 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
         contentLayout.add(upload);
 
         if (storedFile != null) {
-          if ( storedFile.getOrginalContent() == null )
-            storedFile.setOrginalContent( storedFile.getContent() );
+          if (storedFile.getOrginalContent() == null) {
+            storedFile.setOrginalContent(storedFile.getContent());
+          }
           buildCropper(storedFile.getOrginalContent(), storedFile.getFilename(),
               storedFile != null ? storedFile.getMetadata().get("copperData") : null);
         }
@@ -256,10 +257,10 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
       @Override
       protected void onDialogResized(DialogResizeEvent event) {
         if (nbAddedFile > 0) {
-          int _height = Integer
-              .parseInt(event.getHeight().substring(0, event.getHeight().indexOf("px")).trim());
-          int _width = Integer
-              .parseInt(event.getWidth().substring(0, event.getWidth().indexOf("px")).trim());
+          int _height = (int) Double
+              .parseDouble(event.getHeight().substring(0, event.getHeight().indexOf("px")).trim());
+          int _width = (int) Double
+              .parseDouble(event.getWidth().substring(0, event.getWidth().indexOf("px")).trim());
           cropperJs.resize(_height - 30, _width);
         } else {
           cropperJs.resize(event.getHeight(), event.getWidth());

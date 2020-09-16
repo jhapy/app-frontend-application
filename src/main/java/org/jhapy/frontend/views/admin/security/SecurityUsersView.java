@@ -49,7 +49,6 @@ import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityUserDataProvider;
 import org.jhapy.frontend.renderer.BooleanOkRenderer;
-import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
@@ -62,12 +61,14 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_USERS)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class SecurityUsersView extends DefaultMasterDetailsView<SecurityUser, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class SecurityUsersView extends
+    DefaultMasterDetailsView<SecurityUser, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public SecurityUsersView(MyI18NProvider myI18NProvider) {
     super("securityUser.", SecurityUser.class, new SecurityUserDataProvider(),
         (e) -> SecurityServices.getSecurityUserService().save(new SaveQuery<>(e)),
-        e -> SecurityServices.getSecurityUserService().delete(new DeleteByStrIdQuery(e.getId())), myI18NProvider);
+        e -> SecurityServices.getSecurityUserService().delete(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   protected Grid createGrid() {

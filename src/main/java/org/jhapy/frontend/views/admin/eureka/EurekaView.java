@@ -37,7 +37,6 @@ import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
-import org.jhapy.frontend.views.JHapyMainView;
 import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.core.env.Environment;
 import org.springframework.security.access.annotation.Secured;

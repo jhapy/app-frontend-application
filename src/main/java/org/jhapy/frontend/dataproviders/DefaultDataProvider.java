@@ -90,7 +90,7 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
     private String filter;
     private Boolean showInactive;
 
-    public DefaultFilter(){
+    public DefaultFilter() {
     }
 
     public DefaultFilter(String filter) {
@@ -118,6 +118,8 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
       return showInactive;
     }
 
-    public void setShowInactive( Boolean showInactive ) { this.showInactive = showInactive; }
+    public void setShowInactive(Boolean showInactive) {
+      this.showInactive = showInactive;
+    }
   }
 }

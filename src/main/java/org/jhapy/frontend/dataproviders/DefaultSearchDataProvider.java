@@ -19,18 +19,9 @@
 package org.jhapy.frontend.dataproviders;
 
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
-import com.vaadin.flow.data.provider.QuerySortOrder;
-import com.vaadin.flow.data.provider.QuerySortOrderBuilder;
 import java.io.Serializable;
-import java.util.List;
-import java.util.function.Consumer;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
-import org.jhapy.dto.utils.DirectionEnum;
-import org.jhapy.dto.utils.Page;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
-import org.jhapy.frontend.dataproviders.utils.FilterablePageableDataProvider;
 
 /**
  * @author jHapy Lead Dev.
@@ -53,7 +44,7 @@ public abstract class DefaultSearchDataProvider<T extends SearchQueryResult, F e
     private String filter;
     private Boolean showInactive;
 
-    public DefaultFilter(){
+    public DefaultFilter() {
     }
 
     public DefaultFilter(String filter) {
@@ -81,6 +72,8 @@ public abstract class DefaultSearchDataProvider<T extends SearchQueryResult, F e
       return showInactive;
     }
 
-    public void setShowInactive( Boolean showInactive ) { this.showInactive = showInactive; }
+    public void setShowInactive(Boolean showInactive) {
+      this.showInactive = showInactive;
+    }
   }
 }

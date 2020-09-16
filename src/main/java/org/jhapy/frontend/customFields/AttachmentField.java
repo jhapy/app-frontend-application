@@ -26,7 +26,6 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -41,26 +40,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.serviceQuery.ServiceResult;
-import org.jhapy.dto.serviceQuery.generic.GetByStrIdQuery;
 import org.jhapy.dto.utils.StoredFile;
-import org.jhapy.frontend.client.BaseServices;
-import org.jhapy.frontend.client.ResourceService;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.ImageViewerDialog;
-import org.jhapy.frontend.components.InputDialog;
-import org.jhapy.frontend.components.InputDialog.FluentButton;
 import org.jhapy.frontend.components.ListItem;
-import org.jhapy.frontend.components.PdfViewer;
 import org.jhapy.frontend.components.PdfViewerDialog;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawer;
-import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.events.AttachmentsFieldValueChangeEvent;
-import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.layout.size.Vertical;
@@ -107,15 +95,16 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
 
     MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
     upload = new Upload(buffer);
-    if ( acceptedFileType != null && acceptedFileType.length > 0 )
-    upload.setAcceptedFileTypes(acceptedFileType);
+    if (acceptedFileType != null && acceptedFileType.length > 0) {
+      upload.setAcceptedFileTypes(acceptedFileType);
+    }
     upload.setAutoUpload(true);
     upload.setMaxFileSize(maxFileSizeMb * 1024 * 124);
     upload.setMaxFiles(maxFiles);
 
     upload.addSucceededListener(event -> {
       String loggerPrefix = getLoggerPrefix("upload.succeeded");
-      logger().debug(loggerPrefix+"Start");
+      logger().debug(loggerPrefix + "Start");
 
       StoredFile storedFile = new StoredFile();
       storedFile.setMimeType(event.getMIMEType());
@@ -124,21 +113,22 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
       } catch (IOException e) {
         Notification.show(e.getLocalizedMessage());
       }
-      if ( event.getMIMEType().contains("image"))
+      if (event.getMIMEType().contains("image")) {
         storedFile.setOrginalContent(storedFile.getContent());
+      }
       storedFile.setFilesize((long) storedFile.getContent().length);
       storedFile.setFilename(event.getFileName());
 
       List<StoredFile> oldValues = new ArrayList<>(storedFiles);
       storedFiles.add(storedFile);
 
-      logger().debug(loggerPrefix+"Notify listeners, " + changeListeners.size() + " listeners");
+      logger().debug(loggerPrefix + "Notify listeners, " + changeListeners.size() + " listeners");
 
       changeListeners.forEach(listener -> listener
           .valueChanged(new AttachmentsFieldValueChangeEvent(oldValues.toArray(new StoredFile[0]),
               storedFiles.toArray(new StoredFile[0]), this)));
 
-      logger().debug(loggerPrefix+"End");
+      logger().debug(loggerPrefix + "End");
     });
 
     add(upload);
@@ -149,29 +139,34 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
   protected void addDocumentInList(StoredFile file) {
     String iconFile = file.getFilename()
         .substring(file.getFilename().lastIndexOf(".") + 1) + "-icon-48x48.png";
-    if (!FileExtLookup.getInstance().doesExtExists(iconFile))
+    if (!FileExtLookup.getInstance().doesExtExists(iconFile)) {
       iconFile = "unknown-48x48.png";
+    }
     Image fileIcon = new Image("images/filesExt/" + iconFile,
         file.getFilename());
 
     fileIcon.addClassName(IconSize.M.getClassName());
 
     ListItem item = new ListItem(fileIcon, file.getFilename());
-    item.setSuffix(createDownloadButton(file), createViewButton(file), createRemoveButton(file, item));
+    item.setSuffix(createDownloadButton(file), createViewButton(file),
+        createRemoveButton(file, item));
 
     documentList.add(item);
   }
 
   private Component createDownloadButton(StoredFile item) {
     Button downloadButton = UIUtils.createSmallButton(VaadinIcon.DOWNLOAD);
-    downloadButton.addClickListener( event -> {} );
+    downloadButton.addClickListener(event -> {
+    });
 
-      Anchor downloadLink = new Anchor(new StreamResource(item.getFilename(), () -> new ByteArrayInputStream(item.getContent())), "");
-      downloadLink.getElement().setAttribute("download", true);
+    Anchor downloadLink = new Anchor(
+        new StreamResource(item.getFilename(), () -> new ByteArrayInputStream(item.getContent())),
+        "");
+    downloadLink.getElement().setAttribute("download", true);
 
-      downloadLink.add(downloadButton);
+    downloadLink.add(downloadButton);
 
-      return downloadLink;
+    return downloadLink;
   }
 
   private Button createViewButton(StoredFile item) {
@@ -179,8 +174,8 @@ public class AttachmentField extends FlexBoxLayout implements HasStyle, HasSize,
     infoButton.addClickListener(
         e -> {
           if (item != null && item.getId() != null) {
-            if (item.getMimeType().startsWith("image") ) {
-              ImageViewerDialog imageViewerDialog = new ImageViewerDialog(item, false );
+            if (item.getMimeType().startsWith("image")) {
+              ImageViewerDialog imageViewerDialog = new ImageViewerDialog(item, false);
               imageViewerDialog.open();
             } else {
               PdfViewerDialog pdfViewerDialog = new PdfViewerDialog(item);

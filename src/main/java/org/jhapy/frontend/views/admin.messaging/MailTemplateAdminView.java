@@ -75,7 +75,8 @@ public class MailTemplateAdminView extends ViewFrame implements RouterLayout, Ha
   private final Binder<MailTemplate> binder = new Binder<>();
   private MailTemplate mailTemplate;
   private DefaultDataProvider<MailTemplate, DefaultFilter> securityUserDataProvider;
-private Registration contextIconRegistration = null;
+  private Registration contextIconRegistration = null;
+
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
@@ -90,15 +91,17 @@ private Registration contextIconRegistration = null;
 
   @Override
   protected void onDetach(DetachEvent detachEvent) {
-    if ( contextIconRegistration != null )
-    contextIconRegistration.remove();
+    if (contextIconRegistration != null) {
+      contextIconRegistration.remove();
+    }
   }
 
   private AppBar initAppBar() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-    if ( contextIconRegistration == null )
-    contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
+    if (contextIconRegistration == null) {
+      contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
+    }
     return appBar;
   }
 

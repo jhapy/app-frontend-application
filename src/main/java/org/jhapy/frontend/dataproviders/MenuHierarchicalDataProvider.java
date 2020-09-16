@@ -1,11 +1,7 @@
 package org.jhapy.frontend.dataproviders;
 
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.jhapy.dto.utils.Page;
 import org.jhapy.frontend.views.JHapyMainView3;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;

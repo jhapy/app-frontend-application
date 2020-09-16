@@ -25,10 +25,7 @@ import com.github.appreciated.app.layout.addons.notification.component.Notificat
 import com.github.appreciated.app.layout.addons.profile.ProfileButton;
 import com.github.appreciated.app.layout.addons.profile.builder.AppBarProfileButtonBuilder;
 import com.github.appreciated.app.layout.addons.search.SearchButton;
-import com.github.appreciated.app.layout.addons.search.overlay.SearchOverlayButton;
-import com.github.appreciated.app.layout.addons.search.overlay.SearchOverlayButtonBuilder;
 import com.github.appreciated.app.layout.component.appbar.AppBarBuilder;
-import com.github.appreciated.app.layout.component.applayout.AppLayout;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts.LeftResponsive;
 import com.github.appreciated.app.layout.component.builder.AppLayoutBuilder;
@@ -36,21 +33,14 @@ import com.github.appreciated.app.layout.component.menu.left.builder.LeftAppMenu
 import com.github.appreciated.app.layout.component.menu.left.items.LeftHeaderItem;
 import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
 import com.github.appreciated.app.layout.entity.DefaultBadgeHolder;
-import com.github.appreciated.card.RippleClickableCard;
-import com.github.appreciated.card.content.Item;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
@@ -58,10 +48,6 @@ import com.vaadin.flow.server.ErrorHandler;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.material.Material;
-import java.util.Arrays;
-import java.util.Optional;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.utils.StoredFile;
@@ -108,10 +94,10 @@ import org.vaadin.tatu.Tree;
 public abstract class JHapyMainView2 extends AppLayoutRouterLayout<LeftResponsive>
     implements RouterLayout, PageConfigurator, AfterNavigationObserver, HasLogger {
 
-  private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
-  private DefaultBadgeHolder badge = new DefaultBadgeHolder(5);
-private MenuData menuData = new MenuData();
-private Tree<MenuEntry> menuTree;
+  private final DefaultNotificationHolder notifications = new DefaultNotificationHolder();
+  private final DefaultBadgeHolder badge = new DefaultBadgeHolder(5);
+  private final MenuData menuData = new MenuData();
+  private final Tree<MenuEntry> menuTree;
   private static final String CLASS_NAME = "root";
   private final ConfirmDialog confirmDialog;
   protected FlexBoxLayout viewContainer;
@@ -126,7 +112,7 @@ private Tree<MenuEntry> menuTree;
 
   private AppBar appBar;
 
-  private AppLayoutBuilder<LeftResponsive> appLayoutBuilder;
+  private final AppLayoutBuilder<LeftResponsive> appLayoutBuilder;
 
   public JHapyMainView2(Environment environment) {
     VaadinSession.getCurrent()
@@ -152,7 +138,6 @@ private Tree<MenuEntry> menuTree;
       /* React manually to user inputs */
     });
 
-
     ProfileButton profileButton = AppBarProfileButtonBuilder.get()
         .withItem("ProfileButton Entry 1", event -> Notification.show("Profile clicked"))
         .withItem("ProfileButton Entry 2", event -> Notification.show("Profile clicked"))
@@ -168,8 +153,10 @@ private Tree<MenuEntry> menuTree;
             .build())
         .withAppMenu(LeftAppMenuBuilder.get()
             .addToSection(HEADER,
-                new LeftHeaderItem(getTranslation("element.menu.title"), environment.getProperty("APP_VERSION") + " " + environment.getProperty("info.tags.environment"), "/frontend/images/logo.png")
-                )
+                new LeftHeaderItem(getTranslation("element.menu.title"),
+                    environment.getProperty("APP_VERSION") + " " + environment
+                        .getProperty("info.tags.environment"), "/frontend/images/logo.png")
+            )
             .add(menuTree = getNavigationMenu())
             .build());
 
@@ -186,7 +173,9 @@ private Tree<MenuEntry> menuTree;
         .filter(component -> RouterLayout.class.isAssignableFrom(component.getClass()))
         .findFirst().orElse(null);
   }
+
   class TestSearchResult {
+
     private final String header;
     private final String description;
 
@@ -290,7 +279,7 @@ private Tree<MenuEntry> menuTree;
 
         addToSettingsMenu(settingsSubMenu);
 
-        menuData.addMenuEntry( settingsSubMenu );
+        menuData.addMenuEntry(settingsSubMenu);
         /*
          * i18N
          */
@@ -343,7 +332,8 @@ private Tree<MenuEntry> menuTree;
         /*
          * Reference
          */
-        boolean isReferenceMenuDisplay = hasReferencesMenuEntries() || SecurityUtils.isAccessGranted(CountriesView.class);
+        boolean isReferenceMenuDisplay =
+            hasReferencesMenuEntries() || SecurityUtils.isAccessGranted(CountriesView.class);
 
         if (isReferenceMenuDisplay) {
           MenuEntry referenceSubMenu = new MenuEntry(AppConst.PAGE_REFERENCES);
@@ -385,7 +375,8 @@ private Tree<MenuEntry> menuTree;
         if (isDisplayNotifications) {
           MenuEntry notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);
           notificationsSubMenu.setVaadinIcon(VaadinIcon.SITEMAP);
-          notificationsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
+          notificationsSubMenu
+              .setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
           notificationsSubMenu.setParentMenuEntry(settingsSubMenu);
 
           menuData.addMenuEntry(notificationsSubMenu);
@@ -486,7 +477,7 @@ private Tree<MenuEntry> menuTree;
             menuData.addMenuEntry(subMenu);
           }
 
-          addToSecurityMenu( securitySubMenu);
+          addToSecurityMenu(securitySubMenu);
         }
         boolean isDisplayMonitoring =
             SecurityUtils.isAccessGranted(EurekaView.class) ||
@@ -529,8 +520,8 @@ private Tree<MenuEntry> menuTree;
 
     tree.asSingleSelect().addValueChangeListener(event -> {
       if (event.getValue() != null && event.getValue().getTargetClass() != null) {
-        UI.getCurrent().navigate( event.getValue().getTargetClass());
-      };
+        UI.getCurrent().navigate(event.getValue().getTargetClass());
+      }
     });
     tree.setHeightByRows(true);
     tree.setSizeFull();
@@ -569,8 +560,9 @@ private Tree<MenuEntry> menuTree;
 
   @Override
   public void afterNavigation(AfterNavigationEvent event) {
-    if  ( ! menuTree.getSelectedItems().isEmpty()  )
-    setTitle( menuTree.getSelectedItems().iterator().next().getTitle());
+    if (!menuTree.getSelectedItems().isEmpty()) {
+      setTitle(menuTree.getSelectedItems().iterator().next().getTitle());
+    }
 
 /*    NaviItem active = getActiveItem(event);
     if (active != null) {

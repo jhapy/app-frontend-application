@@ -36,7 +36,6 @@ import java.io.Serializable;
 import java.util.Locale;
 import org.jhapy.dto.domain.i18n.MessageTrl;
 import org.jhapy.frontend.renderer.BooleanOkRenderer;
-import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 
 /**

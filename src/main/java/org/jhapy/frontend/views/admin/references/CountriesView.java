@@ -52,7 +52,6 @@ import org.jhapy.frontend.customFields.CountryTrlListField;
 import org.jhapy.frontend.dataproviders.CountryDataProvider;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.renderer.BooleanOkRenderer;
-import org.jhapy.frontend.renderer.BooleanRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
@@ -68,12 +67,14 @@ import org.springframework.security.access.annotation.Secured;
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_COUNTRIES)
 @Secured(SecurityConst.ROLE_ADMIN)
-public class CountriesView extends DefaultMasterDetailsView<Country, DefaultFilter, SearchQuery, SearchQueryResult> {
+public class CountriesView extends
+    DefaultMasterDetailsView<Country, DefaultFilter, SearchQuery, SearchQueryResult> {
 
   public CountriesView(MyI18NProvider myI18NProvider) {
     super("country.", Country.class, new CountryDataProvider(),
         (e) -> ReferenceServices.getCountryService().save(new SaveQuery<>(e)),
-        e -> ReferenceServices.getCountryService().delete(new DeleteByIdQuery(e.getId())), myI18NProvider);
+        e -> ReferenceServices.getCountryService().delete(new DeleteByIdQuery(e.getId())),
+        myI18NProvider);
   }
 
   protected Grid createGrid() {

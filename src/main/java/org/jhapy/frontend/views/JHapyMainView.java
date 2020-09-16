@@ -143,7 +143,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
     getElement().appendChild(new AppCookieConsent().getElement());
   }
 
-  public static JHapyMainView3   get() {
+  public static JHapyMainView3 get() {
     return (JHapyMainView3) UI.getCurrent().getChildren()
         .filter(component -> RouterLayout.class.isAssignableFrom(component.getClass()))
         .findFirst().orElse(null);

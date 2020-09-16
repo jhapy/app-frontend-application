@@ -2,7 +2,6 @@ package org.jhapy.frontend.views;
 
 import com.vaadin.flow.component.Component;
 import org.jhapy.frontend.components.FlexBoxLayout;
-import org.jhapy.frontend.layout.size.Bottom;
 import org.jhapy.frontend.utils.css.Overflow;
 
 /**
@@ -18,8 +17,8 @@ public class DefaultDetailsContent extends FlexBoxLayout {
     setOverflow(Overflow.SCROLL);
   }
 
-  public void setContent( Component... components ) {
+  public void setContent(Component... components) {
     removeAll();
-    add( components );
+    add(components);
   }
 }

@@ -105,7 +105,6 @@ public class SearchOverlayView<T extends SearchQueryResult, F extends SearchQuer
     });
     searchField.setMinWidth("50%");
 
-
     closeButton.addClickListener(event -> {
       searchField.clear();
       close();

@@ -19,8 +19,6 @@
 package org.jhapy.frontend.components.navigation.bar;
 
 
-import ch.carnet.kasparscherrer.LanguageSelect;
-import com.vaadin.componentfactory.ToggleButton;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -28,20 +26,16 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
@@ -50,32 +44,22 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import com.vaadin.flow.theme.lumo.Lumo;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.http.Cookie;
-import org.apache.tika.Tika;
-import org.apache.tika.config.TikaConfig;
-import org.apache.tika.mime.MimeTypeException;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.domain.security.SecurityUser;
-import org.jhapy.dto.domain.user.BaseUser;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.AppContext;
@@ -86,8 +70,6 @@ import org.jhapy.frontend.components.navigation.tab.NaviTabs;
 import org.jhapy.frontend.components.notification.DefaultNotificationHolder;
 import org.jhapy.frontend.components.notification.component.NotificationButton;
 import org.jhapy.frontend.components.notification.entity.DefaultNotification;
-import org.jhapy.frontend.components.notification.entity.Priority;
-import org.jhapy.frontend.components.search.SearchButton;
 import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
@@ -101,6 +83,7 @@ import org.jhapy.frontend.views.JHapyMainView3;
 @SpringComponent
 @UIScope
 public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLogger {
+
   private static final Set<String> rtlSet;
 
   static {
@@ -213,11 +196,12 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   private void initNotification() {
     notifications = new DefaultNotificationHolder();
-    notifications.addClickListener(notification -> {/* Use the listener to react on the click on the notification */});
+    notifications.addClickListener(
+        notification -> {/* Use the listener to react on the click on the notification */});
     notificationButton = new NotificationButton<>(VaadinIcon.BELL, notifications);
   }
 
-  public void addNotification( DefaultNotification defaultNotification ) {
+  public void addNotification(DefaultNotification defaultNotification) {
     notifications.add(defaultNotification);
   }
 
@@ -337,18 +321,20 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
           VaadinSession.getCurrent().setAttribute("Theme", Lumo.DARK);
         }
       });
-      Button exitButton = UIUtils.createButton(getTranslation("action.global.logout"), VaadinIcon.EXIT, ButtonVariant.LUMO_TERTIARY_INLINE);
+      Button exitButton = UIUtils
+          .createButton(getTranslation("action.global.logout"), VaadinIcon.EXIT,
+              ButtonVariant.LUMO_TERTIARY_INLINE);
       contextMenu.addItem(new Anchor("logout", exitButton));
     }
   }
 
-  private void setLanguage( Locale language ){
+  private void setLanguage(Locale language) {
     UI.getCurrent().getSession().setLocale(language);
-      Cookie languageCookie = new Cookie("PreferredLanguage", language.getLanguage());
-      languageCookie.setMaxAge(31449600);
-      languageCookie.setPath("/");
-      languageCookie.setSecure(true);
-      VaadinService.getCurrentResponse().addCookie(languageCookie);
+    Cookie languageCookie = new Cookie("PreferredLanguage", language.getLanguage());
+    languageCookie.setMaxAge(31449600);
+    languageCookie.setPath("/");
+    languageCookie.setSecure(true);
+    VaadinService.getCurrentResponse().addCookie(languageCookie);
     UI.getCurrent().getPage().reload();
   }
 
@@ -413,9 +399,10 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   public Component addActionItem(Component component) {
-    if ( component == null )
+    if (component == null) {
       return null;
-    String loggerPrefix = getLoggerPrefix("addActionItem", System.identityHashCode( this ));
+    }
+    String loggerPrefix = getLoggerPrefix("addActionItem", System.identityHashCode(this));
     //logger().debug(loggerPrefix+"Add Action Item");
     actionItems.add(component);
     updateActionItemsVisibility();
@@ -423,7 +410,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   public void removeActionItem(Component component) {
-    String loggerPrefix = getLoggerPrefix("removeActionItem", System.identityHashCode( this ));
+    String loggerPrefix = getLoggerPrefix("removeActionItem", System.identityHashCode(this));
     //logger().debug(loggerPrefix+"Remove Action Item");
     actionItems.remove(component);
     updateActionItemsVisibility();
@@ -461,6 +448,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   public void dispatchTabs() {
     tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
   }
+
   private void configureTab(Tab tab) {
     tab.addClassName(CLASS_NAME + "__tab");
     updateTabsVisibility();
@@ -630,7 +618,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   public SearchOverlayButton getSearchButton() {
-    if ( searchButton == null ) {
+    if (searchButton == null) {
       searchButton = new SearchOverlayButton<>();
       addActionItem(searchButton);
     }

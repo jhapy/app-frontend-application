@@ -3,8 +3,6 @@ package org.jhapy.frontend.components;
 import com.google.gson.Gson;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -12,8 +10,6 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.server.StreamResource;
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
@@ -26,7 +22,6 @@ import org.jhapy.frontend.component.cropperjs.CropperJs;
 import org.jhapy.frontend.component.cropperjs.model.Data;
 import org.jhapy.frontend.component.cropperjs.model.DragMode;
 import org.jhapy.frontend.component.cropperjs.model.ViewMode;
-import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.UIUtils;
 
 /**
@@ -35,13 +30,14 @@ import org.jhapy.frontend.utils.UIUtils;
  * @since 05/09/2020
  */
 public class ImageViewerDialog extends AbstractDialog implements HasLogger {
+
   private FlexBoxLayout contentLayout;
-  private StoredFile storedFile;
-  private Boolean isReadOnly;
+  private final StoredFile storedFile;
+  private final Boolean isReadOnly;
   private CropperJs cropperJs;
 
-  public ImageViewerDialog( StoredFile storedFile, boolean isReadOnly) {
-  this.storedFile = storedFile;
+  public ImageViewerDialog(StoredFile storedFile, boolean isReadOnly) {
+    this.storedFile = storedFile;
     if (storedFile != null && storedFile.getId() != null) {
       ServiceResult<StoredFile> _storedFile = BaseServices
           .getResourceService().getById(new GetByStrIdQuery(storedFile.getId()));
@@ -51,7 +47,7 @@ public class ImageViewerDialog extends AbstractDialog implements HasLogger {
       }
     }
 
-  this.isReadOnly = isReadOnly;
+    this.isReadOnly = isReadOnly;
   }
 
   @Override
@@ -70,12 +66,13 @@ public class ImageViewerDialog extends AbstractDialog implements HasLogger {
     contentLayout.setHeightFull();
     contentLayout.setFlexDirection(FlexDirection.COLUMN);
 
-    if (storedFile != null && ! isReadOnly) {
+    if (storedFile != null && !isReadOnly) {
       buildCropper(storedFile.getOrginalContent(), storedFile.getFilename(),
           storedFile != null ? storedFile.getMetadata().get("copperData") : null);
     } else {
       contentLayout.add(new Image(new StreamResource(
-          storedFile.getFilename(),() -> new ByteArrayInputStream(storedFile.getContent())), storedFile.getFilename()));
+          storedFile.getFilename(), () -> new ByteArrayInputStream(storedFile.getContent())),
+          storedFile.getFilename()));
     }
 
     return contentLayout;
@@ -189,7 +186,7 @@ public class ImageViewerDialog extends AbstractDialog implements HasLogger {
 
   @Override
   protected void onDialogResized(DialogResizeEvent event) {
-      cropperJs.resize(event.getHeight(), event.getWidth());
+    cropperJs.resize(event.getHeight(), event.getWidth());
   }
 
   @Override

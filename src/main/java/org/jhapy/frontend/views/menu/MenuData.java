@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class MenuData implements Serializable {
 
-  private List<MenuEntry> menuList = new ArrayList<>();
+  private final List<MenuEntry> menuList = new ArrayList<>();
 
   public void addMenuEntry(MenuEntry... menuEntries) {
     menuList.addAll(Arrays.asList(menuEntries));
@@ -37,7 +37,9 @@ public class MenuData implements Serializable {
         .collect(Collectors.toList());
   }
 
-  public Optional<MenuEntry> getFirstMenuByTargetId( String targetId ) {
-    return menuList.stream().filter( menuEntry -> menuEntry.getTargetId() != null && menuEntry.getTargetId().equalsIgnoreCase(targetId)).findFirst();
+  public Optional<MenuEntry> getFirstMenuByTargetId(String targetId) {
+    return menuList.stream().filter(
+        menuEntry -> menuEntry.getTargetId() != null && menuEntry.getTargetId()
+            .equalsIgnoreCase(targetId)).findFirst();
   }
 }

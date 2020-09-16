@@ -5,26 +5,16 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.ContentAlignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.server.StreamResource;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.GetByStrIdQuery;
 import org.jhapy.dto.utils.PdfConvert;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.client.BaseServices;
-import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.utils.UIUtils;
 
 /**
@@ -71,13 +61,15 @@ public class PdfViewerDialog extends AbstractDialog implements HasLogger {
       byte[] fileContent = storedFile.getContent();
       String filename = storedFile.getFilename();
       if (!storedFile.getMimeType().contains("pdf")) {
-        if ( ! storedFile.getPdfConvertStatus().equals(
+        if (!storedFile.getPdfConvertStatus().equals(
             PdfConvert.CONVERTED)) {
           Button downloadButton = UIUtils
               .createButton(getTranslation(storedFile.getPdfConvertStatus().equals(
-                  PdfConvert.NOT_CONVERTED) ? "error.docConvert.notConvertedYet" : "error.docConvert.cannotConvert"), VaadinIcon.DOWNLOAD,
+                  PdfConvert.NOT_CONVERTED) ? "error.docConvert.notConvertedYet"
+                      : "error.docConvert.cannotConvert"), VaadinIcon.DOWNLOAD,
                   ButtonVariant.LUMO_ERROR);
-          Anchor downloadLink = new Anchor(new StreamResource(storedFile.getFilename(), () -> new ByteArrayInputStream(storedFile.getContent())), "");
+          Anchor downloadLink = new Anchor(new StreamResource(storedFile.getFilename(),
+              () -> new ByteArrayInputStream(storedFile.getContent())), "");
           downloadLink.getElement().setAttribute("download", true);
           downloadLink.add(downloadButton);
           contentLayout.setAlignContent(ContentAlignment.CENTER);

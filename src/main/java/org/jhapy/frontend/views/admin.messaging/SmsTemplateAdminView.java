@@ -90,15 +90,17 @@ public class SmsTemplateAdminView extends ViewFrame implements RouterLayout, Has
 
   @Override
   protected void onDetach(DetachEvent detachEvent) {
-    if ( contextIconRegistration != null )
+    if (contextIconRegistration != null) {
       contextIconRegistration.remove();
+    }
   }
 
   private AppBar initAppBar() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-    if ( contextIconRegistration == null )
-    contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
+    if (contextIconRegistration == null) {
+      contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
+    }
     return appBar;
   }
 
