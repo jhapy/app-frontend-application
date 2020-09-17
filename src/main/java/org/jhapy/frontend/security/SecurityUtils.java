@@ -124,6 +124,26 @@ public final class SecurityUtils {
     return null;
   }
 
+  public static SecurityUser getSecurityUser(Authentication authentication) {
+    if (authentication == null) {
+      return null;
+    }
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof DefaultOidcUser) {
+      Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
+      SecurityUser securityUser = new SecurityUser();
+      securityUser.setEmail(attributes.get("email").toString());
+      securityUser.setFirstName(attributes.get("given_name").toString());
+      securityUser.setLastName(attributes.get("family_name").toString());
+      securityUser.setUsername(attributes.get("preferred_username").toString());
+      return securityUser;
+    } else if (principal instanceof SecurityUser) {
+      return (SecurityUser) principal;
+    }
+    // Anonymous or no authentication.
+    return null;
+  }
+
   /**
    * Checks if access is granted for the current user for the given secured view, defined by the
    * view class.
@@ -204,10 +224,6 @@ public final class SecurityUtils {
     VaadinSession.getCurrent().getSession()
         .setAttribute(SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     VaadinSession.getCurrent().setAttribute(SecurityUser.class, securityUser);
-    securityUser.setLastSuccessfulLogin(Instant.now());
-    securityUser.setIsAccountLocked(false);
-    securityUser.setFailedLoginAttempts(0);
-    SecurityServices.getSecurityUserService().save(new SaveQuery(securityUser));
 
     AuditServices.getAuditServiceQueue().newSession(
         new NewSession(VaadinRequest.getCurrent().getWrappedSession().getId(),
@@ -241,7 +257,7 @@ public final class SecurityUtils {
     }
     AuditServices.getAuditServiceQueue().endSession(new EndSession(jSessionId, Instant.now()));
 
-    VaadinSession.getCurrent().close();
+    // VaadinSession.getCurrent().close();
   }
 
   private static Optional<Cookie> getRememberMeCookie() {

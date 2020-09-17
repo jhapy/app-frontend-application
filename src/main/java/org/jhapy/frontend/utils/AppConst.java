@@ -48,6 +48,7 @@ public class AppConst {
   public static final String PAGE_SMS_TEMPLATE_ADMIN = "notifications/smsTemplateAdmin";
   public static final String PAGE_MONITORING = "monitoring";
   public static final String PAGE_SESSIONS_ADMIN = "monitoring/sessionsAdmin";
+  public static final String PAGE_ACTUAL_SESSIONS_ADMIN = "monitoring/actualSessionsAdmin";
   public static final String PAGE_EUREKA_ADMIN = "monitoring/eurekaAdmin";
   public static final String PAGE_CLOUD_CONFIG_ADMIN = "cloudConfigAdmin";
   public static final String PAGE_SMS_ADMIN = "notifications/smsAdmin";
@@ -89,6 +90,7 @@ public class AppConst {
   public static final String TITLE_SETTINGS = "element.page.title.settings";
   public static final String TITLE_USERS_ADMIN = "element.page.title.usersAdmin";
   public static final String TITLE_MAILS_ADMIN = "element.page.title.mailsAdmin";
+  public static final String TITLE_ACTUAL_SESSIONS_ADMIN = "element.page.title.actualSessionsAdmin";
   public static final String TITLE_SESSIONS_ADMIN = "element.page.title.sessionsAdmin";
   public static final String TITLE_EUREKA_ADMIN = "element.page.title.eurekaAdmin";
   public static final String TITLE_CLOUD_CONFIG_ADMIN = "element.page.title.cloudConfigAdmin";
@@ -134,6 +136,7 @@ public class AppConst {
   public static final String[] DEFAULT_USER_SORT_FIELDS = {"u.lastName"};
   public static final String[] DEFAULT_GROUP_SORT_FIELDS = {"n.name"};
   public static final String[] DEFAULT_RECORD_STATUS_SORT_FIELDS = {"seq"};
+  public static final String[] DEFAULT_SESSION_SORT_FIELDS = {"sessionStart"};
   public static final String[] DEFAULT_ASSET_SORT_FIELDS = {"a.name", "a.id"};
   public static final String[] COUNTRY_SORT_FIELDS = {"m.name"};
   public static final String[] PLACE_TYPE_SORT_FIELDS = {"t.name"};
@@ -142,6 +145,7 @@ public class AppConst {
   public static final DirectionEnum DEFAULT_SORT_DIRECTION = DirectionEnum.ASC;
   public static final DirectionEnum DEFAULT_INSURANCE_POLICIES_SORT_DIRECTION = DirectionEnum.DESC;
   public static final DirectionEnum POST_SORT_DIRECTION = DirectionEnum.DESC;
+  public static final DirectionEnum DEFAULT_SESSION_SORT_DIRECTION = DirectionEnum.DESC;
 
   public static final String ICON_OK = "/images/iconfinder_ok.png";
   public static final String ICON_KO = "/images/iconfinder_ko.png";

@@ -18,6 +18,7 @@
 
 package org.jhapy.frontend.views;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -35,16 +36,23 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.codecamp.vaadin.components.messagedialog.MessageDialog;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
+import org.jhapy.dto.messageQueue.NewSession;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.StoredFile;
+import org.jhapy.frontend.client.audit.AuditServices;
 import org.jhapy.frontend.components.AppCookieConsent;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
@@ -60,6 +68,7 @@ import org.jhapy.frontend.utils.TextColor;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.css.Shadow;
+import org.jhapy.frontend.views.admin.MonitoringAdminView;
 import org.jhapy.frontend.views.admin.audit.SessionView;
 import org.jhapy.frontend.views.admin.configServer.CloudConfigView;
 import org.jhapy.frontend.views.admin.eureka.EurekaView;
@@ -78,6 +87,7 @@ import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
 import org.springframework.core.env.Environment;
 import org.vaadin.tatu.Tree;
+import org.xnio.Options;
 
 @CssImport(value = "./styles/components/charts.css", themeFor = "vaadin-chart", include = "vaadin-chart-default-theme")
 @CssImport(value = "./styles/components/floating-action-button.css", themeFor = "vaadin-button")
@@ -108,9 +118,12 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private Div appFooterOuter;
   private AppBar appBar;
   protected MenuHierarchicalDataProvider menuProvider;
+  private final HazelcastInstance hazelcastInstance;
 
-  public JHapyMainView3(MenuHierarchicalDataProvider menuProvider, Environment environment) {
+  public JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
+      HazelcastInstance hazelcastInstance, Environment environment) {
     this.menuProvider = menuProvider;
+    this.hazelcastInstance = hazelcastInstance;
 
     afterLogin();
 
@@ -138,6 +151,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     initHeadersAndFooters();
 
     getElement().appendChild(new AppCookieConsent().getElement());
+  }
+
+  private ConcurrentMap<String, LocalDateTime> retrieveMap() {
+    return hazelcastInstance.getMap("userSessions");
   }
 
   public static JHapyMainView3 get() {
@@ -175,8 +192,26 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   }
 
   public void afterLogin() {
-    //JHapyMainView.get().rebuildNaviItems();
-    //UI.getCurrent().navigate(JHapyMainView.get().getHomePage());
+    String loggerPrefix = getLoggerPrefix("afterLogin");
+
+    SecurityUser currentSecurityUser = VaadinSession.getCurrent().getAttribute(SecurityUser.class);
+    if (currentSecurityUser == null) {
+      currentSecurityUser = SecurityUtils.getSecurityUser();
+      if (currentSecurityUser != null) {
+        VaadinSession currentSession = VaadinSession.getCurrent();
+        VaadinRequest currentRequest = VaadinRequest.getCurrent();
+        logger().info(
+            loggerPrefix + "Create remote session, Session ID = " + currentSession.getSession()
+                .getId());
+        AuditServices.getAuditServiceQueue().newSession(
+            new NewSession(currentSession.getSession().getId(),
+                currentSecurityUser.getUsername(), currentRequest.getRemoteAddr(), Instant
+                .now(),
+                true, null));
+
+        retrieveMap().put(currentSecurityUser.getEmail(), LocalDateTime.now());
+      }
+    }
   }
 
   /**
@@ -520,6 +555,15 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setParentMenuEntry(monitoringSubMenu);
             subMenu.setHasChildNodes(false);
 
+            menuData.addMenuEntry(subMenu);
+          }
+          if (SecurityUtils.isAccessGranted(MonitoringAdminView.class)) {
+            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ACTUAL_SESSIONS_ADMIN);
+            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
+            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ACTUAL_SESSIONS_ADMIN));
+            subMenu.setTargetClass(MonitoringAdminView.class);
+            subMenu.setParentMenuEntry(monitoringSubMenu);
+            subMenu.setHasChildNodes(false);
             menuData.addMenuEntry(subMenu);
           }
         }

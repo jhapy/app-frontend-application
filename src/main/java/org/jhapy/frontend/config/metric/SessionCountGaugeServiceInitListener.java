@@ -21,11 +21,14 @@ package org.jhapy.frontend.config.metric;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jhapy.commons.utils.HasLogger;
+import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.frontend.security.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jHapy Lead Dev.
@@ -34,6 +37,7 @@ import org.jhapy.frontend.security.SecurityUtils;
  */
 @SpringComponent
 public class SessionCountGaugeServiceInitListener implements VaadinServiceInitListener, HasLogger {
+
 
   private final MeterRegistry meterRegistry;
 
@@ -58,9 +62,6 @@ public class SessionCountGaugeServiceInitListener implements VaadinServiceInitLi
       String loggerPrefix = getLoggerPrefix("sessionDestroy");
       logger().info(loggerPrefix + "Vaadin session destroyed. Current count is: " + sessionsCount
           .decrementAndGet());
-      if (e.getSession() != null && e.getSession().getSession() != null) {
-        SecurityUtils.endSession(e.getSession().getSession().getId());
-      }
     });
   }
 }

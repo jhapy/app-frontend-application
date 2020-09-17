@@ -232,23 +232,43 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
 
     logger().debug(loggerPrefix + "Bootstrap " + iso3Language);
     elementMap.clear();
-    List<ElementTrl> elements = I18NServices.getElementTrlService()
-        .findByIso3(new FindByIso3Query(iso3Language)).getData();
-    elements.forEach(element -> elementMap.put(element.getName(), element));
-    logger().debug(loggerPrefix + elements.size() + " elements loaded");
+    ServiceResult<List<ElementTrl>> _elements = I18NServices.getElementTrlService()
+        .findByIso3(new FindByIso3Query(iso3Language));
+    if (_elements != null && _elements.getIsSuccess() && _elements.getData() != null) {
+      List<ElementTrl> elements = _elements.getData();
+      elements.forEach(element -> elementMap.put(element.getName(), element));
+      logger().debug(loggerPrefix + elements.size() + " elements loaded");
+    } else {
+      logger().error(
+          loggerPrefix + "Cannot get elements " + (_elements != null ? _elements.getMessage()
+              : "Null service"));
+    }
 
     actionMap.clear();
-    List<ActionTrl> actions = I18NServices.getActionTrlService()
-        .findByIso3(new FindByIso3Query(iso3Language)).getData();
-    actions.forEach(action -> actionMap.put(action.getName(), action));
-    logger().debug(loggerPrefix + actions.size() + " actions loaded");
+    ServiceResult<List<ActionTrl>> _actions = I18NServices.getActionTrlService()
+        .findByIso3(new FindByIso3Query(iso3Language));
+    if (_actions != null && _actions.getIsSuccess() && _actions.getData() != null) {
+      List<ActionTrl> actions = _actions.getData();
+      actions.forEach(action -> actionMap.put(action.getName(), action));
+      logger().debug(loggerPrefix + actions.size() + " actions loaded");
+    } else {
+      logger().error(
+          loggerPrefix + "Cannot get actions " + (_actions != null ? _actions.getMessage()
+              : "Null service"));
+    }
 
     messageMap.clear();
-    List<MessageTrl> messages = I18NServices.getMessageTrlService()
-        .findByIso3(new FindByIso3Query(iso3Language)).getData();
-    messages.forEach(message -> messageMap.put(message.getName(), message));
-    logger().debug(loggerPrefix + messages.size() + " messages loaded");
-
+    ServiceResult<List<MessageTrl>> _messages = I18NServices.getMessageTrlService()
+        .findByIso3(new FindByIso3Query(iso3Language));
+    if (_messages != null && _messages.getIsSuccess() && _messages.getData() != null) {
+      List<MessageTrl> messages = _messages.getData();
+      messages.forEach(message -> messageMap.put(message.getName(), message));
+      logger().debug(loggerPrefix + messages.size() + " messages loaded");
+    } else {
+      logger().error(
+          loggerPrefix + "Cannot get messages " + (_messages != null ? _messages.getMessage()
+              : "Null service"));
+    }
     loadedLocale = iso3Language;
 
     logger().debug(loggerPrefix + "Bootstrap " + iso3Language + " done");
@@ -271,7 +291,7 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
       logger().warn(loggerPrefix + "Element '" + name + "' not found locally, check on the server");
       ServiceResult<ElementTrl> _elementTrl = I18NServices.getElementTrlService()
           .getByNameAndIso3(new GetByNameAndIso3Query(name, iso3Language));
-      if (_elementTrl.getIsSuccess()) {
+      if (_elementTrl != null && _elementTrl.getIsSuccess() && _elementTrl.getData() != null) {
         element = _elementTrl.getData();
         elementMap.put(name, element);
 
@@ -298,7 +318,7 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
       logger().warn(loggerPrefix + "Action '" + name + "' not found locally, check on the server");
       ServiceResult<ActionTrl> _actionTrl = I18NServices.getActionTrlService()
           .getByNameAndIso3(new GetByNameAndIso3Query(name, iso3Language));
-      if (_actionTrl.getIsSuccess()) {
+      if (_actionTrl != null && _actionTrl.getIsSuccess() && _actionTrl.getData() != null) {
         action = _actionTrl.getData();
         actionMap.put(name, action);
 
@@ -329,7 +349,7 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
       logger().warn(loggerPrefix + "Message '" + name + "' not found locally, check on the server");
       ServiceResult<MessageTrl> _messageTrl = I18NServices.getMessageTrlService()
           .getByNameAndIso3(new GetByNameAndIso3Query(name, iso3Language));
-      if (_messageTrl.getIsSuccess()) {
+      if (_messageTrl != null && _messageTrl.getIsSuccess() && _messageTrl.getData() != null) {
         message = _messageTrl.getData();
         messageMap.put(name, message);
 

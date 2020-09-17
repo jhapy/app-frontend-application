@@ -156,7 +156,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
                                      @Override
                                      public void logout(HttpServletRequest request, HttpServletResponse response,
                                          Authentication authentication) {
-                                       propagateLogoutToKeycloak((OidcUser) authentication.getPrincipal());
+                                       if (authentication != null
+                                           && authentication.getPrincipal() != null
+                                           && authentication.getPrincipal() instanceof OidcUser) {
+                                         propagateLogoutToKeycloak(
+                                             (OidcUser) authentication.getPrincipal());
+                                       }
                                      }
 
                                      private void propagateLogoutToKeycloak(OidcUser user) {
@@ -171,8 +176,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
                                                user.getIdToken().getTokenValue());
 
                                        logger().info(
-                                           loggerPrefix + "Call Keycloak logout endpoint : "
-                                               + builder.toUriString());
+                                           loggerPrefix + "Call Keycloak logout endpoint");
                                        ResponseEntity<String> logoutResponse = restTemplate
                                            .getForEntity(builder.toUriString(), String.class);
                                        if (logoutResponse.getStatusCode().is2xxSuccessful()) {
@@ -193,11 +197,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         // I don't want a page with different clients as login options
         // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
         // plus the configured realm as immediate redirect to Keycloak
-        .loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);  /*.successHandler((httpServletRequest, httpServletResponse, authentication) -> {
-      String loggerPrefix = getLoggerPrefix("successHandler");
-          logger().debug(loggerPrefix+"Success login");
-          // JHapyMainView3.get().afterLogin();
-    });*/
+        .loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
   }
 
   Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {

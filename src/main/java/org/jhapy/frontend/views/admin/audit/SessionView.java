@@ -59,17 +59,23 @@ public class SessionView extends
     grid.setHeight("100%");
 
     grid.addColumn(Session::getUsername).setKey("username");
-    grid.addColumn(Session::getJsessionId).setKey("jsessionId");
     grid.addColumn(Session::getSourceIp).setKey("sourceIp");
-    grid.addColumn(Session::getSessionStart).setKey("sessionStart");
-    grid.addColumn(Session::getSessionEnd).setKey("sessionEnd");
+    grid.addColumn(
+        session -> DateTimeFormatter.format(session.getSessionStart(), getLocale()))
+        .setKey("sessionStart");
+    grid.addColumn(
+        session -> DateTimeFormatter.format(session.getSessionEnd(), getLocale()))
+        .setKey("sessionEnd");
 
     grid.getColumns().forEach(column -> {
       if (column.getKey() != null) {
         column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
         column.setResizable(true);
+        column.setSortable(true);
+        column.setAutoWidth(true);
       }
     });
+    grid.addColumn(Session::getJsessionId).setKey("jsessionId");
     return grid;
   }
 
@@ -148,7 +154,7 @@ public class SessionView extends
   protected void filter(String filter) {
     dataProvider
         .setFilter(new DefaultFilter(
-            StringUtils.isBlank(filter) ? null : "*" + filter + "*",
+            StringUtils.isBlank(filter) ? null : ".*" + filter + ".*",
             Boolean.TRUE));
   }
 }

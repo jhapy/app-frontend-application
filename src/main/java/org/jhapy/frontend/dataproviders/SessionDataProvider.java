@@ -44,8 +44,8 @@ public class SessionDataProvider extends DefaultDataProvider<Session, DefaultFil
 
   @Autowired
   public SessionDataProvider() {
-    super(AppConst.DEFAULT_SORT_DIRECTION,
-        AppConst.DEFAULT_SORT_FIELDS);
+    super(AppConst.DEFAULT_SESSION_SORT_DIRECTION,
+        AppConst.DEFAULT_SESSION_SORT_FIELDS);
   }
 
   @Override
