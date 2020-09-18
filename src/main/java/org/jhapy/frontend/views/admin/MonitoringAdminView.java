@@ -61,7 +61,7 @@ public class MonitoringAdminView extends ViewFrame implements RouterLayout, HasL
 
     ConcurrentMap<String, SessionInfo> userSession = retrieveMap();
     List<SessionInfo> data = new ArrayList<>(userSession.values());
-    data.sort(Comparator.comparing(SessionInfo::getLastContact));
+    data.sort((o1, o2) -> -1 * o1.getLastContact().compareTo(o2.getLastContact()));
     data.forEach(sessionInfo -> {
       ListItem item = new ListItem(sessionInfo.getUsername() + " " + sessionInfo.getSourceIp(),
           "Login : " + DateTimeFormatter.format(sessionInfo.getLoginDateTime(), getLocale())

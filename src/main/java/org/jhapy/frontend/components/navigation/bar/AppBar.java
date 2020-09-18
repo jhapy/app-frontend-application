@@ -248,6 +248,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   private void initAvatar() {
+    String loggerPrefix = getLoggerPrefix("initAvatar");
     avatar = new Image();
     avatar.setClassName(CLASS_NAME + "__avatar");
     avatar.setAlt("User menu");
@@ -270,6 +271,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
           .createButton(getTranslation("action.settings.language"), VaadinIcon.GLOBE,
               ButtonVariant.LUMO_TERTIARY_INLINE);
       Locale currentLocale = UI.getCurrent().getSession().getLocale();
+      logger().debug(loggerPrefix + "Current locale : " + currentLocale.getLanguage());
       languageMenu = contextMenu.addItem(languageButton);
 
       List<MenuItem> menuItems = new ArrayList();
@@ -277,7 +279,8 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
         MenuItem menu = languageMenu.getSubMenu()
             .addItem(new Label(locale.getDisplayLanguage(getLocale())));
         menu.setCheckable(true);
-        menu.setChecked(currentLocale.equals(locale));
+        logger().debug(loggerPrefix + "Add locale : " + locale + " - " + locale.getLanguage());
+        menu.setChecked(currentLocale.getLanguage().equals(locale.getLanguage()));
         menu.addClickListener(event -> {
           setLanguage(locale);
           menuItems.forEach(menuItem -> {
