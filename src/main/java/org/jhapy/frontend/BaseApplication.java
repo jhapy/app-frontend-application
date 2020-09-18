@@ -151,6 +151,7 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
       DeploymentConfiguration deploymentConfiguration,
       ApplicationContext applicationContext) {
     return new SpringVaadinServletService(servlet, deploymentConfiguration, applicationContext) {
+
       @Override
       public void requestStart(VaadinRequest request, VaadinResponse response) {
         super.requestStart(request, response);

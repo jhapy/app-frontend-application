@@ -19,6 +19,8 @@
 package org.jhapy.frontend.client.i18n;
 
 import feign.hystrix.FallbackFactory;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
@@ -55,6 +57,13 @@ public class I18NServiceFallback implements I18NService, HasLogger,
       logger().debug("Client fallback called for the cause : {}", errMessage);
     }
     return new I18NServiceFallback(cause);
+  }
+
+  @Override
+  public ServiceResult<List<String>> getExistingLanguages(BaseRemoteQuery query) {
+    logger().error(getLoggerPrefix("getExistingLanguages") + "Cannot connect to the server");
+
+    return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
   }
 
   @Override

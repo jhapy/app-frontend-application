@@ -7,14 +7,18 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.EndSession;
 import org.jhapy.dto.messageQueue.NewSession;
 import org.jhapy.frontend.client.audit.AuditServices;
-import org.jhapy.frontend.security.SecurityUtils;
+import org.jhapy.frontend.utils.SessionInfo;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * @author Alexandre Clavaud.
@@ -22,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 17/09/2020
  */
 @Configuration
+@EnableScheduling
 public class SessionManager implements VaadinServiceInitListener, HasLogger {
 
   private final HazelcastInstance hazelcastInstance;
@@ -30,7 +35,7 @@ public class SessionManager implements VaadinServiceInitListener, HasLogger {
     this.hazelcastInstance = hazelcastInstance;
   }
 
-  private ConcurrentMap<String, LocalDateTime> retrieveMap() {
+  private ConcurrentMap<String, SessionInfo> retrieveMap() {
     return hazelcastInstance.getMap("userSessions");
   }
 
@@ -41,21 +46,31 @@ public class SessionManager implements VaadinServiceInitListener, HasLogger {
     vaadinService.addSessionDestroyListener(e -> {
       String loggerPrefix = getLoggerPrefix("sessionDestroy");
 
-      SecurityUser currentSecurityUser = SecurityUtils.getSecurityUser();
+      Optional<String> currentSecurityUser = SecurityUtils.getCurrentUserLogin();
 
       logger().info(loggerPrefix + "Vaadin session destroyed. Current user is : " + (
-          currentSecurityUser != null ? currentSecurityUser.getEmail() : "Not set"));
+          currentSecurityUser.orElse("Not set")));
 
-      if (currentSecurityUser != null) {
-        if (e.getSession() != null && e.getSession().getSession() != null) {
-          logger().info(loggerPrefix + "End remote session");
-          AuditServices.getAuditServiceQueue()
-              .endSession(new EndSession(e.getSession().getSession().getId(), Instant.now()));
-        }
+      if (e.getSession() != null && e.getSession().getSession() != null) {
+        logger().info(loggerPrefix + "End remote session");
 
-        retrieveMap().remove(currentSecurityUser.getEmail());
+        String sessionId = e.getSession().getSession().getId();
+        retrieveMap().remove(sessionId);
+
+        AuditServices.getAuditServiceQueue()
+            .endSession(new EndSession(sessionId, Instant.now()));
       }
     });
+  }
 
+  // @Scheduled(fixedDelay = 60 * 1000)
+  public void removeDeadSessions() {
+    String loggerPrefix = getLoggerPrefix("removedDeadSessions");
+    retrieveMap().forEach((s, sessionInfo) -> {
+      if (sessionInfo.getLastContact().plusMinutes(2).isBefore(LocalDateTime.now())) {
+        logger().info(loggerPrefix + "Remove dead session : " + sessionInfo);
+        retrieveMap().remove(s);
+      }
+    });
   }
 }

@@ -20,6 +20,7 @@ package org.jhapy.frontend.utils.i18n;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.i18n.I18NProvider;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,11 +30,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.i18n.ActionTrl;
 import org.jhapy.dto.domain.i18n.ElementTrl;
 import org.jhapy.dto.domain.i18n.MessageTrl;
+import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.i18n.FindByIso3Query;
 import org.jhapy.dto.serviceQuery.i18n.GetByNameAndIso3Query;
@@ -54,6 +57,21 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   private Map<String, ActionTrl> actionMap = new HashMap<>();
   private Map<String, MessageTrl> messageMap = new HashMap<>();
   private String loadedLocale;
+
+  public static List<Locale> getAvailableLanguagesInDB(Locale currentLanguage) {
+    ServiceResult<List<String>> _languages = I18NServices.getI18NService()
+        .getExistingLanguages(new BaseRemoteQuery());
+    if (_languages.getIsSuccess() && _languages.getData() != null) {
+      List<Locale> result = new ArrayList<>();
+      _languages.getData().forEach(s -> result.add(new Locale(s)));
+
+      return result.stream().sorted(
+          Comparator.comparing(o -> o.getDisplayLanguage(currentLanguage)))
+          .collect(Collectors.toList());
+    } else {
+      return Collections.emptyList();
+    }
+  }
 
   public static Locale[] getAvailableLanguages() {
     if (availableLanguages == null) {

@@ -6,6 +6,9 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.router.RouterLayout;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import org.jhapy.commons.utils.HasLogger;
@@ -18,6 +21,7 @@ import org.jhapy.frontend.layout.size.Top;
 import org.jhapy.frontend.layout.size.Vertical;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.FontSize;
+import org.jhapy.frontend.utils.SessionInfo;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
@@ -55,16 +59,22 @@ public class MonitoringAdminView extends ViewFrame implements RouterLayout, HasL
 
     content.add(UIUtils.createLabel(FontSize.L, "Current sessions :"));
 
-    ConcurrentMap<String, LocalDateTime> userSession = retrieveMap();
-    userSession.forEach((userEmail, localDateTime) -> {
-      ListItem item = new ListItem(userEmail, DateTimeFormatter.format(localDateTime, getLocale()));
+    ConcurrentMap<String, SessionInfo> userSession = retrieveMap();
+    List<SessionInfo> data = new ArrayList<>(userSession.values());
+    data.sort(Comparator.comparing(SessionInfo::getLastContact));
+    data.forEach(sessionInfo -> {
+      ListItem item = new ListItem(sessionInfo.getUsername() + " " + sessionInfo.getSourceIp(),
+          "Login : " + DateTimeFormatter.format(sessionInfo.getLoginDateTime(), getLocale())
+              + ", last contact : " + (sessionInfo.getLastContact() != null ?
+              DateTimeFormatter.format(sessionInfo.getLastContact(), getLocale()) : "N/A") + " ("
+              + sessionInfo.getJSessionId() + ")");
       content.add(item);
     });
 
     return content;
   }
 
-  private ConcurrentMap<String, LocalDateTime> retrieveMap() {
+  private ConcurrentMap<String, SessionInfo> retrieveMap() {
     return hazelcastInstance.getMap("userSessions");
   }
 }

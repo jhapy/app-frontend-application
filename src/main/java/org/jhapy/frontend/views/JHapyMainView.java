@@ -57,6 +57,7 @@ import org.jhapy.frontend.utils.TextColor;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.css.Shadow;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.admin.audit.SessionView;
 import org.jhapy.frontend.views.admin.configServer.CloudConfigView;
 import org.jhapy.frontend.views.admin.eureka.EurekaView;

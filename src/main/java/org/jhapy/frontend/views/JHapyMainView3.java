@@ -64,10 +64,12 @@ import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.FontSize;
 import org.jhapy.frontend.utils.IconSize;
 import org.jhapy.frontend.utils.LumoStyles;
+import org.jhapy.frontend.utils.SessionInfo;
 import org.jhapy.frontend.utils.TextColor;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.css.Shadow;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.admin.MonitoringAdminView;
 import org.jhapy.frontend.views.admin.audit.SessionView;
 import org.jhapy.frontend.views.admin.configServer.CloudConfigView;
@@ -153,7 +155,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     getElement().appendChild(new AppCookieConsent().getElement());
   }
 
-  private ConcurrentMap<String, LocalDateTime> retrieveMap() {
+  private ConcurrentMap<String, SessionInfo> retrieveMap() {
     return hazelcastInstance.getMap("userSessions");
   }
 
@@ -200,6 +202,12 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
       if (currentSecurityUser != null) {
         VaadinSession currentSession = VaadinSession.getCurrent();
         VaadinRequest currentRequest = VaadinRequest.getCurrent();
+
+        // 5 minutes
+        logger().info(loggerPrefix + "Max Inactive Interval = " + currentSession.getSession()
+            .getMaxInactiveInterval());
+        // currentSession.getSession().setMaxInactiveInterval( 2 * 60);
+
         logger().info(
             loggerPrefix + "Create remote session, Session ID = " + currentSession.getSession()
                 .getId());
@@ -209,7 +217,13 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
                 .now(),
                 true, null));
 
-        retrieveMap().put(currentSecurityUser.getEmail(), LocalDateTime.now());
+        SessionInfo sessionInfo = new SessionInfo();
+        sessionInfo.setJSessionId(currentSession.getSession().getId());
+        sessionInfo.setLoginDateTime(LocalDateTime.now());
+        sessionInfo.setLastContact(LocalDateTime.now());
+        sessionInfo.setSourceIp(currentRequest.getRemoteAddr());
+        sessionInfo.setUsername(currentSecurityUser.getUsername());
+        retrieveMap().put(sessionInfo.getJSessionId(), sessionInfo);
       }
     }
   }

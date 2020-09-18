@@ -64,6 +64,7 @@ import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.AppContext;
 import org.jhapy.dto.utils.StoredFile;
+import org.jhapy.frontend.client.i18n.I18NServices;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.tab.NaviTab;
 import org.jhapy.frontend.components.navigation.tab.NaviTabs;
@@ -76,6 +77,7 @@ import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.SecurityUtils2;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
+import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.JHapyMainView;
 import org.jhapy.frontend.views.JHapyMainView3;
 
@@ -270,6 +272,23 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       Locale currentLocale = UI.getCurrent().getSession().getLocale();
       languageMenu = contextMenu.addItem(languageButton);
 
+      List<MenuItem> menuItems = new ArrayList();
+      MyI18NProvider.getAvailableLanguagesInDB(getLocale()).forEach(locale -> {
+        MenuItem menu = languageMenu.getSubMenu()
+            .addItem(new Label(locale.getDisplayLanguage(getLocale())));
+        menu.setCheckable(true);
+        menu.setChecked(currentLocale.equals(locale));
+        menu.addClickListener(event -> {
+          setLanguage(locale);
+          menuItems.forEach(menuItem -> {
+            if (!menuItem.equals(menu)) {
+              menuItem.setChecked(false);
+            }
+          });
+        });
+        menuItems.add(menu);
+      });
+      /*
       MenuItem frMenu = languageMenu.getSubMenu().addItem(new Label("Francais"));
       MenuItem enMenu = languageMenu.getSubMenu().addItem(new Label("English"));
       MenuItem arMenu = languageMenu.getSubMenu().addItem(new Label("Arabic"));
@@ -296,7 +315,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       });
       arMenu.setCheckable(true);
       arMenu.setChecked(currentLocale.equals(new Locale("ar", "MA")));
-
+*/
       Button settingsButton = UIUtils.createButton(currentUserLogin.get(), VaadinIcon.USER,
           ButtonVariant.LUMO_TERTIARY_INLINE);
       contextMenu.addItem(settingsButton, event -> getUI().get()

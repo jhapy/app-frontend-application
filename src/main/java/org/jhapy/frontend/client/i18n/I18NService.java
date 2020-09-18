@@ -18,6 +18,7 @@
 
 package org.jhapy.frontend.client.i18n;
 
+import java.util.List;
 import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.i18n.ImportI18NFileQuery;
@@ -40,4 +41,7 @@ public interface I18NService {
 
   @PostMapping(value = "/importI18NFile")
   ServiceResult<Void> importI18NFile(@RequestBody ImportI18NFileQuery query);
+
+  @PostMapping(value = "/getExistingLanguages")
+  ServiceResult<List<String>> getExistingLanguages(@RequestBody BaseRemoteQuery query);
 }
