@@ -43,7 +43,10 @@ import dev.mett.vaadin.tooltip.Tooltips;
 import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
 import dev.mett.vaadin.tooltip.config.TooltipConfiguration;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -67,6 +70,25 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
  */
 public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame implements
     HasLogger, HasUrlParameter<String> {
+  protected static final Set<String> rtlSet;
+
+  static {
+    Set<String> lang = new HashSet<>();
+    lang.add("ar"); // Arabic
+    lang.add("dv"); // Divehi
+    lang.add("fa"); // Persian
+    lang.add("ha"); // Hausa
+    lang.add("he"); // Hebrew
+    lang.add("iw"); // Hebrew
+    lang.add("ji"); // Yiddish
+    lang.add("ps"); // Pushto
+    lang.add("sd"); // Sindhi
+    lang.add("ug"); // Uighur
+    lang.add("ur"); // Urdu
+    lang.add("yi"); // Yiddish
+
+    rtlSet = Collections.unmodifiableSet(lang);
+  }
 
   protected final String I18N_PREFIX;
   protected DetailsDrawerFooter detailsDrawerFooter;

@@ -22,6 +22,7 @@ package org.jhapy.frontend.components.navigation.bar;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -630,13 +631,11 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   @Override
   public void localeChange(LocaleChangeEvent event) {
-    /*
     if (rtlSet.contains(event.getLocale().getLanguage())) {
       UI.getCurrent().setDirection(Direction.RIGHT_TO_LEFT);
     } else {
       UI.getCurrent().setDirection(Direction.LEFT_TO_RIGHT);
     }
-     */
   }
 
   public SearchOverlayButton getSearchButton() {
