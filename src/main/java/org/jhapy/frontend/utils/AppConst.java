@@ -138,6 +138,7 @@ public class AppConst {
   public static final String[] DEFAULT_RECORD_STATUS_SORT_FIELDS = {"seq"};
   public static final String[] DEFAULT_SESSION_SORT_FIELDS = {"sessionStart"};
   public static final String[] DEFAULT_ASSET_SORT_FIELDS = {"a.name", "a.id"};
+  public static final String[] DEFAULT_ID_SORT_FIELDS = {"id"};
   public static final String[] COUNTRY_SORT_FIELDS = {"m.name"};
   public static final String[] PLACE_TYPE_SORT_FIELDS = {"t.name"};
   public static final String[] POST_SORT_FIELDS = {"created"};
