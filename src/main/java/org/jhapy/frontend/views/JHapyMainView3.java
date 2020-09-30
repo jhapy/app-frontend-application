@@ -85,6 +85,7 @@ import org.jhapy.frontend.views.admin.references.CountriesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakGroupsView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakRolesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakUsersView;
+import org.jhapy.frontend.views.admin.swagger.SwaggersAdminView;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
 import org.springframework.core.env.Environment;
@@ -580,6 +581,15 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             subMenu.setHasChildNodes(false);
             menuData.addMenuEntry(subMenu);
           }
+        }
+        if (SecurityUtils.isAccessGranted(SwaggersAdminView.class)) {
+          MenuEntry swaggersMenu = new MenuEntry(AppConst.TITLE_SWAGGERS_ADMIN);
+          swaggersMenu.setVaadinIcon(VaadinIcon.CODE);
+          swaggersMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SWAGGERS_ADMIN));
+          swaggersMenu.setTargetClass(SwaggersAdminView.class);
+          swaggersMenu.setParentMenuEntry(settingsSubMenu);
+          swaggersMenu.setHasChildNodes(false);
+          menuData.addMenuEntry(swaggersMenu);
         }
       }
       naviDrawer.refreshMenu();

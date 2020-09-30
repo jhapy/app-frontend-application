@@ -73,6 +73,8 @@ public class AppConst {
   public static final String PAGE_SECURITY_USERS = "settings/security/securityUsers";
   public static final String PAGE_SECURITY_ROLES = "settings/security/securityRoles";
   public static final String PAGE_SECURITY_GROUPS = "settings/security/securityGroups";
+  public static final String PAGE_ADMIN_SWAGGERS = "settings/swaggers";
+  public static final String PAGE_ADMIN_SWAGGER_DETAILS = "settings/swagger/detail";
   public static final String PAGE_COUNTRIES = "settings/reference/countries";
   public static final String PAGE_ACTIVITIES_ADMIN = "settings/activities/activitiesAdmin";
   public static final String PAGE_ACTIVITY_ADMIN = "settings/activities/activitiyAdmin";
@@ -91,6 +93,8 @@ public class AppConst {
   public static final String TITLE_USERS_ADMIN = "element.page.title.usersAdmin";
   public static final String TITLE_MAILS_ADMIN = "element.page.title.mailsAdmin";
   public static final String TITLE_ACTUAL_SESSIONS_ADMIN = "element.page.title.actualSessionsAdmin";
+  public static final String TITLE_SWAGGER_ADMIN = "element.page.title.swagger";
+  public static final String TITLE_SWAGGERS_ADMIN = "element.page.title.swaggers";
   public static final String TITLE_SESSIONS_ADMIN = "element.page.title.sessionsAdmin";
   public static final String TITLE_EUREKA_ADMIN = "element.page.title.eurekaAdmin";
   public static final String TITLE_CLOUD_CONFIG_ADMIN = "element.page.title.cloudConfigAdmin";
