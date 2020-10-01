@@ -3,22 +3,28 @@ package org.jhapy.frontend.views.admin.swagger;
 import com.hazelcast.core.HazelcastInstance;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.IFrame;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.shared.Registration;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.ListItem;
+import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Vertical;
@@ -29,7 +35,9 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView3;
+import org.jhapy.frontend.views.admin.messaging.MailTemplatesAdminView;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.web.util.UrlUtils;
 
 /**
  * @author Alexandre Clavaud.
@@ -42,13 +50,34 @@ public class SwaggerAdminView extends ViewFrame implements RouterLayout, HasLogg
     HasUrlParameter<String> {
 
   private IFrame swaggerView;
+  private String appName;
   private String swaggerUrl;
+  private Registration contextIconRegistration = null;
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    JHapyMainView3.get().getAppBar().setTitle(getTranslation("element.swagger.title"));
+
+    initAppBar();
+
+    JHapyMainView3.get().getAppBar().setTitle(appName);
     setViewContent(createContent());
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    if (contextIconRegistration != null) {
+      contextIconRegistration.remove();
+    }
+  }
+
+  private AppBar initAppBar() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
+    if (contextIconRegistration == null) {
+      contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
+    }
+    return appBar;
   }
 
   private Component createContent() {
@@ -66,6 +95,15 @@ public class SwaggerAdminView extends ViewFrame implements RouterLayout, HasLogg
 
   @Override
   public void setParameter(BeforeEvent event, String parameter) {
-    swaggerUrl = URLDecoder.decode(parameter, StandardCharsets.UTF_8) + "swagger-ui.html";
+    if (StringUtils.isNoneBlank(parameter)) {
+      String[] params = parameter.split("&");
+      swaggerUrl =
+          URLDecoder.decode(params[0].split("=")[1], StandardCharsets.UTF_8) + "swagger-ui.html";
+      this.appName = params[1].split("=")[1];
+    }
+  }
+
+  private void goBack() {
+    UI.getCurrent().navigate(SwaggersAdminView.class);
   }
 }

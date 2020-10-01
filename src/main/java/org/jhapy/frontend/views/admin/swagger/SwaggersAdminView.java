@@ -124,7 +124,8 @@ public class SwaggersAdminView extends ViewFrame {
   protected void showDetails(EurekaApplication app) {
     try {
       UI.getCurrent().navigate(SwaggerAdminView.class,
-          URLEncoder.encode(app.getInstances().get(0).getHomePageUrl(), "UTF-8"));
+          "baseUrl=" + URLEncoder.encode(app.getInstances().get(0).getHomePageUrl(), "UTF-8")
+              + "&app=" + app.getName());
     } catch (UnsupportedEncodingException e) {
     }
   }

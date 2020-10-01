@@ -19,6 +19,7 @@
 package org.jhapy.frontend.views.admin.security;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -32,6 +33,7 @@ import org.jhapy.dto.serviceQuery.generic.DeleteByStrIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.security.SecurityServices;
+import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityRoleKeycloakDataProvider;
 import org.jhapy.frontend.utils.AppConst;
@@ -40,6 +42,7 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
+import org.jhapy.frontend.views.JHapyMainView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_ROLES)
@@ -52,6 +55,21 @@ public class SecurityKeycloakRolesView extends
         (e) -> SecurityServices.getKeycloakClient().saveRole(new SaveQuery<>(e)),
         e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())),
         myI18NProvider);
+  }
+
+  @Override
+  protected void initHeader() {
+    super.initHeader();
+
+    AppBar appBar = JHapyMainView.get().getAppBar();
+
+    Button clearCacheButton = new Button(getTranslation("action.sync.clearCache"));
+    clearCacheButton.addClickListener(buttonClickEvent -> {
+      SecurityServices.getKeycloakClient().cleanRoleCache();
+      dataProvider.refreshAll();
+    });
+
+    appBar.addActionItem(clearCacheButton);
   }
 
   protected Grid createGrid() {

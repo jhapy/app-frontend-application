@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-04-16
  */
-@FeignClient(name = "${jhapy.remote-services.audit-server.name:null}", url = "${jhapy.remote-services.audit-server.url:}", path = "/sessionService", fallbackFactory = MailServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.audit-server.name:null}", url = "${jhapy.remote-services.audit-server.url:}", path = "/api/sessionService", fallbackFactory = MailServiceFallback.class)
 @Primary
 public interface SessionService {
 

@@ -42,6 +42,7 @@ import org.jhapy.commons.utils.OrikaBeanMapper;
 import org.jhapy.dto.domain.security.SecurityKeycloakGroup;
 import org.jhapy.dto.domain.security.SecurityKeycloakRole;
 import org.jhapy.dto.domain.security.SecurityKeycloakUser;
+import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -49,6 +50,7 @@ import org.jhapy.dto.serviceQuery.generic.DeleteByStrIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.security.SecurityServices;
+import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityUserKeycloakDataProvider;
 import org.jhapy.frontend.utils.AppConst;
@@ -57,6 +59,8 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
+import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
@@ -75,6 +79,21 @@ public class SecurityKeycloakUsersView extends
         e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())),
         myI18NProvider);
     this.orikaBeanMapper = orikaBeanMapper;
+  }
+
+  @Override
+  protected void initHeader() {
+    super.initHeader();
+
+    AppBar appBar = JHapyMainView.get().getAppBar();
+
+    Button clearCacheButton = new Button(getTranslation("action.sync.clearCache"));
+    clearCacheButton.addClickListener(buttonClickEvent -> {
+      SecurityServices.getKeycloakClient().cleanUserCache();
+      dataProvider.refreshAll();
+    });
+
+    appBar.addActionItem(clearCacheButton);
   }
 
   protected Grid createGrid() {

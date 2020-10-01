@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-03-27
  */
-@FeignClient(name = "${jhapy.remote-services.backend-server.name:null}", url = "${jhapy.remote-services.backend-server.url:}", path = "/intermediateRegionService", fallback = IntermediateRegionServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.backend-server.name:null}", url = "${jhapy.remote-services.backend-server.url:}", path = "/api/intermediateRegionService", fallback = IntermediateRegionServiceFallback.class)
 @Primary
 public interface IntermediateRegionService {
 

@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-05-15
  */
-@FeignClient(name = "${jhapy.remote-services.resource-server.name:null}", url = "${jhapy.remote-services.resource-server.url:}", path = "/resourceService", fallbackFactory = ResourceServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.resource-server.name:null}", url = "${jhapy.remote-services.resource-server.url:}", path = "/api/resourceService", fallbackFactory = ResourceServiceFallback.class)
 @Primary
 public interface ResourceService {
 

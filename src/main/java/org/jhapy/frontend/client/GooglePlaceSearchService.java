@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-03-16
  */
-@FeignClient(name = "${jhapy.remote-services.backend-server.name:null}", url = "${jhapy.remote-services.backend-server.url:}", path = "/googlePlaceSearchService", fallbackFactory = GooglePlaceSearchServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.backend-server.name:null}", url = "${jhapy.remote-services.backend-server.url:}", path = "/api/googlePlaceSearchService", fallbackFactory = GooglePlaceSearchServiceFallback.class)
 @Primary
 public interface GooglePlaceSearchService {
 

@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-03-27
  */
-@FeignClient(name = "${jhapy.remote-services.backend-server.name:null}", url = "${jhapy.remote-services.backend-server.url:}", path = "/subRegionService", fallback = SubRegionServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.backend-server.name:null}", url = "${jhapy.remote-services.backend-server.url:}", path = "/api/subRegionService", fallback = SubRegionServiceFallback.class)
 @Primary
 public interface SubRegionService {
 

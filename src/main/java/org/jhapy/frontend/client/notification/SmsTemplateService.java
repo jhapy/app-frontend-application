@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @since 2019-04-16
  */
-@FeignClient(name = "${jhapy.remote-services.notification-server.name:null}", url = "${jhapy.remote-services.notification-server.url:}", path = "/smsTemplateService", fallbackFactory = SmsTemplateServiceFallback.class)
+@FeignClient(name = "${jhapy.remote-services.notification-server.name:null}", url = "${jhapy.remote-services.notification-server.url:}", path = "/api/smsTemplateService", fallbackFactory = SmsTemplateServiceFallback.class)
 @Primary
 public interface SmsTemplateService {
 

@@ -468,8 +468,8 @@ public class KeycloakClient implements HasLogger {
     }
   }
 
-  @CacheEvict(cacheNames = {"allRoles", "roleByName", "roleById", "findRoles",
-      "countRoles"}, allEntries = true)
+  @CacheEvict(cacheNames = {"allGroups", "groupByName", "groupById", "findGroups",
+      "countGroups"}, allEntries = true)
   public void cleanGroupCache() {
   }
 
