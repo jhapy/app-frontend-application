@@ -88,6 +88,11 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
 
     initSearchBar();
 
+    String title = getTitle();
+    if (title != null) {
+      appBar.setTitle(title);
+    }
+
     if (canCreateRecord()) {
       newRecordButton = UIUtils
           .createTertiaryButton(VaadinIcon.PLUS);
@@ -99,6 +104,14 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
       });
       appBar.addActionItem(newRecordButton);
     }
+
+    Button refreshButton = UIUtils.createTertiaryButton(VaadinIcon.REFRESH);
+    refreshButton.addClickListener(buttonClickEvent -> dataProvider.refreshAll());
+    appBar.addActionItem(refreshButton);
+  }
+
+  protected String getTitle() {
+    return null;
   }
 
   protected boolean canCreateRecord() {

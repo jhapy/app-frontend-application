@@ -176,6 +176,11 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
     initSearchBar();
 
+    String title = getTitle();
+    if (title != null) {
+      appBar.setTitle(title);
+    }
+
     if (canCreateRecord() && saveHandler != null) {
       newRecordButton = UIUtils.createTertiaryButton(VaadinIcon.PLUS);
       newRecordButton.addClickListener(event -> showDetails());
@@ -193,6 +198,10 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
     }
+  }
+
+  protected String getTitle() {
+    return null;
   }
 
   protected boolean canCreateRecord() {

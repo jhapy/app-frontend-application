@@ -18,6 +18,7 @@
 
 package org.jhapy.frontend.security;
 
+import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ATTRIBUTE;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 import com.vaadin.flow.server.ServletHelper.RequestType;
@@ -49,6 +50,7 @@ import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.jhapy.frontend.client.security.SecurityServices;
+import org.jhapy.frontend.utils.AppConst;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -104,8 +106,8 @@ public final class SecurityUtils {
       return null;
     }
     if (VaadinSession.getCurrent() != null
-        && VaadinSession.getCurrent().getAttribute(SecurityUser.class) != null) {
-      return VaadinSession.getCurrent().getAttribute(SecurityUser.class);
+        && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
+      return (SecurityUser) VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE);
     }
     Object principal = context.getAuthentication().getPrincipal();
     if (principal instanceof DefaultOidcUser) {
@@ -115,7 +117,7 @@ public final class SecurityUtils {
       securityUser.setFirstName(attributes.get("given_name").toString());
       securityUser.setLastName(attributes.get("family_name").toString());
       securityUser.setUsername(attributes.get("preferred_username").toString());
-      VaadinSession.getCurrent().setAttribute(SecurityUser.class, securityUser);
+      VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
       return securityUser;
     } else if (principal instanceof SecurityUser) {
       return (SecurityUser) principal;
@@ -223,7 +225,7 @@ public final class SecurityUtils {
 
     VaadinSession.getCurrent().getSession()
         .setAttribute(SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
-    VaadinSession.getCurrent().setAttribute(SecurityUser.class, securityUser);
+    VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
 
     AuditServices.getAuditServiceQueue().newSession(
         new NewSession(VaadinRequest.getCurrent().getWrappedSession().getId(),

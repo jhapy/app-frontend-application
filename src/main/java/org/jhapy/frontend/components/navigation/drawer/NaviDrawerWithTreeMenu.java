@@ -20,6 +20,7 @@ package org.jhapy.frontend.components.navigation.drawer;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -69,8 +70,8 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
   private final Div main = new Div();
 
   public NaviDrawerWithTreeMenu(MenuHierarchicalDataProvider menuDataProvider,
-      boolean showSearchMenu, String version,
-      String environement) {
+      boolean showSearchMenu, Component altSearchMenu, String version,
+      String environment) {
     this.dataProvider = menuDataProvider;
     setClassName(CLASS_NAME);
     getElement().getThemeList().remove("spacing");
@@ -81,12 +82,14 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
     initHeader();
     if (showSearchMenu) {
       initSearch();
+    } else if (altSearchMenu != null) {
+      mainContent.add(altSearchMenu);
     }
 
     initScrollableArea();
     initMenu();
 
-    initFooter(version, environement);
+    initFooter(version, environment);
     add(main);
     dragger = new Dragger(getMainContent());
     dragger.setClassName(CLASS_NAME + "__dragger");

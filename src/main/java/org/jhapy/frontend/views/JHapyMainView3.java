@@ -18,6 +18,8 @@
 
 package org.jhapy.frontend.views;
 
+import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ATTRIBUTE;
+
 import com.hazelcast.core.HazelcastInstance;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -31,6 +33,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
@@ -61,6 +64,7 @@ import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
+import org.jhapy.frontend.utils.AttributeContextListener;
 import org.jhapy.frontend.utils.FontSize;
 import org.jhapy.frontend.utils.IconSize;
 import org.jhapy.frontend.utils.LumoStyles;
@@ -122,6 +126,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private AppBar appBar;
   protected MenuHierarchicalDataProvider menuProvider;
   private final HazelcastInstance hazelcastInstance;
+  private List<AttributeContextListener> contextListeners = new ArrayList<>();
 
   public JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
       HazelcastInstance hazelcastInstance, Environment environment) {
@@ -143,7 +148,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     setSizeFull();
 
     // Initialise the UI building blocks
-    initStructure(menuProvider, false, environment.getProperty("APP_VERSION"),
+    initStructure(menuProvider, false, getAltSearchMenu(), environment.getProperty("APP_VERSION"),
         environment.getProperty("info.tags.environment"));
 
     // Populate the navigation drawer
@@ -154,6 +159,23 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     initHeadersAndFooters();
 
     getElement().appendChild(new AppCookieConsent().getElement());
+  }
+
+  public void addAttributeContextListener(AttributeContextListener contextListener) {
+    contextListeners.add(contextListener);
+  }
+
+  public void removeAttributeContextListener(AttributeContextListener contextListener) {
+    contextListeners.remove(contextListener);
+  }
+
+  public void fireAttributeContextChanged(String attributeName, Object attributeValue) {
+    contextListeners.parallelStream().forEach(contextListener -> contextListener
+        .onAttributeContextChanged(attributeName, attributeValue));
+  }
+
+  protected Component getAltSearchMenu() {
+    return null;
   }
 
   private ConcurrentMap<String, SessionInfo> retrieveMap() {
@@ -197,7 +219,8 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   public void afterLogin() {
     String loggerPrefix = getLoggerPrefix("afterLogin");
 
-    SecurityUser currentSecurityUser = VaadinSession.getCurrent().getAttribute(SecurityUser.class);
+    SecurityUser currentSecurityUser = (SecurityUser) VaadinSession.getCurrent()
+        .getAttribute(SECURITY_USER_ATTRIBUTE);
     if (currentSecurityUser == null) {
       currentSecurityUser = SecurityUtils.getSecurityUser();
       if (currentSecurityUser != null) {
@@ -233,8 +256,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
    * Initialise the required components and containers.
    */
   private void initStructure(MenuHierarchicalDataProvider menuProvider, boolean showSearchMenu,
+      Component altSearchMenu,
       String version, String environnement) {
-    naviDrawer = new NaviDrawerWithTreeMenu(menuProvider, showSearchMenu, version, environnement);
+    naviDrawer = new NaviDrawerWithTreeMenu(menuProvider, showSearchMenu, altSearchMenu, version,
+        environnement);
 
     viewContainer = new FlexBoxLayout();
     viewContainer.addClassName(CLASS_NAME + "__view-container");

@@ -163,4 +163,7 @@ public class AppConst {
   // Mutable for testing.
   public static final int NOTIFICATION_DURATION = 4000;
 
+  public static final String AVATAR_ATTRIBUTE = "AVATAR";
+  public static final String SECURITY_USER_ATTRIBUTE = "SECURITY_USER";
+  public static final String THEME_ATTRIBUTE = "THEME";
 }

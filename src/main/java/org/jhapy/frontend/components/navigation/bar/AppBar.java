@@ -19,6 +19,8 @@
 package org.jhapy.frontend.components.navigation.bar;
 
 
+import static org.jhapy.frontend.utils.AppConst.*;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -76,6 +78,7 @@ import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.SecurityUtils2;
+import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
@@ -159,7 +162,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       languageMenu.setVisible(false);
     }
 
-    if (VaadinSession.getCurrent().getAttribute("Theme") != null) {
+    if (VaadinSession.getCurrent().getAttribute(THEME_ATTRIBUTE) != null) {
       ThemeList themeList = UI.getCurrent().getElement().getThemeList();
       themeList.add(Lumo.DARK);
     }
@@ -329,7 +332,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       Button switchDarkThemeButton = UIUtils
           .createButton(getTranslation("action.global.darkTheme"), VaadinIcon.CIRCLE_THIN,
               ButtonVariant.LUMO_TERTIARY_INLINE);
-      if (VaadinSession.getCurrent().getAttribute("Theme") != null) {
+      if (VaadinSession.getCurrent().getAttribute(THEME_ATTRIBUTE) != null) {
         switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
       }
 
@@ -337,11 +340,11 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
         if (themeList.contains(Lumo.DARK)) {
           themeList.remove(Lumo.DARK);
           switchDarkThemeButton.setIcon(VaadinIcon.CIRCLE_THIN.create());
-          VaadinSession.getCurrent().setAttribute("Theme", null);
+          VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, null);
         } else {
           themeList.add(Lumo.DARK);
           switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
-          VaadinSession.getCurrent().setAttribute("Theme", Lumo.DARK);
+          VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, Lumo.DARK);
         }
       });
       Button exitButton = UIUtils

@@ -52,7 +52,7 @@
     <problem-spring-web.version>0.25.0</problem-spring-web.version>
     <spring-data-provider.version>2.1.0</spring-data-provider.version>
 
-    <vaadin.version>14.3.7</vaadin.version>
+    <vaadin.version>14.3.8</vaadin.version>
 
     <confirm-dialog.versîon>2.0.0</confirm-dialog.versîon>
     <multiselect-combo-box-flow.version>3.0.2</multiselect-combo-box-flow.version>
@@ -124,6 +124,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-undertow</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
