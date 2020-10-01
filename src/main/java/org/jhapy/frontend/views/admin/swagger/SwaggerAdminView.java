@@ -12,6 +12,8 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.shared.Registration;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -96,10 +98,11 @@ public class SwaggerAdminView extends ViewFrame implements RouterLayout, HasLogg
   @Override
   public void setParameter(BeforeEvent event, String parameter) {
     if (StringUtils.isNoneBlank(parameter)) {
-      String[] params = parameter.split("&");
-      swaggerUrl =
-          URLDecoder.decode(params[0].split("=")[1], StandardCharsets.UTF_8) + "swagger-ui.html";
-      this.appName = params[1].split("=")[1];
+      String url = ((VaadinServletRequest) VaadinService.getCurrentRequest()).getRequestURL()
+          .toString();
+
+      swaggerUrl = url + "swagger/" + parameter + "/swagger-ui.html";
+      this.appName = parameter;
     }
   }
 

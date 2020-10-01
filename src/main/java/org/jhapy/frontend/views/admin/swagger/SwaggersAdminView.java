@@ -111,7 +111,9 @@ public class SwaggersAdminView extends ViewFrame {
   protected void initHeader() {
     AppBar appBar = JHapyMainView3.get().getAppBar();
     appBar.setNaviMode(NaviMode.MENU);
+    appBar.setTitle(getTranslation(AppConst.TITLE_SWAGGERS_ADMIN));
   }
+
 
   private Component createContent() {
     FlexBoxLayout content = new FlexBoxLayout(createGrid());
@@ -122,12 +124,7 @@ public class SwaggersAdminView extends ViewFrame {
   }
 
   protected void showDetails(EurekaApplication app) {
-    try {
-      UI.getCurrent().navigate(SwaggerAdminView.class,
-          "baseUrl=" + URLEncoder.encode(app.getInstances().get(0).getHomePageUrl(), "UTF-8")
-              + "&app=" + app.getName());
-    } catch (UnsupportedEncodingException e) {
-    }
+    UI.getCurrent().navigate(SwaggerAdminView.class, app.getName().toLowerCase());
   }
 
   protected Grid createGrid() {
