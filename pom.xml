@@ -22,7 +22,7 @@
   <name>jHapy Framework - Front End Application</name>
 
   <properties>
-    <java.version>14</java.version>
+    <java.version>15</java.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -34,6 +34,7 @@
     <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
     <sonar-maven-plugin.version>3.6.1.1688</sonar-maven-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+    <lombok.version>1.18.14</lombok.version>
 
     <spring-cloud.version>Hoxton.SR7</spring-cloud.version>
     <spring-data.version>Neumann-SR3</spring-data.version>
@@ -52,7 +53,7 @@
     <problem-spring-web.version>0.25.0</problem-spring-web.version>
     <spring-data-provider.version>2.1.0</spring-data-provider.version>
 
-    <vaadin.version>14.3.8</vaadin.version>
+    <vaadin.version>14.4.0</vaadin.version>
 
     <confirm-dialog.versîon>2.0.0</confirm-dialog.versîon>
     <multiselect-combo-box-flow.version>3.0.2</multiselect-combo-box-flow.version>
@@ -257,6 +258,7 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-spring</artifactId>
+      <version>12.3.2</version>
     </dependency>
 
       <dependency>
@@ -321,6 +323,12 @@
       <groupId>org.vaadin.tatu</groupId>
       <artifactId>twincolselect</artifactId>
       <version>1.4.1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.vaadin.artur</groupId>
@@ -360,7 +368,7 @@
       <version>${error-window-vaadin.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>vaadin</artifactId>
+          <artifactId>vaadin-core</artifactId>
           <groupId>com.vaadin</groupId>
         </exclusion>
       </exclusions>
@@ -392,26 +400,56 @@
       <groupId>com.github.appreciated</groupId>
       <artifactId>app-layout-addon</artifactId>
       <version>4.0.0.rc5</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jhapy</groupId>
       <artifactId>tree-flow</artifactId>
       <version>1.1.1-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>ch.carnet.kasparscherrer</groupId>
       <artifactId>language-select</artifactId>
       <version>1.0.8</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>dev.mett.vaadin</groupId>
       <artifactId>tooltip</artifactId>
       <version>1.6.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.vaadin.componentfactory</groupId>
       <artifactId>togglebutton</artifactId>
       <version>1.0.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>vaadin-core</artifactId>
+          <groupId>com.vaadin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!--dependency>
       <groupId>org.bklab</groupId>
@@ -551,6 +589,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
