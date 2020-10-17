@@ -94,7 +94,6 @@ import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
 import org.springframework.core.env.Environment;
 import org.vaadin.tatu.Tree;
-import org.xnio.Options;
 
 @CssImport(value = "./styles/components/charts.css", themeFor = "vaadin-chart", include = "vaadin-chart-default-theme")
 @CssImport(value = "./styles/components/floating-action-button.css", themeFor = "vaadin-button")
@@ -622,7 +621,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   }
 
   /**
-   * Configure the app's inner and outer headers and footers.
+   * Configure the app's inner and outer headers and footers.micrometer-core.version
    */
   protected void initHeadersAndFooters() {
     //setAppHeaderOuter();
@@ -631,7 +630,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     // setAppFooterInner();
 
     appBar = new AppBar();
-    UIUtils.setTheme(Lumo.DARK, appBar);
+    //UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }
 

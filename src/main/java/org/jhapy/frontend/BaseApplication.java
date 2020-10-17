@@ -26,11 +26,14 @@ import com.vaadin.flow.server.VaadinServletService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.SpringServlet;
 import com.vaadin.flow.spring.SpringVaadinServletService;
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
+import org.jhapy.commons.config.AppProperties;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.commons.utils.SpringProfileConstants;
 import org.slf4j.Logger;
@@ -55,8 +58,11 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
 
   private final Environment env;
 
-  public BaseApplication(Environment env) {
+  private AppProperties appProperties;
+
+  public BaseApplication(Environment env, AppProperties appProperties) {
     this.env = env;
+    this.appProperties = appProperties;
   }
 
   protected static void logApplicationStartup(Environment env) {
@@ -185,5 +191,19 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
         super.requestEnd(request, response, session);
       }
     };
+  }
+
+  @PostConstruct
+  void postConstruct() {
+    if (StringUtils.isNotBlank(appProperties.getSecurity().getTrustStore().getTrustStorePath())) {
+      File trustStoreFilePath = new File(
+          appProperties.getSecurity().getTrustStore().getTrustStorePath());
+      String tsp = trustStoreFilePath.getAbsolutePath();
+      System.setProperty("javax.net.ssl.trustStore", tsp);
+      System.setProperty("javax.net.ssl.trustStorePassword",
+          appProperties.getSecurity().getTrustStore().getTrustStorePassword());
+      System.setProperty("javax.net.ssl.keyStoreType",
+          appProperties.getSecurity().getTrustStore().getDefaultType());
+    }
   }
 }

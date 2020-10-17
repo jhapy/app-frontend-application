@@ -250,7 +250,8 @@ public class ImageField extends CustomField<StoredFile> implements HasStyle, Ser
         } else {
           image.setSrc(AppConst.NO_PICTURE);
         }
-        cropperJs.destroy();
+        if ( cropperJs != null )
+          cropperJs.destroy();
         return true;
       }
 
