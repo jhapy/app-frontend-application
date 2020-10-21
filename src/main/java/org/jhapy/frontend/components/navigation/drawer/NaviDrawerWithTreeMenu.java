@@ -176,6 +176,10 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
 
   private MenuEntry lastMenuEntry = null;
 
+  public MenuEntry getLastMenuEntry() {
+    return lastMenuEntry;
+  }
+
   private void initMenu() {
     menuData = new MenuData();
 
@@ -277,7 +281,11 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
     return selected.getTargetId().equalsIgnoreCase(targetId);
   }
 
-  private void navigate(MenuEntry menuEntry) {
+  public void navigate(MenuEntry menuEntry) {
+    if (menuEntry == null) {
+      return;
+    }
+
     String loggerPrefix = getLoggerPrefix("navigate", menuEntry.getTitle());
     if (menuEntry.getTargetClass() == null) {
       return;

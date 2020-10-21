@@ -297,7 +297,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     naviDrawer.toogleSearch();
     initNaviItems();
 
-    UI.getCurrent().access(() -> naviDrawer.getMenuComponent().expand(expandedMenus));
+    UI.getCurrent().access(() -> {
+      naviDrawer.getMenuComponent().expand(expandedMenus);
+      naviDrawer.navigate(naviDrawer.getLastMenuEntry());
+    });
 
     if (resetAppBar) {
       appBar.reset();
