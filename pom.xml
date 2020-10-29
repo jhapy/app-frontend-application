@@ -73,7 +73,7 @@
 
     <spring-data-provider.version>2.1.0</spring-data-provider.version>
 
-    <vaadin.version>14.4.0</vaadin.version>
+    <vaadin.version>14.4.2</vaadin.version>
 
     <confirm-dialog.versîon>2.0.0</confirm-dialog.versîon>
     <multiselect-combo-box-flow.version>3.0.2</multiselect-combo-box-flow.version>
@@ -548,7 +548,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>collaboration-engine</artifactId>
+      <version>1.0.0</version>
+    </dependency>
     <dependency>
       <groupId>com.github.appreciated</groupId>
       <artifactId>card</artifactId>
@@ -903,6 +907,16 @@
     <repository>
       <id>javaxt.com</id>
       <url>http://www.javaxt.com/maven</url>
+    </repository>
+    <repository>
+      <id>vaadin-prereleases</id>
+      <url>https://maven.vaadin.com/vaadin-prereleases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 </project>
