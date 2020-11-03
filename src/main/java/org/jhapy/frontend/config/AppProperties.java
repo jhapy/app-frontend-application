@@ -42,7 +42,7 @@ public class AppProperties extends org.jhapy.commons.config.AppProperties {
 
   @Data
   public static final class Authorization {
-
+    private Boolean forceRealmToHttps = Boolean.FALSE;
     private String facebookUrl;
     private String googleUrl;
     private String publicKey;

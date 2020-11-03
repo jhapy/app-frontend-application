@@ -94,7 +94,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
 
   private final RestTemplate restTemplate = new RestTemplate();
 
-  public SecurityConfiguration(Environment env, AppProperties appProperties,
+  public SecurityConfiguration(AppProperties appProperties,
       SecurityProblemSupport problemSupport,
       SecurityRoleService securityRoleService,
       ClientRegistrationRepository clientRegistrationRepository,
@@ -104,11 +104,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
     this.securityRoleService = securityRoleService;
     this.clientRegistrationRepository = clientRegistrationRepository;
     this.realm = realm;
-    this.forceHttpsForRealm = env
-        .acceptsProfiles(Profiles.of(SpringProfileConstants.SPRING_PROFILE_TEST,
-            SpringProfileConstants.SPRING_PROFILE_DEVELOPMENT,
-            SpringProfileConstants.SPRING_PROFILE_STAGING,
-            SpringProfileConstants.SPRING_PROFILE_PRODUCTION));
+    this.forceHttpsForRealm = appProperties.getAuthorization().getForceRealmToHttps();
   }
 
   @Override

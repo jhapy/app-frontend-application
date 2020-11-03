@@ -48,7 +48,8 @@ public class CustomOAuth2AuthorizationRequestResolver implements
 
   private OAuth2AuthorizationRequest customizeAuthorizationRequest(
       OAuth2AuthorizationRequest req) {
-    String loggerPrefix = getLoggerPrefix("customizeAuthorizationRequest");
+    String loggerPrefix = getLoggerPrefix("customizeAuthorizationRequest", forceHttps);
+    logger().debug(loggerPrefix + "Initial Redirect URI = " + req.getRedirectUri());
     if (forceHttps) {
       URI uri = null;
       try {
