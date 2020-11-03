@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.jhapy.commons.security.oauth2.AudienceValidator;
 import org.jhapy.commons.security.oauth2.JwtGrantedAuthorityConverter;
 import org.jhapy.commons.utils.HasLogger;
+import org.jhapy.commons.utils.SpringProfileConstants;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
@@ -39,6 +40,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -54,6 +57,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -82,20 +86,29 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
   private final SecurityProblemSupport problemSupport;
   private final SecurityRoleService securityRoleService;
   private final String realm;
+  private final boolean forceHttpsForRealm;
+  private final ClientRegistrationRepository clientRegistrationRepository;
 
   @Autowired
   private KeycloakOauth2UserService keycloakOidcUserService;
 
   private final RestTemplate restTemplate = new RestTemplate();
 
-  public SecurityConfiguration(AppProperties appProperties,
+  public SecurityConfiguration(Environment env, AppProperties appProperties,
       SecurityProblemSupport problemSupport,
       SecurityRoleService securityRoleService,
+      ClientRegistrationRepository clientRegistrationRepository,
       @Value("${kc.realm}") String realm) {
     this.problemSupport = problemSupport;
     this.appProperties = appProperties;
     this.securityRoleService = securityRoleService;
+    this.clientRegistrationRepository = clientRegistrationRepository;
     this.realm = realm;
+    this.forceHttpsForRealm = env
+        .acceptsProfiles(Profiles.of(SpringProfileConstants.SPRING_PROFILE_TEST,
+            SpringProfileConstants.SPRING_PROFILE_DEVELOPMENT,
+            SpringProfileConstants.SPRING_PROFILE_STAGING,
+            SpringProfileConstants.SPRING_PROFILE_PRODUCTION));
   }
 
   @Override
@@ -133,6 +146,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+
     http
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
         .headers()
@@ -194,7 +208,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .jwt()
         .jwtAuthenticationConverter(authenticationConverter())
         .and().and()
-        .oauth2Login().userInfoEndpoint().oidcUserService(keycloakOidcUserService).and()
+        .oauth2Login().authorizationEndpoint()
+        .authorizationRequestResolver(
+            new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
+                "/oauth2/authorization", forceHttpsForRealm)).and().userInfoEndpoint()
+        .oidcUserService(keycloakOidcUserService).and()
         // I don't want a page with different clients as login options
         // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
         // plus the configured realm as immediate redirect to Keycloak
