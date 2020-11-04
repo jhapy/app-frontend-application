@@ -142,7 +142,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-
     http
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
         .headers()
@@ -212,7 +211,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         // I don't want a page with different clients as login options
         // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
         // plus the configured realm as immediate redirect to Keycloak
-        .loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
+        //.loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
+        .loginPage(appProperties.getAuthorization().getLoginRootUrl()
+            + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
   }
 
   Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
