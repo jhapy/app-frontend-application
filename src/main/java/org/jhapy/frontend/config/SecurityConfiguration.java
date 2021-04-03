@@ -142,6 +142,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+    String loggerPrefix = getLoggerPrefix("configure");
     http
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
         .headers()
@@ -214,6 +215,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         //.loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
         .loginPage(appProperties.getAuthorization().getLoginRootUrl()
             + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
+    logger().debug(loggerPrefix + "Using login root url : " + (appProperties.getAuthorization().getLoginRootUrl()
+        + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm ) );
   }
 
   Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {

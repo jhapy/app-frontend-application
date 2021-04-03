@@ -37,6 +37,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.shared.Registration;
 import dev.mett.vaadin.tooltip.Tooltips;
@@ -415,8 +416,13 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
           .map(Optional::get).distinct()
           .collect(Collectors.joining(", "));
 
+      String errorText2 = validate.getBeanValidationErrors()
+          .stream()
+          .map(ValidationResult::getErrorMessage)
+          .collect(Collectors.joining(", "));
+
       Notification
-          .show(getTranslation("message.global.validationErrorMessage", errorText), 3000,
+          .show(getTranslation("message.global.validationErrorMessage", errorText + errorText2), 3000,
               Notification.Position.BOTTOM_CENTER);
     }
   }

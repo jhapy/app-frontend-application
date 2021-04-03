@@ -29,7 +29,7 @@ import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.frontend.client.security.SecurityServices;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.utils.AppConst;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,6 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SecurityUserKeycloakDataProvider extends
     DefaultDataProvider<SecurityKeycloakUser, DefaultFilter> implements
     Serializable {
+
+  protected boolean allowEmptyFilter = false;
 
   @Autowired
   public SecurityUserKeycloakDataProvider() {
@@ -71,12 +73,20 @@ public class SecurityUserKeycloakDataProvider extends
     DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
     String filterStr = filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
 
-    if (StringUtils.isBlank(filterStr) || filterStr.length() < 3) {
+    if (! isAllowEmptyFilter() && ( StringUtils.isBlank(filterStr) || filterStr.length() < 3)) {
       return 0;
     }
 
     return SecurityServices.getKeycloakClient()
         .countUsers(new CountAnyMatchingQuery(filterStr, true))
         .getData().intValue();
+  }
+
+  public boolean isAllowEmptyFilter() {
+    return allowEmptyFilter;
+  }
+
+  public void setAllowEmptyFilter(boolean allowEmptyFilter) {
+    this.allowEmptyFilter = allowEmptyFilter;
   }
 }

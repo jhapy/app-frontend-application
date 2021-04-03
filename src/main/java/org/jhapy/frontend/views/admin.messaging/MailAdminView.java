@@ -34,7 +34,7 @@ import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.customFields.AttachmentField;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.dataproviders.MailDataProvider;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;

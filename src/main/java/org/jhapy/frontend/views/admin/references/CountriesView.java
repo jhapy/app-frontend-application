@@ -50,7 +50,7 @@ import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.reference.ReferenceServices;
 import org.jhapy.frontend.customFields.CountryTrlListField;
 import org.jhapy.frontend.dataproviders.CountryDataProvider;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.renderer.BooleanOkRenderer;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;

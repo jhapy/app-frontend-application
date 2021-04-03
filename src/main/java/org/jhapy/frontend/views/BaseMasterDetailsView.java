@@ -33,7 +33,7 @@ import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerFooter;
 import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.bar.AppBar.NaviMode;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.layout.SplitViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Top;

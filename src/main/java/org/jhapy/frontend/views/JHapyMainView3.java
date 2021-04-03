@@ -523,34 +523,19 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           menuData.addMenuEntry(securitySubMenu);
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_USERS);
-            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
-            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_USERS));
-            subMenu.setTargetClass(SecurityKeycloakUsersView.class);
-            subMenu.setParentMenuEntry(securitySubMenu);
-            subMenu.setHasChildNodes(false);
+            MenuEntry subMenu = getSecurityUserMenuEntry(securitySubMenu);
 
             menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ROLES);
-            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
-            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_ROLES));
-            subMenu.setTargetClass(SecurityKeycloakRolesView.class);
-            subMenu.setParentMenuEntry(securitySubMenu);
-            subMenu.setHasChildNodes(false);
+            MenuEntry subMenu = getSecurityRoleMenuEntry(securitySubMenu);
 
             menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_GROUPS);
-            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
-            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY_GROUPS));
-            subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
-            subMenu.setParentMenuEntry(securitySubMenu);
-            subMenu.setHasChildNodes(false);
+            MenuEntry subMenu = getSecurityGroupsMenuEntry(securitySubMenu);
 
             menuData.addMenuEntry(subMenu);
           }
@@ -621,6 +606,39 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
       }
       naviDrawer.refreshMenu();
     }
+  }
+
+  protected MenuEntry getSecurityUserMenuEntry(MenuEntry parentEntry ) {
+    MenuEntry subMenu = new MenuEntry(AppConst.PAGE_USERS);
+    subMenu.setVaadinIcon(VaadinIcon.QUESTION);
+    subMenu.setTitle(UI.getCurrent().getTranslation(AppConst.TITLE_SECURITY_USERS));
+    subMenu.setTargetClass(SecurityKeycloakUsersView.class);
+    subMenu.setParentMenuEntry(parentEntry);
+    subMenu.setHasChildNodes(false);
+
+    return subMenu;
+  }
+
+  protected MenuEntry getSecurityRoleMenuEntry(MenuEntry parentEntry ) {
+    MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ROLES);
+    subMenu.setVaadinIcon(VaadinIcon.QUESTION);
+    subMenu.setTitle(UI.getCurrent().getTranslation(AppConst.TITLE_SECURITY_ROLES));
+    subMenu.setTargetClass(SecurityKeycloakRolesView.class);
+    subMenu.setParentMenuEntry(parentEntry);
+    subMenu.setHasChildNodes(false);
+
+    return subMenu;
+  }
+
+  protected MenuEntry getSecurityGroupsMenuEntry(MenuEntry parentEntry ) {
+    MenuEntry subMenu = new MenuEntry(AppConst.PAGE_GROUPS);
+    subMenu.setVaadinIcon(VaadinIcon.QUESTION);
+    subMenu.setTitle(UI.getCurrent().getTranslation(AppConst.TITLE_SECURITY_GROUPS));
+    subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
+    subMenu.setParentMenuEntry(parentEntry);
+    subMenu.setHasChildNodes(false);
+
+    return subMenu;
   }
 
   /**

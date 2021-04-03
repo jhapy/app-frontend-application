@@ -32,6 +32,7 @@ import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.dto.utils.Pageable.Order;
 import org.jhapy.dto.utils.Pageable.Order.Direction;
+import org.jhapy.dto.utils.Slice;
 import org.jhapy.frontend.utils.Pair;
 
 /**
@@ -39,7 +40,7 @@ import org.jhapy.frontend.utils.Pair;
  * @version 1.0
  * @since 2019-06-03
  */
-public abstract class PageableDataProvider<T extends Serializable, F>
+public abstract class SliceDataProvider<T extends Serializable, F>
     extends AbstractBackEndDataProvider<T, F> {
 
   private static Order queryOrderToSpringOrder(QuerySortOrder queryOrder) {
@@ -50,34 +51,10 @@ public abstract class PageableDataProvider<T extends Serializable, F>
 
   public static Pair<Integer, Integer> limitAndOffsetToPageSizeAndNumber(
       int offset, int limit) {
-/*
-    int precision = 1000000;
-    int pageSize = limit;
-    int page = (offset + limit) / limit -1;
-    page = Math.round(page * precision) / precision;
-    return Pair.of(pageSize, page);
-
- */
-    /*
-    int window, leftShift;
-    for (window = limit; window <= offset + limit; window++) {
-      for (leftShift = 0; leftShift <= window - limit; leftShift++) {
-        if ((offset - leftShift) % window == 0) {
-          int size = (offset - leftShift) / window;
-          int page = window;
-          return Pair.of(page, size);
-        }
-      }
-    }
-    return Pair.of(offset + limit , 0);
-*/
-
-
-    int minPageSize = limit;
     int lastIndex = offset + limit - 1;
     int maxPageSize = lastIndex + 1;
 
-    for (double pageSize = minPageSize; pageSize <= maxPageSize; pageSize++) {
+    for (double pageSize = limit; pageSize <= maxPageSize; pageSize++) {
       int startPage = (int) (offset / pageSize);
       int endPage = (int) (lastIndex / pageSize);
       if (startPage == endPage) {
@@ -93,11 +70,11 @@ public abstract class PageableDataProvider<T extends Serializable, F>
   @Override
   protected Stream<T> fetchFromBackEnd(Query<T, F> query) {
     Pageable pageable = getPageable(query);
-    Page<T> result = fetchFromBackEnd(query, pageable);
+    Slice<T> result = fetchFromBackEnd(query, pageable);
     return fromPageable(result, pageable, query);
   }
 
-  protected abstract Page<T> fetchFromBackEnd(Query<T, F> query, Pageable pageable);
+  protected abstract Slice<T> fetchFromBackEnd(Query<T, F> query, Pageable pageable);
 
   private Pageable getPageable(Query<T, F> q) {
     Pair<Integer, Integer> pageSizeAndNumber = limitAndOffsetToPageSizeAndNumber(
@@ -114,7 +91,7 @@ public abstract class PageableDataProvider<T extends Serializable, F>
       sortOrders = q.getSortOrders();
     }
     List<Order> orders = sortOrders.stream()
-        .map(PageableDataProvider::queryOrderToSpringOrder)
+        .map(SliceDataProvider::queryOrderToSpringOrder)
         .collect(Collectors.toList());
     if (orders.isEmpty()) {
       return null;
@@ -125,7 +102,7 @@ public abstract class PageableDataProvider<T extends Serializable, F>
 
   protected abstract List<QuerySortOrder> getDefaultSortOrders();
 
-  private <T extends Serializable> Stream<T> fromPageable(Page<T> result, Pageable pageable,
+  private <T extends Serializable> Stream<T> fromPageable(Slice<T> result, Pageable pageable,
       Query<T, ?> query) {
     List<T> items = result.getContent();
 

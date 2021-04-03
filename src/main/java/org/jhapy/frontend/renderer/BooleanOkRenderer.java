@@ -18,7 +18,10 @@
 
 package org.jhapy.frontend.renderer;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.function.ValueProvider;
 import org.jhapy.frontend.utils.AppConst;
@@ -28,15 +31,22 @@ import org.jhapy.frontend.utils.AppConst;
  * @version 1.0
  * @since 2019-02-14
  */
-public class BooleanOkRenderer<SOURCE> extends ComponentRenderer<Image, SOURCE> {
+public class BooleanOkRenderer<SOURCE> extends ComponentRenderer<Component, SOURCE> {
 
   protected ValueProvider<SOURCE, Boolean> valueProvider;
+  protected ValueProvider<SOURCE, String> textProvider;
 
   public BooleanOkRenderer(ValueProvider<SOURCE, Boolean> valueProvider) {
     this.valueProvider = valueProvider;
   }
 
-  public Image createComponent(SOURCE item) {
+  public BooleanOkRenderer(ValueProvider<SOURCE, Boolean> valueProvider,
+      ValueProvider<SOURCE, String> textProvider) {
+    this.valueProvider = valueProvider;
+    this.textProvider = textProvider;
+  }
+
+  public Component createComponent(SOURCE item) {
     Image image = new Image();
 
     Boolean val = valueProvider.apply(item);
@@ -47,6 +57,12 @@ public class BooleanOkRenderer<SOURCE> extends ComponentRenderer<Image, SOURCE> 
       image.setSrc(AppConst.ICON_BLANK);
     }
 
-    return image;
+    if ( textProvider != null ) {
+      HorizontalLayout horizontalLayout = new HorizontalLayout();
+      horizontalLayout.add(image);
+      horizontalLayout.add(new Span(textProvider.apply(item)));
+      return horizontalLayout;
+    } else
+      return image;
   }
 }

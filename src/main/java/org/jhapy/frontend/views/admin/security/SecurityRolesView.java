@@ -32,7 +32,7 @@ import org.jhapy.dto.serviceQuery.generic.DeleteByStrIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.security.SecurityServices;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityRoleDataProvider;
 import org.jhapy.frontend.renderer.BooleanOkRenderer;
 import org.jhapy.frontend.utils.AppConst;

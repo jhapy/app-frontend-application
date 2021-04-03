@@ -20,6 +20,7 @@ package org.jhapy.frontend.converter;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
@@ -54,13 +55,7 @@ public class SecurityUserConverter extends
     result.setUsername(source.getUsername());
     result.setEmailVerified(source.getEmailVerified());
     result.setEnabled(source.getIsActivated());
-    result.setAttributes(new HashMap<>());
-    if (source.getTitle() != null) {
-      result.getAttributes().put("title", Collections.singletonList(source.getTitle()));
-    }
-    if (source.getMobileNumber() != null) {
-      result.getAttributes().put("phone", Collections.singletonList(source.getMobileNumber()));
-    }
+    source.getAttributes().forEach((s, o) -> result.getAttributes().put(s, Collections.singletonList(o.toString())));
     //result.getAttributes().put("picture", Collections.singletonList( source.getPicture() ));
     return result;
   }
@@ -110,6 +105,10 @@ public class SecurityUserConverter extends
         }
       }
     }
+    Objects.requireNonNull(source.getAttributes())
+        .keySet().stream().filter( s -> ! s.equalsIgnoreCase("title") && ! s.equalsIgnoreCase("phone") &&
+        ! s.equalsIgnoreCase("locale") && ! s.equalsIgnoreCase("picture")).forEach(s -> result.getAttributes().put( s, source.getAttributes().get(s).get(0)));
+
     //result.setPicture(source.getAttributes().get("picture"));
     result.setEmailVerified(source.isEmailVerified());
     result.setIsActivated(source.isEnabled());

@@ -198,7 +198,8 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
     menu.setItemTitleProvider(MenuEntry::getTitle);
     menu.addItemClickListener(event -> {
       MenuEntry selectedItem = getSelectedItem();
-      if (selectedItem != null && !selectedItem.equals(lastMenuEntry)) {
+      //if (selectedItem != null && !selectedItem.equals(lastMenuEntry)) {
+      if (selectedItem != null) {
         navigate(selectedItem);
       }
     });

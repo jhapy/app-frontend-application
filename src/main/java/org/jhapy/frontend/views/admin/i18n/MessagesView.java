@@ -38,7 +38,7 @@ import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.i18n.I18NServices;
 import org.jhapy.frontend.components.CheckboxColumnComponent;
 import org.jhapy.frontend.customFields.MessageTrlListField;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.dataproviders.MessageDataProvider;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;

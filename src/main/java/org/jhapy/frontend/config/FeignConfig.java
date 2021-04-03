@@ -28,7 +28,7 @@ public class FeignConfig extends RibbonAutoConfiguration {
 
   @Bean
   public Level feignLoggerLevel() {
-    return Level.NONE;
+    return Level.FULL;
   }
 /*
   @Bean

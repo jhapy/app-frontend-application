@@ -27,21 +27,23 @@ import java.util.function.Consumer;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.DirectionEnum;
 import org.jhapy.dto.utils.Page;
+import org.jhapy.dto.utils.Slice;
 import org.jhapy.frontend.dataproviders.utils.FilterablePageableDataProvider;
+import org.jhapy.frontend.dataproviders.utils.FilterableSliceDataProvider;
 
 /**
  * @author jHapy Lead Dev.
  * @version 1.0
  * @since 2019-02-14
  */
-public abstract class DefaultDataProvider<T extends BaseEntity, F extends DefaultFilter> extends
-    FilterablePageableDataProvider<T, F> implements Serializable {
+public abstract class DefaultSliceDataProvider<T extends BaseEntity, F extends DefaultFilter> extends
+    FilterableSliceDataProvider<T, F> implements Serializable {
 
   private List<QuerySortOrder> defaultSortOrder;
-  private Consumer<Page<T>> pageObserver;
+  private Consumer<Slice<T>> pageObserver;
   private Query<T, F> currentQuery;
 
-  public DefaultDataProvider(DirectionEnum defaultSortDirection, String[] defaultSortFields) {
+  public DefaultSliceDataProvider(DirectionEnum defaultSortDirection, String[] defaultSortFields) {
     setSortOrder(defaultSortDirection, defaultSortFields);
   }
 
@@ -71,11 +73,11 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
     return defaultSortOrder;
   }
 
-  public Consumer<Page<T>> getPageObserver() {
+  public Consumer<Slice<T>> getPageObserver() {
     return pageObserver;
   }
 
-  public void setPageObserver(Consumer<Page<T>> pageObserver) {
+  public void setPageObserver(Consumer<Slice<T>> pageObserver) {
     this.pageObserver = pageObserver;
   }
 
@@ -83,5 +85,4 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
   public Object getId(T item) {
     return item.getId();
   }
-
 }
