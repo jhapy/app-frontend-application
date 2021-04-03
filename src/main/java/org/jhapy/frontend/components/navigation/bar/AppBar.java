@@ -21,6 +21,7 @@ package org.jhapy.frontend.components.navigation.bar;
 
 import static org.jhapy.frontend.utils.AppConst.*;
 
+import ch.carnet.kasparscherrer.IndeterminateCheckbox;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -29,6 +30,7 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -39,6 +41,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
@@ -47,6 +50,7 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
@@ -128,6 +132,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   private FlexBoxLayout searchArea;
   private TextField search;
+  private Checkbox activeFilter;
   private ArrayList<Registration> searchValueChangedListeners;
 
   private NotificationButton notificationButton;
@@ -217,9 +222,11 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     search.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
     //search.setVisible(false);
 
+    activeFilter = new Checkbox(getTranslation("action.search.showInactive"));
+    activeFilter.setValue(false);
     searchValueChangedListeners = new ArrayList<>();
 
-    searchArea = new FlexBoxLayout(search);
+    searchArea = new FlexBoxLayout(search, activeFilter);
     searchArea.setVisible(false);
     searchArea.addClassName(CLASS_NAME + "__container");
     searchArea.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -234,7 +241,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private void resetSearchArea() {
     List<Component> toRemove = new ArrayList<>();
     for (int i = 0; i < searchArea.getComponentCount(); i++) {
-      if (!searchArea.getComponentAt(i).equals(search)) {
+      if (!searchArea.getComponentAt(i).equals(search) && !searchArea.getComponentAt(i).equals(activeFilter)) {
         toRemove.add(searchArea.getComponentAt(i));
       }
     }
@@ -323,10 +330,13 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       arMenu.setCheckable(true);
       arMenu.setChecked(currentLocale.equals(new Locale("ar", "MA")));
 */
+
       Button settingsButton = UIUtils.createButton(currentUserLogin.get(), VaadinIcon.USER,
           ButtonVariant.LUMO_TERTIARY_INLINE);
-      contextMenu.addItem(settingsButton, event -> getUI().get()
-          .navigate(JHapyMainView3.get().getUserSettingsView()));
+      contextMenu.addItem(settingsButton, event -> {
+        if ( JHapyMainView3.get().getUserSettingsView() != null )
+          getUI().get().navigate(JHapyMainView3.get().getUserSettingsView());
+      });
 
       ThemeList themeList = UI.getCurrent().getElement().getThemeList();
       Button switchDarkThemeButton = UIUtils
@@ -361,6 +371,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     languageCookie.setPath("/");
     languageCookie.setSecure(true);
     VaadinService.getCurrentResponse().addCookie(languageCookie);
+
     UI.getCurrent().getPage().reload();
   }
 
@@ -566,6 +577,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   public void addSearchListener(HasValue.ValueChangeListener listener) {
     searchValueChangedListeners.add(search.addValueChangeListener(listener));
+    searchValueChangedListeners.add(activeFilter.addValueChangeListener(listener));
   }
 
   public void setSearchPlaceholder(String placeholder) {
@@ -630,6 +642,10 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   public String getSearchString() {
     return search.getValue();
+  }
+
+  public Boolean getSearchShowActive() {
+    return activeFilter.getValue();
   }
 
   @Override

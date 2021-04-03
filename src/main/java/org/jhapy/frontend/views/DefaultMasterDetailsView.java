@@ -63,7 +63,7 @@ import org.jhapy.frontend.components.detailsdrawers.DetailsDrawerHeader;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.bar.AppBar.NaviMode;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.dataproviders.DefaultSearchDataProvider;
 import org.jhapy.frontend.layout.SplitViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
@@ -134,7 +134,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     setViewDetails(createDetailsDrawer());
 
     if (initialFetch) {
-      filter(null);
+      filter(null, false);
     }
 
     if (currentEditing != null) {
@@ -221,7 +221,9 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     if (!isGlobalSearchEnabled()) {
       Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
       searchButton.addClickListener(event -> appBar.searchModeOn());
-      appBar.addSearchListener(event -> filter((String) event.getValue()));
+      appBar.addSearchListener(event -> {
+          filter(appBar.getSearchString(), appBar.getSearchShowActive());
+      });
       appBar.setSearchPlaceholder(getTranslation("element.global.search"));
       appBar.addActionItem(searchButton);
     } else {
@@ -518,11 +520,11 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     currentEditing = null;
   }
 
-  protected void filter(String filter) {
+  protected void filter(String filter, Boolean showInactive) {
     dataProvider
         .setFilter((F) new DefaultFilter(
             StringUtils.isBlank(filter) ? null : filter,
-            null));
+            showInactive));
   }
 
   protected Label getLabel(String element) {

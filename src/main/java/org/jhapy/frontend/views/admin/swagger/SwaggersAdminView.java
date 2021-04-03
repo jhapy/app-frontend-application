@@ -62,7 +62,7 @@ import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.bar.AppBar.NaviMode;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityUserDataProvider;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;

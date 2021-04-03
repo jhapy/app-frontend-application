@@ -38,7 +38,7 @@ import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.views.JHapyMainView;
 
 /**

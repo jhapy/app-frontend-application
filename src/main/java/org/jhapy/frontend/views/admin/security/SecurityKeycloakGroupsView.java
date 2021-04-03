@@ -42,7 +42,7 @@ import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.utils.SecurityConst;
 import org.jhapy.frontend.client.security.SecurityServices;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.dataproviders.SecurityGroupKeycloakDataProvider;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;

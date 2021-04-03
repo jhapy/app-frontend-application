@@ -53,7 +53,7 @@ import org.jhapy.frontend.components.CheckboxColumnComponent;
 import org.jhapy.frontend.components.ImportFileDialog;
 import org.jhapy.frontend.customFields.ActionTrlListField;
 import org.jhapy.frontend.dataproviders.ActionDataProvider;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;

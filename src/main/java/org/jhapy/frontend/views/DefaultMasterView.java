@@ -25,6 +25,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.data.provider.DataProvider;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.BaseEntity;
@@ -32,7 +33,8 @@ import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.bar.AppBar.NaviMode;
 import org.jhapy.frontend.dataproviders.DefaultDataProvider;
-import org.jhapy.frontend.dataproviders.DefaultDataProvider.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultFilter;
+import org.jhapy.frontend.dataproviders.DefaultSliceDataProvider;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.layout.size.Horizontal;
 import org.jhapy.frontend.layout.size.Top;
@@ -51,10 +53,11 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   protected final String I18N_PREFIX;
   protected Grid<T> grid;
   protected DefaultDataProvider<T, F> dataProvider;
+  protected DefaultSliceDataProvider<T, F> sliceProvider;
   private final Class<T> entityType;
   private Tabs tabs;
   private Button newRecordButton;
-  private final Class entityViewClass;
+  protected final Class entityViewClass;
   protected final MyI18NProvider myI18NProvider;
 
   public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
@@ -66,6 +69,21 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     this.dataProvider = dataProvider;
     this.entityViewClass = entityViewClass;
     this.myI18NProvider = myI18NProvider;
+  }
+
+  public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
+      DefaultSliceDataProvider<T, F> sliceProvider, Class entityViewClass,
+      MyI18NProvider myI18NProvider) {
+    super();
+    this.I18N_PREFIX = I18N_PREFIX;
+    this.entityType = entityType;
+    this.sliceProvider = sliceProvider;
+    this.entityViewClass = entityViewClass;
+    this.myI18NProvider = myI18NProvider;
+  }
+
+  protected DataProvider<T, F> getDataProvider() {
+    if ( dataProvider != null ) return dataProvider; else return sliceProvider;
   }
 
   protected Class<T> getEntityType() {
@@ -96,18 +114,22 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     if (canCreateRecord()) {
       newRecordButton = UIUtils
           .createTertiaryButton(VaadinIcon.PLUS);
-      newRecordButton.addClickListener(event -> {
-        try {
-          showDetails(entityType.getDeclaredConstructor().newInstance());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
-        }
-      });
+      addNewRecordButtonAction( newRecordButton );
       appBar.addActionItem(newRecordButton);
     }
 
     Button refreshButton = UIUtils.createTertiaryButton(VaadinIcon.REFRESH);
-    refreshButton.addClickListener(buttonClickEvent -> dataProvider.refreshAll());
+    refreshButton.addClickListener(buttonClickEvent -> getDataProvider().refreshAll());
     appBar.addActionItem(refreshButton);
+  }
+
+  protected void addNewRecordButtonAction( Button newRecordButton ) {
+    newRecordButton.addClickListener(event -> {
+      try {
+        showDetails(entityType.getDeclaredConstructor().newInstance());
+      } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+      }
+    });
   }
 
   protected String getTitle() {
@@ -123,7 +145,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     appBar.disableGlobalSearch();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
-    appBar.addSearchListener(event -> filter((String) event.getValue()));
+    appBar.addSearchListener(event -> filter( appBar.getSearchString() ));
     appBar.setSearchPlaceholder(getTranslation("element.global.search"));
     appBar.addActionItem(searchButton);
   }
@@ -144,9 +166,14 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   }
 
   protected void filter(String filter) {
+    if ( dataProvider != null )
     dataProvider
         .setFilter((F) new DefaultFilter(
             StringUtils.isBlank(filter) ? null : filter,
-            null));
+            JHapyMainView3.get().getAppBar().getSearchShowActive()));
+    else
+      sliceProvider.setFilter((F) new DefaultFilter(
+          StringUtils.isBlank(filter) ? null : filter,
+          JHapyMainView3.get().getAppBar().getSearchShowActive()));
   }
 }
