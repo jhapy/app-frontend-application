@@ -22,7 +22,9 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -155,6 +157,14 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     content.setBoxSizing(BoxSizing.BORDER_BOX);
     content.setHeightFull();
     content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
+
+    Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0 ) );
+    dataProvider.setPageObserver( executionPage -> {
+      nbRows.setText(getTranslation("element.global.nbRows", executionPage.getTotalElements() ) );
+    });
+
+    FooterRow footerRow = grid.appendFooterRow();
+    footerRow.getCell(grid.getColumns().get(0)).setComponent(nbRows);
     return content;
   }
 

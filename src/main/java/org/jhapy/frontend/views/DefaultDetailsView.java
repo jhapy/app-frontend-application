@@ -187,7 +187,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
       Button newRecordButton = UIUtils.createTertiaryButton(VaadinIcon.PLUS);
       newRecordButton.addClickListener(event -> {
         try {
-          showDetails(entityType.getDeclaredConstructor().newInstance());
+          showDetails(getNewInstance());
           appBar.setTitle(getTitle(currentEditing));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
         }
@@ -198,6 +198,11 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
     if (isShowTabs()) {
       buildTabs();
     }
+  }
+
+  protected T getNewInstance()
+      throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    return entityType.getDeclaredConstructor().newInstance();
   }
 
   protected boolean canCreateRecord() {
@@ -298,6 +303,9 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   }
 
   protected void showDetails(T entity) {
+    if ( entity == null )
+      return;
+
     this.binder = new BeanValidationBinder<>(entityType);
     currentEditing = entity;
     detailsDrawer.setContent(createDetails(entity));

@@ -139,9 +139,9 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
     loadRemoteLocales(iso3Language);
 
     if (s.startsWith("element.")) {
-      return getElementTranslation(s.substring(s.indexOf('.') + 1), iso3Language);
+      return getElementTranslation(s.substring(s.indexOf('.') + 1), iso3Language, objects);
     } else if (s.startsWith("action.")) {
-      return getActionTranslation(s.substring(s.indexOf('.') + 1), iso3Language);
+      return getActionTranslation(s.substring(s.indexOf('.') + 1), iso3Language, objects);
     } else if (s.startsWith("message.")) {
       return getMessageTranslation(s.substring(s.indexOf('.') + 1), iso3Language, objects);
     } else {
@@ -179,12 +179,16 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
     }
   }
 
-  protected String getElementTranslation(String s, String iso3Language) {
+  protected String getElementTranslation(String s, String iso3Language, Object... objects) {
     String loggerPrefix = getLoggerPrefix("getElementTranslation", s, iso3Language);
     ElementTrl elementTrl = getElementTrl(s, iso3Language);
 
     if (elementTrl != null) {
-      return elementTrl.getValue();
+      if (objects.length > 0) {
+        return String.format(elementTrl.getValue(), objects);
+      } else {
+        return elementTrl.getValue();
+      }
     } else {
       logger().debug(loggerPrefix + "Translation for '" + s + "' in " + iso3Language
           + " not found");
@@ -204,12 +208,16 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
     }
   }
 
-  protected String getActionTranslation(String s, String iso3Language) {
+  protected String getActionTranslation(String s, String iso3Language, Object... objects) {
     String loggerPrefix = getLoggerPrefix("getActionTranslation", s, iso3Language);
     ActionTrl actionTrl = getActionTrl(s, iso3Language);
 
     if (actionTrl != null) {
-      return actionTrl.getValue();
+      if (objects.length > 0) {
+        return String.format(actionTrl.getValue(), objects);
+      } else {
+        return actionTrl.getValue();
+      }
     } else {
       logger().debug(loggerPrefix + "Translation for '" + s + "' in " + iso3Language
           + " not found");
