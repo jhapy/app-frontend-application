@@ -31,12 +31,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseInnerEntity;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.events.CustomListFieldFreeValueChangeEvent;
-import org.jhapy.frontend.components.events.CustomListFieldValueChangeEvent;
-import org.jhapy.frontend.dataproviders.DefaultBackend;
 import org.jhapy.frontend.dataproviders.DefaultBackendFree;
 
 /**
@@ -62,7 +59,9 @@ public abstract class DefaultCustomListFieldFree<C extends BaseInnerEntity> exte
     return "<vaadin-crud-edit aria-label=\"" + crudI18n + "\"></vaadin-crud-edit>";
   }
 
-  public DefaultBackendFree<C> getDataProvider() { return dataProvider; }
+  public DefaultBackendFree<C> getDataProvider() {
+    return dataProvider;
+  }
 
   @Override
   public List<C> getValue() {
@@ -151,9 +150,11 @@ public abstract class DefaultCustomListFieldFree<C extends BaseInnerEntity> exte
 
     public void setValues(Collection<C> values) {
       fieldsMap.clear();
-      values.forEach(value -> {if (value.getTemporaryId() == null) {
-        value.setTemporaryId(uniqueLong.incrementAndGet());
-      }});
+      values.forEach(value -> {
+        if (value.getTemporaryId() == null) {
+          value.setTemporaryId(uniqueLong.incrementAndGet());
+        }
+      });
       fieldsMap.addAll(values);
     }
 

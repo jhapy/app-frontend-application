@@ -57,7 +57,6 @@ import org.jhapy.frontend.utils.TextColor;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.css.Shadow;
-import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.admin.audit.SessionView;
 import org.jhapy.frontend.views.admin.configServer.CloudConfigView;
 import org.jhapy.frontend.views.admin.eureka.EurekaView;
@@ -290,12 +289,9 @@ public abstract class JHapyMainView extends FlexBoxLayout
         /*
          * i18N
          */
-        boolean isDisplayI18n = false;
-        if (SecurityUtils.isAccessGranted(ActionsView.class) ||
+        boolean isDisplayI18n = SecurityUtils.isAccessGranted(ActionsView.class) ||
             SecurityUtils.isAccessGranted(ElementsView.class) ||
-            SecurityUtils.isAccessGranted(MessagesView.class)) {
-          isDisplayI18n = true;
-        }
+            SecurityUtils.isAccessGranted(MessagesView.class);
 
         if (isDisplayI18n) {
           NaviItem i18nSubmenu = menu
@@ -334,10 +330,7 @@ public abstract class JHapyMainView extends FlexBoxLayout
 
           addToReferencesMenu(menu, referenceSubMenu);
 
-          boolean isDisplayReference = false;
-          if (SecurityUtils.isAccessGranted(CountriesView.class)) {
-            isDisplayReference = true;
-          }
+          boolean isDisplayReference = SecurityUtils.isAccessGranted(CountriesView.class);
 
           if (isDisplayReference) {
 
@@ -351,13 +344,11 @@ public abstract class JHapyMainView extends FlexBoxLayout
         /*
          * Notification
          */
-        boolean isDisplayNotifications = false;
-        if (SecurityUtils.isAccessGranted(MailTemplatesAdminView.class) ||
-            SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class) ||
-            SecurityUtils.isAccessGranted(SmsAdminView.class) ||
-            SecurityUtils.isAccessGranted(MailAdminView.class)) {
-          isDisplayNotifications = true;
-        }
+        boolean isDisplayNotifications =
+            SecurityUtils.isAccessGranted(MailTemplatesAdminView.class) ||
+                SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class) ||
+                SecurityUtils.isAccessGranted(SmsAdminView.class) ||
+                SecurityUtils.isAccessGranted(MailAdminView.class);
 
         if (isDisplayNotifications) {
           NaviItem notificationsSubMenu = menu

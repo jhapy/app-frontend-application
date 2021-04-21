@@ -57,12 +57,13 @@ public class BooleanOkRenderer<SOURCE> extends ComponentRenderer<Component, SOUR
       image.setSrc(AppConst.ICON_BLANK);
     }
 
-    if ( textProvider != null ) {
+    if (textProvider != null) {
       HorizontalLayout horizontalLayout = new HorizontalLayout();
       horizontalLayout.add(image);
       horizontalLayout.add(new Span(textProvider.apply(item)));
       return horizontalLayout;
-    } else
+    } else {
       return image;
+    }
   }
 }

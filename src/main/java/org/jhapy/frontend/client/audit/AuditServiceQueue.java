@@ -21,7 +21,8 @@ package org.jhapy.frontend.client.audit;
 import org.jhapy.dto.messageQueue.EndSession;
 import org.jhapy.dto.messageQueue.NewSession;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,14 +33,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuditServiceQueue {
 
-  @Autowired
-  AmqpTemplate jmsTemplate;
+  private final AmqpTemplate amqpTemplate;
+  private final Queue newSessionQueue;
+  private final Queue endSessionQueue;
+
+  public AuditServiceQueue(AmqpTemplate amqpTemplate,
+      @Qualifier("newSessionQueue") Queue newSessionQueue,
+      @Qualifier("endSessionQueue") Queue endSessionQueue) {
+    this.amqpTemplate = amqpTemplate;
+    this.newSessionQueue = newSessionQueue;
+    this.endSessionQueue = endSessionQueue;
+  }
 
   public void newSession(final NewSession newSession) {
-    jmsTemplate.convertAndSend("newSession", newSession);
+    amqpTemplate.convertAndSend(newSessionQueue.getName(), newSession);
   }
 
   public void endSession(final EndSession endSession) {
-    jmsTemplate.convertAndSend("endSession", endSession);
+    amqpTemplate.convertAndSend(endSessionQueue.getName(), endSession);
   }
 }

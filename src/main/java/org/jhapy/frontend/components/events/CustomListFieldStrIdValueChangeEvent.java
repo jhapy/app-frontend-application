@@ -20,9 +20,7 @@ package org.jhapy.frontend.components.events;
 
 import com.vaadin.flow.component.HasValue;
 import java.util.List;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseEntityStrId;
-import org.jhapy.frontend.customFields.DefaultCustomListField;
 import org.jhapy.frontend.customFields.DefaultCustomListFieldStrId;
 
 public class CustomListFieldStrIdValueChangeEvent<C extends BaseEntityStrId> implements

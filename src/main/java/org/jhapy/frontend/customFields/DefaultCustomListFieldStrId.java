@@ -31,13 +31,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseEntityStrId;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.events.CustomListFieldStrIdValueChangeEvent;
-import org.jhapy.frontend.components.events.CustomListFieldValueChangeEvent;
-import org.jhapy.frontend.dataproviders.DefaultBackend;
-import org.jhapy.frontend.dataproviders.DefaultBackendFree;
 import org.jhapy.frontend.dataproviders.DefaultBackendStrId;
 
 /**
@@ -150,9 +146,11 @@ public abstract class DefaultCustomListFieldStrId<C extends BaseEntityStrId> ext
 
     public void setValues(Collection<C> values) {
       fieldsMap.clear();
-      values.forEach(value -> {if (value.getTemporaryId() == null) {
-        value.setTemporaryId(uniqueLong.incrementAndGet());
-      }});
+      values.forEach(value -> {
+        if (value.getTemporaryId() == null) {
+          value.setTemporaryId(uniqueLong.incrementAndGet());
+        }
+      });
       fieldsMap.addAll(values);
     }
 

@@ -52,7 +52,7 @@ public class I18NServiceFallback implements I18NService, HasLogger,
   public I18NServiceFallback create(Throwable cause) {
     if (cause != null) {
       String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-          : "Unknown error occurred : " + cause.toString();
+          : "Unknown error occurred : " + cause;
       // I don't see this log statement
       logger().debug("Client fallback called for the cause : {}", errMessage);
     }

@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseInnerEntity;
 
 /**
@@ -110,8 +109,8 @@ public abstract class DefaultBackendFree<C extends BaseInnerEntity> extends
     long maxId = 0;
     List<C> result = stream.collect(Collectors.toList());
     for (C c : result) {
-      if ((long) c.getTemporaryId() > maxId) {
-        maxId = (long) c.getTemporaryId();
+      if (c.getTemporaryId() > maxId) {
+        maxId = c.getTemporaryId();
       }
     }
     uniqueLong.set(maxId + 1);

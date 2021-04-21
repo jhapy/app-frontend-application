@@ -85,7 +85,11 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   }
 
   protected DataProvider<T, F> getDataProvider() {
-    if ( dataProvider != null ) return dataProvider; else return sliceProvider;
+    if (dataProvider != null) {
+      return dataProvider;
+    } else {
+      return sliceProvider;
+    }
   }
 
   protected Class<T> getEntityType() {
@@ -116,7 +120,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     if (canCreateRecord()) {
       newRecordButton = UIUtils
           .createTertiaryButton(VaadinIcon.PLUS);
-      addNewRecordButtonAction( newRecordButton );
+      addNewRecordButtonAction(newRecordButton);
       appBar.addActionItem(newRecordButton);
     }
 
@@ -125,7 +129,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     appBar.addActionItem(refreshButton);
   }
 
-  protected void addNewRecordButtonAction( Button newRecordButton ) {
+  protected void addNewRecordButtonAction(Button newRecordButton) {
     newRecordButton.addClickListener(event -> {
       try {
         showDetails(entityType.getDeclaredConstructor().newInstance());
@@ -147,7 +151,7 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     appBar.disableGlobalSearch();
     Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
     searchButton.addClickListener(event -> appBar.searchModeOn());
-    appBar.addSearchListener(event -> filter( appBar.getSearchString() ));
+    appBar.addSearchListener(event -> filter(appBar.getSearchString()));
     appBar.setSearchPlaceholder(getTranslation("element.global.search"));
     appBar.addActionItem(searchButton);
   }
@@ -158,9 +162,9 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
     content.setHeightFull();
     content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
 
-    Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0 ) );
-    dataProvider.setPageObserver( executionPage -> {
-      nbRows.setText(getTranslation("element.global.nbRows", executionPage.getTotalElements() ) );
+    Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0));
+    dataProvider.setPageObserver(executionPage -> {
+      nbRows.setText(getTranslation("element.global.nbRows", executionPage.getTotalElements()));
     });
 
     FooterRow footerRow = grid.appendFooterRow();
@@ -176,14 +180,15 @@ public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultF
   }
 
   protected void filter(String filter) {
-    if ( dataProvider != null )
-    dataProvider
-        .setFilter((F) new DefaultFilter(
-            StringUtils.isBlank(filter) ? null : filter,
-            JHapyMainView3.get().getAppBar().getSearchShowActive()));
-    else
+    if (dataProvider != null) {
+      dataProvider
+          .setFilter((F) new DefaultFilter(
+              StringUtils.isBlank(filter) ? null : filter,
+              JHapyMainView3.get().getAppBar().getSearchShowActive()));
+    } else {
       sliceProvider.setFilter((F) new DefaultFilter(
           StringUtils.isBlank(filter) ? null : filter,
           JHapyMainView3.get().getAppBar().getSearchShowActive()));
+    }
   }
 }

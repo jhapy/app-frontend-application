@@ -51,7 +51,7 @@ public class ResourceServiceFallback implements ResourceService, HasLogger,
   public ResourceServiceFallback create(Throwable cause) {
     if (cause != null) {
       String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-          : "Unknown error occurred : " + cause.toString();
+          : "Unknown error occurred : " + cause;
       // I don't see this log statement
       logger().debug("Client fallback called for the cause : {}", errMessage);
     }

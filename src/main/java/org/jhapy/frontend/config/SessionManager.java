@@ -2,7 +2,6 @@ package org.jhapy.frontend.config;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.vaadin.flow.server.ServiceInitEvent;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import java.time.Instant;
@@ -11,14 +10,11 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.EndSession;
-import org.jhapy.dto.messageQueue.NewSession;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.jhapy.frontend.utils.SessionInfo;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * @author Alexandre Clavaud.

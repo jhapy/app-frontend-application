@@ -223,7 +223,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
       Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
       searchButton.addClickListener(event -> appBar.searchModeOn());
       appBar.addSearchListener(event -> {
-          filter(appBar.getSearchString(), appBar.getSearchShowActive());
+        filter(appBar.getSearchString(), appBar.getSearchShowActive());
       });
       appBar.setSearchPlaceholder(getTranslation("element.global.search"));
       appBar.addActionItem(searchButton);
@@ -282,9 +282,9 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     content.setHeightFull();
     content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
 
-    Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0 ) );
-    dataProvider.setPageObserver( executionPage -> {
-      nbRows.setText(getTranslation("element.global.nbRows", executionPage.getTotalElements() ) );
+    Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0));
+    dataProvider.setPageObserver(executionPage -> {
+      nbRows.setText(getTranslation("element.global.nbRows", executionPage.getTotalElements()));
     });
 
     FooterRow footerRow = grid.appendFooterRow();

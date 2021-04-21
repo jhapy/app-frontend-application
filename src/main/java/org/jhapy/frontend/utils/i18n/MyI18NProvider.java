@@ -109,7 +109,7 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   }
 
   public void reload(String iso3Lang) {
-    if ( loadedLocale != null && loadedLocale.equalsIgnoreCase(iso3Lang)) {
+    if (loadedLocale != null && loadedLocale.equalsIgnoreCase(iso3Lang)) {
       reloadElements();
       reloadMessages();
       reloadActions();
@@ -254,10 +254,11 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
       return s;
     }
   }
+
   public synchronized void loadRemoteLocales(String iso3Language) {
     String loggerPrefix = getLoggerPrefix("loadRemoteLocales", iso3Language);
 
-    if (loadedLocale != null && loadedLocale.equals(iso3Language) ) {
+    if (loadedLocale != null && loadedLocale.equals(iso3Language)) {
       return;
     }
 
@@ -401,8 +402,8 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   public void elementUpdate(I18NUpdateTypeEnum updateType, Element element) {
     String loggerPrefix = getLoggerPrefix("elementUpdate", updateType, element);
 
-    if ( updateType.equals(I18NUpdateTypeEnum.DELETE)) {
-      logger().debug(loggerPrefix+"Delete record");
+    if (updateType.equals(I18NUpdateTypeEnum.DELETE)) {
+      logger().debug(loggerPrefix + "Delete record");
       elementMap.remove(element.getName());
     }
   }
@@ -410,12 +411,12 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   public void elementTrlUpdate(I18NUpdateTypeEnum updateType, ElementTrl elementTrl) {
     String loggerPrefix = getLoggerPrefix("elementTrlUpdate", updateType, elementTrl);
 
-    if ( loadedLocale != null && loadedLocale.equalsIgnoreCase(elementTrl.getIso3Language())) {
-      if ( updateType.equals(I18NUpdateTypeEnum.DELETE)) {
-        logger().debug(loggerPrefix+"Delete record");
+    if (loadedLocale != null && loadedLocale.equalsIgnoreCase(elementTrl.getIso3Language())) {
+      if (updateType.equals(I18NUpdateTypeEnum.DELETE)) {
+        logger().debug(loggerPrefix + "Delete record");
         elementMap.remove(elementTrl.getName());
       } else {
-        logger().debug(loggerPrefix+"Create or Update record");
+        logger().debug(loggerPrefix + "Create or Update record");
         elementMap.put(elementTrl.getName(), elementTrl);
       }
     }
@@ -424,8 +425,8 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   public void actionUpdate(I18NUpdateTypeEnum updateType, Action action) {
     String loggerPrefix = getLoggerPrefix("actionUpdate", updateType, action);
 
-    if ( updateType.equals(I18NUpdateTypeEnum.DELETE)) {
-      logger().debug(loggerPrefix+"Delete record");
+    if (updateType.equals(I18NUpdateTypeEnum.DELETE)) {
+      logger().debug(loggerPrefix + "Delete record");
       actionMap.remove(action.getName());
     }
   }
@@ -433,12 +434,12 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   public void actionTrlUpdate(I18NUpdateTypeEnum updateType, ActionTrl actionTrl) {
     String loggerPrefix = getLoggerPrefix("actionTrlUpdate", updateType, actionTrl);
 
-    if ( loadedLocale != null && loadedLocale.equalsIgnoreCase(actionTrl.getIso3Language())) {
-      if ( updateType.equals(I18NUpdateTypeEnum.DELETE)) {
-        logger().debug(loggerPrefix+"Delete record");
+    if (loadedLocale != null && loadedLocale.equalsIgnoreCase(actionTrl.getIso3Language())) {
+      if (updateType.equals(I18NUpdateTypeEnum.DELETE)) {
+        logger().debug(loggerPrefix + "Delete record");
         actionMap.remove(actionTrl.getName());
       } else {
-        logger().debug(loggerPrefix+"Create or Update record");
+        logger().debug(loggerPrefix + "Create or Update record");
         actionMap.put(actionTrl.getName(), actionTrl);
       }
     }
@@ -447,8 +448,8 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   public void messageUpdate(I18NUpdateTypeEnum updateType, Message message) {
     String loggerPrefix = getLoggerPrefix("messageUpdate", updateType, message);
 
-    if ( updateType.equals(I18NUpdateTypeEnum.DELETE)) {
-      logger().debug(loggerPrefix+"Delete record");
+    if (updateType.equals(I18NUpdateTypeEnum.DELETE)) {
+      logger().debug(loggerPrefix + "Delete record");
       messageMap.remove(message.getName());
     }
   }
@@ -456,12 +457,12 @@ public class MyI18NProvider implements I18NProvider, HasLogger {
   public void messageTrlUpdate(I18NUpdateTypeEnum updateType, MessageTrl messageTrl) {
     String loggerPrefix = getLoggerPrefix("messageTrlUpdate", updateType, messageTrl);
 
-    if ( loadedLocale != null && loadedLocale.equalsIgnoreCase(messageTrl.getIso3Language())) {
-      if ( updateType.equals(I18NUpdateTypeEnum.DELETE)) {
-        logger().debug(loggerPrefix+"Delete record");
+    if (loadedLocale != null && loadedLocale.equalsIgnoreCase(messageTrl.getIso3Language())) {
+      if (updateType.equals(I18NUpdateTypeEnum.DELETE)) {
+        logger().debug(loggerPrefix + "Delete record");
         messageMap.remove(messageTrl.getName());
       } else {
-        logger().debug(loggerPrefix+"Create or Update record");
+        logger().debug(loggerPrefix + "Create or Update record");
         messageMap.put(messageTrl.getName(), messageTrl);
       }
     }

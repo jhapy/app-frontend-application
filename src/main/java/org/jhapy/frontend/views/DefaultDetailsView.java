@@ -71,6 +71,7 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
  */
 public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame implements
     HasLogger, HasUrlParameter<String> {
+
   protected static final Set<String> rtlSet;
 
   static {
@@ -303,8 +304,9 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
   }
 
   protected void showDetails(T entity) {
-    if ( entity == null )
+    if (entity == null) {
       return;
+    }
 
     this.binder = new BeanValidationBinder<>(entityType);
     currentEditing = entity;
@@ -430,7 +432,8 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
           .collect(Collectors.joining(", "));
 
       Notification
-          .show(getTranslation("message.global.validationErrorMessage", errorText + errorText2), 3000,
+          .show(getTranslation("message.global.validationErrorMessage", errorText + errorText2),
+              3000,
               Notification.Position.BOTTOM_CENTER);
     }
   }

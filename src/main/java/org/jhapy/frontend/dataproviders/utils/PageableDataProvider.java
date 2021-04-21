@@ -72,7 +72,6 @@ public abstract class PageableDataProvider<T extends Serializable, F>
     return Pair.of(offset + limit , 0);
 */
 
-
     int minPageSize = limit;
     int lastIndex = offset + limit - 1;
     int maxPageSize = lastIndex + 1;

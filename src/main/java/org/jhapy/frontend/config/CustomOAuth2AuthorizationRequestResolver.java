@@ -17,8 +17,8 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 public class CustomOAuth2AuthorizationRequestResolver implements
     OAuth2AuthorizationRequestResolver, HasLogger {
 
-  private OAuth2AuthorizationRequestResolver defaultResolver;
-  private boolean forceHttps;
+  private final OAuth2AuthorizationRequestResolver defaultResolver;
+  private final boolean forceHttps;
 
   public CustomOAuth2AuthorizationRequestResolver(
       ClientRegistrationRepository repo, String authorizationRequestBaseUri, boolean forceHttps) {

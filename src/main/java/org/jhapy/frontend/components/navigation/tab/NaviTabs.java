@@ -33,7 +33,7 @@ import org.jhapy.frontend.views.JHapyMainView;
  */
 public class NaviTabs extends Tabs {
 
-  private final ComponentEventListener<SelectedChangeEvent> listener = (ComponentEventListener<SelectedChangeEvent>) selectedChangeEvent -> navigateToSelectedTab();
+  private final ComponentEventListener<SelectedChangeEvent> listener = selectedChangeEvent -> navigateToSelectedTab();
 
   public NaviTabs() {
     addSelectedChangeListener(listener);

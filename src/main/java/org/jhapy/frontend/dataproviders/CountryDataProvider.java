@@ -29,7 +29,6 @@ import org.jhapy.dto.utils.AppContext;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.frontend.client.reference.ReferenceServices;
-import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.utils.AppConst;
 import org.springframework.beans.factory.annotation.Autowired;
 

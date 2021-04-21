@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.DirectionEnum;
-import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Slice;
-import org.jhapy.frontend.dataproviders.utils.FilterablePageableDataProvider;
 import org.jhapy.frontend.dataproviders.utils.FilterableSliceDataProvider;
 
 /**

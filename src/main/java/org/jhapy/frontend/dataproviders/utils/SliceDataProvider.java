@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.dto.utils.Pageable.Order;
 import org.jhapy.dto.utils.Pageable.Order.Direction;

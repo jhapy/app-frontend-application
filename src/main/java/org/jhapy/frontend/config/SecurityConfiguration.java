@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.jhapy.commons.security.oauth2.AudienceValidator;
 import org.jhapy.commons.security.oauth2.JwtGrantedAuthorityConverter;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.commons.utils.SpringProfileConstants;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
@@ -40,8 +39,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -215,8 +212,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         //.loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
         .loginPage(appProperties.getAuthorization().getLoginRootUrl()
             + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
-    logger().debug(loggerPrefix + "Using login root url : " + (appProperties.getAuthorization().getLoginRootUrl()
-        + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm ) );
+    logger().debug(loggerPrefix + "Using login root url : " + (
+        appProperties.getAuthorization().getLoginRootUrl()
+            + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm));
   }
 
   Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {

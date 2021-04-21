@@ -29,7 +29,6 @@ import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.frontend.client.security.SecurityServices;
-import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.utils.AppConst;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -73,7 +72,7 @@ public class SecurityUserKeycloakDataProvider extends
     DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
     String filterStr = filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
 
-    if (! isAllowEmptyFilter() && ( StringUtils.isBlank(filterStr) || filterStr.length() < 3)) {
+    if (!isAllowEmptyFilter() && (StringUtils.isBlank(filterStr) || filterStr.length() < 3)) {
       return 0;
     }
 

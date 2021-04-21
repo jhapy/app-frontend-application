@@ -19,9 +19,8 @@
 package org.jhapy.frontend.components.navigation.bar;
 
 
-import static org.jhapy.frontend.utils.AppConst.*;
+import static org.jhapy.frontend.utils.AppConst.THEME_ATTRIBUTE;
 
-import ch.carnet.kasparscherrer.IndeterminateCheckbox;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -41,7 +40,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
@@ -50,7 +48,6 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
@@ -71,7 +68,6 @@ import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.utils.AppContext;
 import org.jhapy.dto.utils.StoredFile;
-import org.jhapy.frontend.client.i18n.I18NServices;
 import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.tab.NaviTab;
 import org.jhapy.frontend.components.navigation.tab.NaviTabs;
@@ -82,7 +78,6 @@ import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.SecurityUtils2;
-import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
@@ -241,7 +236,8 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private void resetSearchArea() {
     List<Component> toRemove = new ArrayList<>();
     for (int i = 0; i < searchArea.getComponentCount(); i++) {
-      if (!searchArea.getComponentAt(i).equals(search) && !searchArea.getComponentAt(i).equals(activeFilter)) {
+      if (!searchArea.getComponentAt(i).equals(search) && !searchArea.getComponentAt(i)
+          .equals(activeFilter)) {
         toRemove.add(searchArea.getComponentAt(i));
       }
     }
@@ -334,8 +330,9 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
       Button settingsButton = UIUtils.createButton(currentUserLogin.get(), VaadinIcon.USER,
           ButtonVariant.LUMO_TERTIARY_INLINE);
       contextMenu.addItem(settingsButton, event -> {
-        if ( JHapyMainView3.get().getUserSettingsView() != null )
+        if (JHapyMainView3.get().getUserSettingsView() != null) {
           getUI().get().navigate(JHapyMainView3.get().getUserSettingsView());
+        }
       });
 
       ThemeList themeList = UI.getCurrent().getElement().getThemeList();

@@ -283,12 +283,9 @@ public abstract class JHapyMainView2 extends AppLayoutRouterLayout<LeftResponsiv
         /*
          * i18N
          */
-        boolean isDisplayI18n = false;
-        if (SecurityUtils.isAccessGranted(ActionsView.class) ||
+        boolean isDisplayI18n = SecurityUtils.isAccessGranted(ActionsView.class) ||
             SecurityUtils.isAccessGranted(ElementsView.class) ||
-            SecurityUtils.isAccessGranted(MessagesView.class)) {
-          isDisplayI18n = true;
-        }
+            SecurityUtils.isAccessGranted(MessagesView.class);
 
         if (isDisplayI18n) {
           MenuEntry i18nSubmenu = new MenuEntry(AppConst.PAGE_I18N);
@@ -343,10 +340,7 @@ public abstract class JHapyMainView2 extends AppLayoutRouterLayout<LeftResponsiv
 
           menuData.addMenuEntry(referenceSubMenu);
 
-          boolean isDisplayReference = false;
-          if (SecurityUtils.isAccessGranted(CountriesView.class)) {
-            isDisplayReference = true;
-          }
+          boolean isDisplayReference = SecurityUtils.isAccessGranted(CountriesView.class);
 
           if (isDisplayReference) {
 
@@ -364,13 +358,11 @@ public abstract class JHapyMainView2 extends AppLayoutRouterLayout<LeftResponsiv
         /*
          * Notification
          */
-        boolean isDisplayNotifications = false;
-        if (SecurityUtils.isAccessGranted(MailTemplatesAdminView.class) ||
-            SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class) ||
-            SecurityUtils.isAccessGranted(SmsAdminView.class) ||
-            SecurityUtils.isAccessGranted(MailAdminView.class)) {
-          isDisplayNotifications = true;
-        }
+        boolean isDisplayNotifications =
+            SecurityUtils.isAccessGranted(MailTemplatesAdminView.class) ||
+                SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class) ||
+                SecurityUtils.isAccessGranted(SmsAdminView.class) ||
+                SecurityUtils.isAccessGranted(MailAdminView.class);
 
         if (isDisplayNotifications) {
           MenuEntry notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);

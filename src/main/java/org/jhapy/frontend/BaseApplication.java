@@ -58,7 +58,7 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
 
   private final Environment env;
 
-  private AppProperties appProperties;
+  private final AppProperties appProperties;
 
   public BaseApplication(Environment env, AppProperties appProperties) {
     this.env = env;

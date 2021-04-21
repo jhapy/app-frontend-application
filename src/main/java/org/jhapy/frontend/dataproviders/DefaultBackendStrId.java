@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseEntityStrId;
 
 /**

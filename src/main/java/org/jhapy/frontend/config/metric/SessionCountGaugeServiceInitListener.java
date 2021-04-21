@@ -21,14 +21,10 @@ package org.jhapy.frontend.config.metric;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
-import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.domain.security.SecurityUser;
-import org.jhapy.frontend.security.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jHapy Lead Dev.

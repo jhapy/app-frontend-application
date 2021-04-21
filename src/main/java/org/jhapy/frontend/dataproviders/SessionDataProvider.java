@@ -28,7 +28,6 @@ import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.frontend.client.audit.AuditServices;
-import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.utils.AppConst;
 import org.springframework.beans.factory.annotation.Autowired;
 

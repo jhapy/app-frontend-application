@@ -42,7 +42,6 @@ import org.jhapy.commons.utils.OrikaBeanMapper;
 import org.jhapy.dto.domain.security.SecurityKeycloakGroup;
 import org.jhapy.dto.domain.security.SecurityKeycloakRole;
 import org.jhapy.dto.domain.security.SecurityKeycloakUser;
-import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -60,7 +59,6 @@ import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.jhapy.frontend.views.JHapyMainView;
-import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
