@@ -50,108 +50,108 @@ import org.vaadin.tabs.PagedTabs;
 @Tag("apiTabContent")
 public class EncryptionTabContent extends CloudConfigBaseView {
 
-  protected FlexBoxLayout content;
-  protected Component component;
+    protected FlexBoxLayout content;
+    protected Component component;
 
-  public EncryptionTabContent(Environment env, UI ui, String I18N_PREFIX,
-      AuthorizationHeaderUtil authorizationHeaderUtil) {
-    super(env, ui, I18N_PREFIX + "encryption.", authorizationHeaderUtil);
-  }
+    public EncryptionTabContent(Environment env, UI ui, String I18N_PREFIX,
+        AuthorizationHeaderUtil authorizationHeaderUtil) {
+        super(env, ui, I18N_PREFIX + "encryption.", authorizationHeaderUtil);
+    }
 
-  public Component getContent() {
-    content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
-        getTranslation("element." + I18N_PREFIX + "title")));
-    content.setAlignItems(FlexComponent.Alignment.CENTER);
-    content.setFlexDirection(FlexDirection.COLUMN);
-    content.setSizeFull();
+    public Component getContent() {
+        content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
+            getTranslation("element." + I18N_PREFIX + "title")));
+        content.setAlignItems(FlexComponent.Alignment.CENTER);
+        content.setFlexDirection(FlexDirection.COLUMN);
+        content.setSizeFull();
 
-    PagedTabs tabs = new PagedTabs(content);
-    content.add(tabs);
+        PagedTabs tabs = new PagedTabs(content);
+        content.add(tabs);
 
-    tabs.add(getTranslation("element." + I18N_PREFIX + "tab.encrypt"), getEncrypt(), false);
-    tabs.add(getTranslation("element." + I18N_PREFIX + "tab.decrypt"), getDecrypt(), false);
+        tabs.add(getTranslation("element." + I18N_PREFIX + "tab.encrypt"), getEncrypt(), false);
+        tabs.add(getTranslation("element." + I18N_PREFIX + "tab.decrypt"), getDecrypt(), false);
 
-    return content;
-  }
+        return content;
+    }
 
-  protected Component getEncrypt() {
-    FlexBoxLayout layout = new FlexBoxLayout();
-    layout.setAlignItems(FlexComponent.Alignment.CENTER);
-    layout.setFlexDirection(FlexDirection.COLUMN);
-    layout.setSizeFull();
+    protected Component getEncrypt() {
+        FlexBoxLayout layout = new FlexBoxLayout();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setFlexDirection(FlexDirection.COLUMN);
+        layout.setSizeFull();
 
-    TextArea inputTextArea = new TextArea();
-    inputTextArea.setSizeFull();
+        TextArea inputTextArea = new TextArea();
+        inputTextArea.setSizeFull();
 
-    TextArea outputTextArea = new TextArea();
-    outputTextArea.setReadOnly(true);
-    outputTextArea.setSizeFull();
+        TextArea outputTextArea = new TextArea();
+        outputTextArea.setReadOnly(true);
+        outputTextArea.setSizeFull();
 
-    Button encryptButton = UIUtils
-        .createPrimaryButton(getTranslation("action." + I18N_PREFIX + "encrypt"));
-    encryptButton.addClickListener(event -> {
-      if (StringUtils.isNotBlank(inputTextArea.getValue())) {
-        final HttpHeaders httpHeaders = new HttpHeaders() {{
-          set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
-          setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-        }};
+        Button encryptButton = UIUtils
+            .createPrimaryButton(getTranslation("action." + I18N_PREFIX + "encrypt"));
+        encryptButton.addClickListener(event -> {
+            if (StringUtils.isNotBlank(inputTextArea.getValue())) {
+                final HttpHeaders httpHeaders = new HttpHeaders() {{
+                    set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
+                    setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+                }};
 
-        String url = env.getProperty("spring.cloud.config.uri") + "/encrypt";
-        logger().debug("Encrypt Url = " + url);
-        ResponseEntity<String> configprops = restTemplate.exchange(URI.create(url),
-            HttpMethod.POST,
-            new HttpEntity<>(inputTextArea.getValue(), httpHeaders), String.class);
-        String configpropsBody = configprops.getBody();
-        logger().debug("Config YAML = " + configpropsBody);
-        outputTextArea.setValue("{cipher}" + configpropsBody);
-      }
-    });
+                String url = env.getProperty("spring.cloud.config.uri") + "/encrypt";
+                logger().debug("Encrypt Url = " + url);
+                ResponseEntity<String> configprops = restTemplate.exchange(URI.create(url),
+                    HttpMethod.POST,
+                    new HttpEntity<>(inputTextArea.getValue(), httpHeaders), String.class);
+                String configpropsBody = configprops.getBody();
+                logger().debug("Config YAML = " + configpropsBody);
+                outputTextArea.setValue("{cipher}" + configpropsBody);
+            }
+        });
 
-    layout.add(inputTextArea, encryptButton, outputTextArea);
+        layout.add(inputTextArea, encryptButton, outputTextArea);
 
-    return layout;
-  }
+        return layout;
+    }
 
-  protected Component getDecrypt() {
-    FlexBoxLayout layout = new FlexBoxLayout();
-    layout.setAlignItems(FlexComponent.Alignment.CENTER);
-    layout.setFlexDirection(FlexDirection.COLUMN);
-    layout.setSizeFull();
+    protected Component getDecrypt() {
+        FlexBoxLayout layout = new FlexBoxLayout();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setFlexDirection(FlexDirection.COLUMN);
+        layout.setSizeFull();
 
-    TextArea inputTextArea = new TextArea();
-    inputTextArea.setSizeFull();
+        TextArea inputTextArea = new TextArea();
+        inputTextArea.setSizeFull();
 
-    TextArea outputTextArea = new TextArea();
-    outputTextArea.setReadOnly(true);
-    outputTextArea.setSizeFull();
+        TextArea outputTextArea = new TextArea();
+        outputTextArea.setReadOnly(true);
+        outputTextArea.setSizeFull();
 
-    Button encryptButton = UIUtils
-        .createPrimaryButton(getTranslation("action." + I18N_PREFIX + "decrypt"));
-    encryptButton.addClickListener(event -> {
-      if (StringUtils.isNotBlank(inputTextArea.getValue())) {
-        final HttpHeaders httpHeaders = new HttpHeaders() {{
-          set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
-          setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-        }};
+        Button encryptButton = UIUtils
+            .createPrimaryButton(getTranslation("action." + I18N_PREFIX + "decrypt"));
+        encryptButton.addClickListener(event -> {
+            if (StringUtils.isNotBlank(inputTextArea.getValue())) {
+                final HttpHeaders httpHeaders = new HttpHeaders() {{
+                    set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
+                    setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+                }};
 
-        String url = env.getProperty("spring.cloud.config.uri") + "/decrypt";
-        logger().debug("Decrypt Url = " + url);
-        ResponseEntity<String> configprops = restTemplate.exchange(URI.create(url),
-            HttpMethod.POST,
-            new HttpEntity<>(inputTextArea.getValue().replace("{cipher}", ""), httpHeaders),
-            String.class);
-        String configpropsBody = configprops.getBody();
-        logger().debug("Config YAML = " + configpropsBody);
-        outputTextArea.setValue(configpropsBody);
-      }
-    });
+                String url = env.getProperty("spring.cloud.config.uri") + "/decrypt";
+                logger().debug("Decrypt Url = " + url);
+                ResponseEntity<String> configprops = restTemplate.exchange(URI.create(url),
+                    HttpMethod.POST,
+                    new HttpEntity<>(inputTextArea.getValue().replace("{cipher}", ""), httpHeaders),
+                    String.class);
+                String configpropsBody = configprops.getBody();
+                logger().debug("Config YAML = " + configpropsBody);
+                outputTextArea.setValue(configpropsBody);
+            }
+        });
 
-    layout.add(inputTextArea, encryptButton, outputTextArea);
+        layout.add(inputTextArea, encryptButton, outputTextArea);
 
-    return layout;
-  }
+        return layout;
+    }
 
-  protected void getDetails(EurekaApplication eurekaApplication,
-      EurekaApplicationInstance eurekaApplicationInstance) {
-  }
+    protected void getDetails(EurekaApplication eurekaApplication,
+        EurekaApplicationInstance eurekaApplicationInstance) {
+    }
 }

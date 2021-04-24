@@ -20,16 +20,16 @@ package org.jhapy.frontend.utils.css;
 
 public enum TextOverflow {
 
-  CLIP("clip"),
-  ELLIPSIS("ellipsis");
+    CLIP("clip"),
+    ELLIPSIS("ellipsis");
 
-  private final String value;
+    private final String value;
 
-  TextOverflow(String value) {
-    this.value = value;
-  }
+    TextOverflow(String value) {
+        this.value = value;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public String getValue() {
+        return value;
+    }
 }

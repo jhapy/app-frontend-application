@@ -42,7 +42,6 @@ import org.jhapy.commons.utils.OrikaBeanMapper;
 import org.jhapy.dto.domain.security.SecurityKeycloakGroup;
 import org.jhapy.dto.domain.security.SecurityKeycloakRole;
 import org.jhapy.dto.domain.security.SecurityKeycloakUser;
-import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
 import org.jhapy.dto.serviceQuery.ServiceResult;
@@ -60,7 +59,6 @@ import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.jhapy.frontend.views.JHapyMainView;
-import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
@@ -70,226 +68,239 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 public class SecurityKeycloakUsersView extends
     DefaultMasterDetailsView<SecurityKeycloakUser, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  private final OrikaBeanMapper orikaBeanMapper;
+    private final OrikaBeanMapper orikaBeanMapper;
 
-  public SecurityKeycloakUsersView(OrikaBeanMapper orikaBeanMapper, MyI18NProvider myI18NProvider) {
-    super("securityUser.", SecurityKeycloakUser.class, new SecurityUserKeycloakDataProvider(),
-        false,
-        (e) -> SecurityServices.getKeycloakClient().saveUser(new SaveQuery<>(e)),
-        e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())),
-        myI18NProvider);
-    this.orikaBeanMapper = orikaBeanMapper;
-  }
-
-  @Override
-  protected void initHeader() {
-    super.initHeader();
-
-    AppBar appBar = JHapyMainView.get().getAppBar();
-
-    Button clearCacheButton = new Button(getTranslation("action.sync.clearCache"));
-    clearCacheButton.addClickListener(buttonClickEvent -> {
-      SecurityServices.getKeycloakClient().cleanUserCache();
-      dataProvider.refreshAll();
-    });
-
-    appBar.addActionItem(clearCacheButton);
-  }
-
-  protected Grid createGrid() {
-    grid = new Grid<>();
-    grid.setSelectionMode(SelectionMode.SINGLE);
-
-    grid.addSelectionListener(event -> event.getFirstSelectedItem()
-        .ifPresent(this::showDetails));
-
-    grid.setDataProvider(dataProvider);
-    grid.setHeight("100%");
-
-    grid.addColumn(SecurityKeycloakUser::getUsername).setKey("username");
-
-    grid.addColumn(new TextRenderer<>(
-        securityUser -> securityUser.getRoles() == null ? ""
-            : securityUser.getRoles().stream().map(SecurityKeycloakRole::getName)
-                .reduce((a, b) -> a.concat(", ").concat(b)).orElse(""))).setKey("roles");
-
-    grid.addColumn(new TextRenderer<>(
-        securityUser -> securityUser.getGroups() == null ? ""
-            : securityUser.getGroups().stream().map(SecurityKeycloakGroup::getName)
-                .reduce((a, b) -> a.concat(", ").concat(b)).orElse(""))).setKey("groups");
-
-    grid.getColumns().forEach(column -> {
-      if (column.getKey() != null) {
-        column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-        column.setResizable(true);
-        column.setSortable(true);
-      }
-    });
-    return grid;
-  }
-
-  protected Component createDetails(SecurityKeycloakUser securityUser) {
-    boolean isNew = securityUser.getId() == null;
-    detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
-        : getTranslation("element.global.update") + " : " + securityUser.getUsername());
-
-    detailsDrawerFooter.setDeleteButtonVisible(!isNew);
-
-    TextField usernameField = new TextField();
-    usernameField.setWidthFull();
-
-    PasswordField passwordField = new PasswordField();
-    passwordField.setWidthFull();
-
-    TextField firstNameField = new TextField();
-    firstNameField.setWidthFull();
-
-    TextField lastNameField = new TextField();
-    lastNameField.setWidthFull();
-
-    EmailField emailField = new EmailField();
-    emailField.setWidthFull();
-
-    TextField titleField = new TextField();
-    titleField.setWidthFull();
-
-    TextField mobileNumberField = new TextField();
-    mobileNumberField.setWidthFull();
-
-    Checkbox isEmailVerifiedField = new Checkbox();
-
-    Checkbox isActivatedField = new Checkbox();
-
-    Checkbox isLocalField = new Checkbox();
-
-    List<Locale> locales = Arrays.asList(Locale.getAvailableLocales());
-    locales.sort(Comparator.comparing(Locale::getDisplayName));
-
-    ComboBox<Locale> defaultLocaleField = new ComboBox<>();
-    defaultLocaleField.setItems(locales);
-    defaultLocaleField.setItemLabelGenerator((ItemLabelGenerator<Locale>) Locale::getDisplayName);
-    defaultLocaleField.setWidthFull();
-
-    MultiselectComboBox<SecurityKeycloakRole> rolesField = new MultiselectComboBox<>();
-    rolesField.setItemLabelGenerator(
-        (ItemLabelGenerator<SecurityKeycloakRole>) SecurityKeycloakRole::getName);
-    ServiceResult<List<SecurityKeycloakRole>> allRolesServiceResult = SecurityServices
-        .getKeycloakClient().getRoles();
-    if (allRolesServiceResult.getIsSuccess() && allRolesServiceResult.getData() != null) {
-      rolesField.setItems(allRolesServiceResult.getData());
+    public SecurityKeycloakUsersView(OrikaBeanMapper orikaBeanMapper,
+        MyI18NProvider myI18NProvider) {
+        super("securityUser.", SecurityKeycloakUser.class, new SecurityUserKeycloakDataProvider(),
+            false,
+            (e) -> SecurityServices.getKeycloakClient().saveUser(new SaveQuery<>(e)),
+            e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())),
+            myI18NProvider);
+        this.orikaBeanMapper = orikaBeanMapper;
     }
-    rolesField.setWidthFull();
 
-    MultiselectComboBox<SecurityKeycloakGroup> groupsField = new MultiselectComboBox<>();
-    groupsField.setItemLabelGenerator(
-        (ItemLabelGenerator<SecurityKeycloakGroup>) SecurityKeycloakGroup::getName);
-    ServiceResult<List<SecurityKeycloakGroup>> allGroupsServiceResult = SecurityServices
-        .getKeycloakClient().getGroups();
-    if (allGroupsServiceResult.getIsSuccess() && allGroupsServiceResult.getData() != null) {
-      groupsField.setItems(allGroupsServiceResult.getData());
+    @Override
+    protected void initHeader() {
+        super.initHeader();
+
+        AppBar appBar = JHapyMainView.get().getAppBar();
+
+        Button clearCacheButton = new Button(getTranslation("action.sync.clearCache"));
+        clearCacheButton.addClickListener(buttonClickEvent -> {
+            SecurityServices.getKeycloakClient().cleanUserCache();
+            dataProvider.refreshAll();
+        });
+
+        appBar.addActionItem(clearCacheButton);
     }
-    groupsField.setWidthFull();
 
-    TextArea effectiveRolesField = new TextArea();
-    effectiveRolesField.setWidthFull();
+    protected Grid createGrid() {
+        grid = new Grid<>();
+        grid.setSelectionMode(SelectionMode.SINGLE);
 
-    Button impressionateButton = UIUtils
-        .createButton(getTranslation("action." + I18N_PREFIX + "impressionate"));
-    impressionateButton.addClickListener(buttonClickEvent -> {
-      SecurityServices.getKeycloakClient().impressionate(securityUser.getId());
-    });
+        grid.addSelectionListener(event -> event.getFirstSelectedItem()
+            .ifPresent(this::showDetails));
 
-    // Form layout
-    FormLayout editingForm = new FormLayout();
-    editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
-        LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
-    editingForm.setResponsiveSteps(
-        new FormLayout.ResponsiveStep("0", 1,
-            FormLayout.ResponsiveStep.LabelsPosition.TOP),
-        new FormLayout.ResponsiveStep("26em", 2,
-            FormLayout.ResponsiveStep.LabelsPosition.TOP));
-    editingForm.addFormItem(usernameField, getTranslation("element." + I18N_PREFIX + "username"));
-    editingForm.addFormItem(passwordField, getTranslation("element." + I18N_PREFIX + "password"));
+        grid.setDataProvider(dataProvider);
+        grid.setHeight("100%");
 
-    editingForm.addFormItem(firstNameField, getTranslation("element." + I18N_PREFIX + "firstName"));
-    editingForm.addFormItem(lastNameField, getTranslation("element." + I18N_PREFIX + "lastName"));
+        grid.addColumn(SecurityKeycloakUser::getUsername).setKey("username");
 
-    editingForm.addFormItem(titleField, getTranslation("element." + I18N_PREFIX + "title"));
-    editingForm.addFormItem(emailField, getTranslation("element." + I18N_PREFIX + "email"));
-    editingForm
-        .addFormItem(mobileNumberField, getTranslation("element." + I18N_PREFIX + "mobileNumber"));
+        grid.addColumn(new TextRenderer<>(
+            securityUser -> securityUser.getRoles() == null ? ""
+                : securityUser.getRoles().stream().map(SecurityKeycloakRole::getName)
+                    .reduce((a, b) -> a.concat(", ").concat(b)).orElse(""))).setKey("roles");
 
-    editingForm
-        .addFormItem(isLocalField,
-            getTranslation("element." + I18N_PREFIX + "isLocal"));
-    editingForm
-        .addFormItem(isEmailVerifiedField,
-            getTranslation("element." + I18N_PREFIX + "isEmailVerified"));
-    editingForm
-        .addFormItem(isActivatedField, getTranslation("element." + I18N_PREFIX + "isActivated"));
+        grid.addColumn(new TextRenderer<>(
+            securityUser -> securityUser.getGroups() == null ? ""
+                : securityUser.getGroups().stream().map(SecurityKeycloakGroup::getName)
+                    .reduce((a, b) -> a.concat(", ").concat(b)).orElse(""))).setKey("groups");
 
-    editingForm
-        .addFormItem(defaultLocaleField,
-            getTranslation("element." + I18N_PREFIX + "defaultLanguage"));
-
-    FormLayout.FormItem groupsItem = editingForm
-        .addFormItem(groupsField, getTranslation("element." + I18N_PREFIX + "groups"));
-
-    FormLayout.FormItem rolesItem = editingForm
-        .addFormItem(rolesField, getTranslation("element." + I18N_PREFIX + "roles"));
-
-    FormLayout.FormItem effectiveRolesItem = editingForm
-        .addFormItem(effectiveRolesField,
-            getTranslation("element." + I18N_PREFIX + "effectiveRoles"));
-
-    // editingForm.add(impressionateButton );
-
-    UIUtils.setColSpan(2, rolesItem, groupsItem, effectiveRolesItem);
-
-    binder.setBean(securityUser);
-
-    binder.forField(usernameField)
-        .asRequired(getTranslation("message.securityUser.usernameRequired"))
-        .bind(SecurityKeycloakUser::getUsername, SecurityKeycloakUser::setUsername);
-    binder.forField(passwordField)
-        .bind(SecurityKeycloakUser::getPassword, SecurityKeycloakUser::setPassword);
-    binder.bind(firstNameField, SecurityKeycloakUser::getFirstName,
-        SecurityKeycloakUser::setFirstName);
-    binder
-        .bind(lastNameField, SecurityKeycloakUser::getLastName, SecurityKeycloakUser::setLastName);
-    binder.bind(emailField, SecurityKeycloakUser::getEmail, SecurityKeycloakUser::setEmail);
-    binder.bind(titleField, SecurityKeycloakUser::getTitle, SecurityKeycloakUser::setTitle);
-    binder.bind(mobileNumberField, SecurityKeycloakUser::getMobileNumber,
-        SecurityKeycloakUser::setMobileNumber);
-    binder.bind(isEmailVerifiedField, SecurityKeycloakUser::getEmailVerified,
-        SecurityKeycloakUser::setEmailVerified);
-    binder.bind(isLocalField, SecurityKeycloakUser::getIsLocal, SecurityKeycloakUser::setIsLocal);
-    binder.bind(isActivatedField, SecurityKeycloakUser::getIsActivated,
-        SecurityKeycloakUser::setIsActivated);
-    binder.bind(defaultLocaleField, SecurityKeycloakUser::getDefaultLocale,
-        SecurityKeycloakUser::setDefaultLocale);
-    binder.bind(rolesField, securityKeycloakUser -> securityKeycloakUser.getRoles() == null ? null
-            : new HashSet<>(securityKeycloakUser.getRoles()),
-        (securityKeycloakUser, securityKeycloakRoles) -> {
-          securityKeycloakUser.setRoles(new ArrayList<>(securityKeycloakRoles));
+        grid.getColumns().forEach(column -> {
+            if (column.getKey() != null) {
+                column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+                column.setResizable(true);
+                column.setSortable(true);
+            }
         });
-    binder.bind(groupsField, securityKeycloakUser -> securityKeycloakUser.getGroups() == null ? null
-            : new HashSet<>(securityKeycloakUser.getGroups()),
-        (securityKeycloakUser, securityKeycloakGroups) -> {
-          securityKeycloakUser.setGroups(new ArrayList<>(securityKeycloakGroups));
+        return grid;
+    }
+
+    protected Component createDetails(SecurityKeycloakUser securityUser) {
+        boolean isNew = securityUser.getId() == null;
+        detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
+            : getTranslation("element.global.update") + " : " + securityUser.getUsername());
+
+        detailsDrawerFooter.setDeleteButtonVisible(!isNew);
+
+        TextField usernameField = new TextField();
+        usernameField.setWidthFull();
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setWidthFull();
+
+        TextField firstNameField = new TextField();
+        firstNameField.setWidthFull();
+
+        TextField lastNameField = new TextField();
+        lastNameField.setWidthFull();
+
+        EmailField emailField = new EmailField();
+        emailField.setWidthFull();
+
+        TextField titleField = new TextField();
+        titleField.setWidthFull();
+
+        TextField mobileNumberField = new TextField();
+        mobileNumberField.setWidthFull();
+
+        Checkbox isEmailVerifiedField = new Checkbox();
+
+        Checkbox isActivatedField = new Checkbox();
+
+        Checkbox isLocalField = new Checkbox();
+
+        List<Locale> locales = Arrays.asList(Locale.getAvailableLocales());
+        locales.sort(Comparator.comparing(Locale::getDisplayName));
+
+        ComboBox<Locale> defaultLocaleField = new ComboBox<>();
+        defaultLocaleField.setItems(locales);
+        defaultLocaleField
+            .setItemLabelGenerator((ItemLabelGenerator<Locale>) Locale::getDisplayName);
+        defaultLocaleField.setWidthFull();
+
+        MultiselectComboBox<SecurityKeycloakRole> rolesField = new MultiselectComboBox<>();
+        rolesField.setItemLabelGenerator(
+            (ItemLabelGenerator<SecurityKeycloakRole>) SecurityKeycloakRole::getName);
+        ServiceResult<List<SecurityKeycloakRole>> allRolesServiceResult = SecurityServices
+            .getKeycloakClient().getRoles();
+        if (allRolesServiceResult.getIsSuccess() && allRolesServiceResult.getData() != null) {
+            rolesField.setItems(allRolesServiceResult.getData());
+        }
+        rolesField.setWidthFull();
+
+        MultiselectComboBox<SecurityKeycloakGroup> groupsField = new MultiselectComboBox<>();
+        groupsField.setItemLabelGenerator(
+            (ItemLabelGenerator<SecurityKeycloakGroup>) SecurityKeycloakGroup::getName);
+        ServiceResult<List<SecurityKeycloakGroup>> allGroupsServiceResult = SecurityServices
+            .getKeycloakClient().getGroups();
+        if (allGroupsServiceResult.getIsSuccess() && allGroupsServiceResult.getData() != null) {
+            groupsField.setItems(allGroupsServiceResult.getData());
+        }
+        groupsField.setWidthFull();
+
+        TextArea effectiveRolesField = new TextArea();
+        effectiveRolesField.setWidthFull();
+
+        Button impressionateButton = UIUtils
+            .createButton(getTranslation("action." + I18N_PREFIX + "impressionate"));
+        impressionateButton.addClickListener(buttonClickEvent -> {
+            SecurityServices.getKeycloakClient().impressionate(securityUser.getId());
         });
-    binder.bind(effectiveRolesField,
-        securityKeycloakUser -> securityKeycloakUser.getEffectiveRoles() == null ? null
-            : securityKeycloakUser.getEffectiveRoles().stream().map(SecurityKeycloakRole::getName)
-                .reduce((a, b) -> a.concat(", ").concat(b)).orElse(""), null);
 
-    return editingForm;
-  }
+        // Form layout
+        FormLayout editingForm = new FormLayout();
+        editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
+            LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+        editingForm.setResponsiveSteps(
+            new FormLayout.ResponsiveStep("0", 1,
+                FormLayout.ResponsiveStep.LabelsPosition.TOP),
+            new FormLayout.ResponsiveStep("26em", 2,
+                FormLayout.ResponsiveStep.LabelsPosition.TOP));
+        editingForm
+            .addFormItem(usernameField, getTranslation("element." + I18N_PREFIX + "username"));
+        editingForm
+            .addFormItem(passwordField, getTranslation("element." + I18N_PREFIX + "password"));
 
-  protected void filter(String filter) {
-    dataProvider
-        .setFilter(new DefaultFilter(
-            StringUtils.isBlank(filter) ? null : filter,
-            Boolean.TRUE));
-  }
+        editingForm
+            .addFormItem(firstNameField, getTranslation("element." + I18N_PREFIX + "firstName"));
+        editingForm
+            .addFormItem(lastNameField, getTranslation("element." + I18N_PREFIX + "lastName"));
+
+        editingForm.addFormItem(titleField, getTranslation("element." + I18N_PREFIX + "title"));
+        editingForm.addFormItem(emailField, getTranslation("element." + I18N_PREFIX + "email"));
+        editingForm
+            .addFormItem(mobileNumberField,
+                getTranslation("element." + I18N_PREFIX + "mobileNumber"));
+
+        editingForm
+            .addFormItem(isLocalField,
+                getTranslation("element." + I18N_PREFIX + "isLocal"));
+        editingForm
+            .addFormItem(isEmailVerifiedField,
+                getTranslation("element." + I18N_PREFIX + "isEmailVerified"));
+        editingForm
+            .addFormItem(isActivatedField,
+                getTranslation("element." + I18N_PREFIX + "isActivated"));
+
+        editingForm
+            .addFormItem(defaultLocaleField,
+                getTranslation("element." + I18N_PREFIX + "defaultLanguage"));
+
+        FormLayout.FormItem groupsItem = editingForm
+            .addFormItem(groupsField, getTranslation("element." + I18N_PREFIX + "groups"));
+
+        FormLayout.FormItem rolesItem = editingForm
+            .addFormItem(rolesField, getTranslation("element." + I18N_PREFIX + "roles"));
+
+        FormLayout.FormItem effectiveRolesItem = editingForm
+            .addFormItem(effectiveRolesField,
+                getTranslation("element." + I18N_PREFIX + "effectiveRoles"));
+
+        // editingForm.add(impressionateButton );
+
+        UIUtils.setColSpan(2, rolesItem, groupsItem, effectiveRolesItem);
+
+        binder.setBean(securityUser);
+
+        binder.forField(usernameField)
+            .asRequired(getTranslation("message.securityUser.usernameRequired"))
+            .bind(SecurityKeycloakUser::getUsername, SecurityKeycloakUser::setUsername);
+        binder.forField(passwordField)
+            .bind(SecurityKeycloakUser::getPassword, SecurityKeycloakUser::setPassword);
+        binder.bind(firstNameField, SecurityKeycloakUser::getFirstName,
+            SecurityKeycloakUser::setFirstName);
+        binder
+            .bind(lastNameField, SecurityKeycloakUser::getLastName,
+                SecurityKeycloakUser::setLastName);
+        binder.bind(emailField, SecurityKeycloakUser::getEmail, SecurityKeycloakUser::setEmail);
+        binder.bind(titleField, SecurityKeycloakUser::getTitle, SecurityKeycloakUser::setTitle);
+        binder.bind(mobileNumberField, SecurityKeycloakUser::getMobileNumber,
+            SecurityKeycloakUser::setMobileNumber);
+        binder.bind(isEmailVerifiedField, SecurityKeycloakUser::getEmailVerified,
+            SecurityKeycloakUser::setEmailVerified);
+        binder
+            .bind(isLocalField, SecurityKeycloakUser::getIsLocal, SecurityKeycloakUser::setIsLocal);
+        binder.bind(isActivatedField, SecurityKeycloakUser::getIsActivated,
+            SecurityKeycloakUser::setIsActivated);
+        binder.bind(defaultLocaleField, SecurityKeycloakUser::getDefaultLocale,
+            SecurityKeycloakUser::setDefaultLocale);
+        binder
+            .bind(rolesField, securityKeycloakUser -> securityKeycloakUser.getRoles() == null ? null
+                    : new HashSet<>(securityKeycloakUser.getRoles()),
+                (securityKeycloakUser, securityKeycloakRoles) -> {
+                    securityKeycloakUser.setRoles(new ArrayList<>(securityKeycloakRoles));
+                });
+        binder.bind(groupsField,
+            securityKeycloakUser -> securityKeycloakUser.getGroups() == null ? null
+                : new HashSet<>(securityKeycloakUser.getGroups()),
+            (securityKeycloakUser, securityKeycloakGroups) -> {
+                securityKeycloakUser.setGroups(new ArrayList<>(securityKeycloakGroups));
+            });
+        binder.bind(effectiveRolesField,
+            securityKeycloakUser -> securityKeycloakUser.getEffectiveRoles() == null ? null
+                : securityKeycloakUser.getEffectiveRoles().stream()
+                    .map(SecurityKeycloakRole::getName)
+                    .reduce((a, b) -> a.concat(", ").concat(b)).orElse(""), null);
+
+        return editingForm;
+    }
+
+    protected void filter(String filter) {
+        dataProvider
+            .setFilter(new DefaultFilter(
+                StringUtils.isBlank(filter) ? null : filter,
+                Boolean.TRUE));
+    }
 }

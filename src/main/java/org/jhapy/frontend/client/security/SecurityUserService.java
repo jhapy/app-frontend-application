@@ -42,22 +42,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface SecurityUserService {
 
-  @PostMapping(value = "/getSecurityUserByUsername", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  ServiceResult<SecurityUser> getSecurityUserByUsername(@RequestBody
-      GetSecurityUserByUsernameQuery query);
+    @PostMapping(value = "/getSecurityUserByUsername", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    ServiceResult<SecurityUser> getSecurityUserByUsername(@RequestBody
+        GetSecurityUserByUsernameQuery query);
 
-  @PostMapping(value = "/findAnyMatching")
-  ServiceResult<Page<SecurityUser>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+    @PostMapping(value = "/findAnyMatching")
+    ServiceResult<Page<SecurityUser>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  @PostMapping(value = "/countAnyMatching")
-  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+    @PostMapping(value = "/countAnyMatching")
+    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-  @PostMapping(value = "/getById")
-  ServiceResult<SecurityUser> getById(@RequestBody GetByStrIdQuery query);
+    @PostMapping(value = "/getById")
+    ServiceResult<SecurityUser> getById(@RequestBody GetByStrIdQuery query);
 
-  @PostMapping(value = "/save")
-  ServiceResult<SecurityUser> save(@RequestBody SaveQuery<SecurityUser> query);
+    @PostMapping(value = "/save")
+    ServiceResult<SecurityUser> save(@RequestBody SaveQuery<SecurityUser> query);
 
-  @PostMapping(value = "/delete")
-  ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
+    @PostMapping(value = "/delete")
+    ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 }

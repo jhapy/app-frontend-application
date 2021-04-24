@@ -19,64 +19,64 @@ import org.springframework.stereotype.Component;
 @Component
 public class I18NReceiver implements HasLogger {
 
-  private final MyI18NProvider i18NService;
+    private final MyI18NProvider i18NService;
 
-  public I18NReceiver(
-      MyI18NProvider i18NService) {
-    this.i18NService = i18NService;
-  }
+    public I18NReceiver(
+        MyI18NProvider i18NService) {
+        this.i18NService = i18NService;
+    }
 
-  @RabbitListener(queues = "#{elementUpdateQueue.name}")
-  public void onElementUpdate(final I18NElementUpdate update) {
-    String loggerPrefix = getLoggerPrefix("onElementUpdate", update);
+    @RabbitListener(queues = "#{elementUpdateQueue.name}")
+    public void onElementUpdate(final I18NElementUpdate update) {
+        String loggerPrefix = getLoggerPrefix("onElementUpdate", update);
 
-    logger().info(loggerPrefix + "Message received");
+        logger().info(loggerPrefix + "Message received");
 
-    i18NService.elementUpdate(update.getUpdateType(), update.getElement());
-  }
+        i18NService.elementUpdate(update.getUpdateType(), update.getElement());
+    }
 
-  @RabbitListener(queues = "#{elementTrlUpdateQueue.name}")
-  public void onElementTrlUpdate(final I18NElementTrlUpdate update) {
-    String loggerPrefix = getLoggerPrefix("onElementTrlUpdate", update);
+    @RabbitListener(queues = "#{elementTrlUpdateQueue.name}")
+    public void onElementTrlUpdate(final I18NElementTrlUpdate update) {
+        String loggerPrefix = getLoggerPrefix("onElementTrlUpdate", update);
 
-    logger().info(loggerPrefix + "Message received");
+        logger().info(loggerPrefix + "Message received");
 
-    i18NService.elementTrlUpdate(update.getUpdateType(), update.getElementTrl());
-  }
+        i18NService.elementTrlUpdate(update.getUpdateType(), update.getElementTrl());
+    }
 
-  @RabbitListener(queues = "#{actionUpdateQueue.name}")
-  public void onActionUpdate(final I18NActionUpdate update) {
-    String loggerPrefix = getLoggerPrefix("onActionUpdate", update);
+    @RabbitListener(queues = "#{actionUpdateQueue.name}")
+    public void onActionUpdate(final I18NActionUpdate update) {
+        String loggerPrefix = getLoggerPrefix("onActionUpdate", update);
 
-    logger().info(loggerPrefix + "Message received");
+        logger().info(loggerPrefix + "Message received");
 
-    i18NService.actionUpdate(update.getUpdateType(), update.getAction());
-  }
+        i18NService.actionUpdate(update.getUpdateType(), update.getAction());
+    }
 
-  @RabbitListener(queues = "#{actionTrlUpdateQueue.name}")
-  public void onActionTrlUpdate(final I18NActionTrlUpdate update) {
-    String loggerPrefix = getLoggerPrefix("onActionTrlUpdate", update);
+    @RabbitListener(queues = "#{actionTrlUpdateQueue.name}")
+    public void onActionTrlUpdate(final I18NActionTrlUpdate update) {
+        String loggerPrefix = getLoggerPrefix("onActionTrlUpdate", update);
 
-    logger().info(loggerPrefix + "Message received");
+        logger().info(loggerPrefix + "Message received");
 
-    i18NService.actionTrlUpdate(update.getUpdateType(), update.getActionTrl());
-  }
+        i18NService.actionTrlUpdate(update.getUpdateType(), update.getActionTrl());
+    }
 
-  @RabbitListener(queues = "#{messageUpdateQueue.name}")
-  public void onMessageUpdate(final I18NMessageUpdate update) {
-    String loggerPrefix = getLoggerPrefix("onMessageUpdate", update);
+    @RabbitListener(queues = "#{messageUpdateQueue.name}")
+    public void onMessageUpdate(final I18NMessageUpdate update) {
+        String loggerPrefix = getLoggerPrefix("onMessageUpdate", update);
 
-    logger().info(loggerPrefix + "Message received");
+        logger().info(loggerPrefix + "Message received");
 
-    i18NService.messageUpdate(update.getUpdateType(), update.getMessage());
-  }
+        i18NService.messageUpdate(update.getUpdateType(), update.getMessage());
+    }
 
-  @RabbitListener(queues = "#{messageTrlUpdateQueue.name}")
-  public void onMessageTrlUpdate(final I18NMessageTrlUpdate update) {
-    String loggerPrefix = getLoggerPrefix("onMessageTrlUpdate", update);
+    @RabbitListener(queues = "#{messageTrlUpdateQueue.name}")
+    public void onMessageTrlUpdate(final I18NMessageTrlUpdate update) {
+        String loggerPrefix = getLoggerPrefix("onMessageTrlUpdate", update);
 
-    logger().info(loggerPrefix + "Message received");
+        logger().info(loggerPrefix + "Message received");
 
-    i18NService.messageTrlUpdate(update.getUpdateType(), update.getMessageTrl());
-  }
+        i18NService.messageTrlUpdate(update.getUpdateType(), update.getMessageTrl());
+    }
 }

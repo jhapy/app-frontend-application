@@ -32,7 +32,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseEntityStrId;
 
 /**
@@ -44,77 +43,77 @@ public abstract class DefaultBackendStrId<C extends BaseEntityStrId> extends
     AbstractBackEndDataProvider<C, CrudFilter> implements
     Serializable {
 
-  protected List<C> fieldsMap = new ArrayList<>();
-  protected AtomicLong uniqueLong = new AtomicLong();
-  private Comparator<C> comparator;
-  private SerializablePredicate<C> filter;
+    protected List<C> fieldsMap = new ArrayList<>();
+    protected AtomicLong uniqueLong = new AtomicLong();
+    private Comparator<C> comparator;
+    private SerializablePredicate<C> filter;
 
-  public DefaultBackendStrId() {
-  }
-
-  public DefaultBackendStrId(Comparator<C> comparator) {
-    this.comparator = comparator;
-  }
-
-  @Override
-  public abstract Object getId(C value);
-
-  public Collection<C> getValues() {
-    if (comparator != null) {
-      return fieldsMap.stream().sorted(comparator).collect(Collectors.toList());
-    } else {
-      return fieldsMap;
-    }
-  }
-
-  public abstract void setValues(Collection<C> values);
-
-  public abstract void persist(C value);
-
-  public abstract void delete(C value);
-
-  public SerializablePredicate<C> getFilter() {
-    return this.filter;
-  }
-
-  public void setFilter(SerializablePredicate<C> filter) {
-    this.filter = filter;
-    this.refreshAll();
-  }
-
-  public void addFilter(SerializablePredicate<C> filter) {
-    Objects.requireNonNull(filter, "Filter cannot be null");
-    if (this.getFilter() == null) {
-      this.setFilter(filter);
-    } else {
-      SerializablePredicate<C> oldFilter = this.getFilter();
-      this.setFilter((item) -> oldFilter.test(item) && filter.test(item));
+    public DefaultBackendStrId() {
     }
 
-  }
-
-  @Override
-  protected int sizeInBackEnd(Query<C, CrudFilter> query) {
-    return fieldsMap.size();
-  }
-
-  @Override
-  protected Stream<C> fetchFromBackEnd(Query<C, CrudFilter> query) {
-    Stream<C> stream = fieldsMap.stream();
-
-    Optional<Comparator<C>> comparing = Stream.of(query.getInMemorySorting(), comparator)
-        .filter(Objects::nonNull).reduce(Comparator::thenComparing);
-    if (comparing.isPresent()) {
-      stream = stream.sorted();
+    public DefaultBackendStrId(Comparator<C> comparator) {
+        this.comparator = comparator;
     }
-    long maxId = 0;
-    List<C> result = stream.collect(Collectors.toList());
-    for (C c : result) {
-      if (c.getTemporaryId() > maxId) {
-        maxId = c.getTemporaryId();
-      }
+
+    @Override
+    public abstract Object getId(C value);
+
+    public Collection<C> getValues() {
+        if (comparator != null) {
+            return fieldsMap.stream().sorted(comparator).collect(Collectors.toList());
+        } else {
+            return fieldsMap;
+        }
     }
-    uniqueLong.set(maxId + 1);
-    return result.stream().skip(query.getOffset()).limit(query.getLimit());
-  }
+
+    public abstract void setValues(Collection<C> values);
+
+    public abstract void persist(C value);
+
+    public abstract void delete(C value);
+
+    public SerializablePredicate<C> getFilter() {
+        return this.filter;
+    }
+
+    public void setFilter(SerializablePredicate<C> filter) {
+        this.filter = filter;
+        this.refreshAll();
+    }
+
+    public void addFilter(SerializablePredicate<C> filter) {
+        Objects.requireNonNull(filter, "Filter cannot be null");
+        if (this.getFilter() == null) {
+            this.setFilter(filter);
+        } else {
+            SerializablePredicate<C> oldFilter = this.getFilter();
+            this.setFilter((item) -> oldFilter.test(item) && filter.test(item));
+        }
+
+    }
+
+    @Override
+    protected int sizeInBackEnd(Query<C, CrudFilter> query) {
+        return fieldsMap.size();
+    }
+
+    @Override
+    protected Stream<C> fetchFromBackEnd(Query<C, CrudFilter> query) {
+        Stream<C> stream = fieldsMap.stream();
+
+        Optional<Comparator<C>> comparing = Stream.of(query.getInMemorySorting(), comparator)
+            .filter(Objects::nonNull).reduce(Comparator::thenComparing);
+        if (comparing.isPresent()) {
+            stream = stream.sorted();
+        }
+        long maxId = 0;
+        List<C> result = stream.collect(Collectors.toList());
+        for (C c : result) {
+            if (c.getTemporaryId() > maxId) {
+                maxId = c.getTemporaryId();
+            }
+        }
+        uniqueLong.set(maxId + 1);
+        return result.stream().skip(query.getOffset()).limit(query.getLimit());
+    }
 }

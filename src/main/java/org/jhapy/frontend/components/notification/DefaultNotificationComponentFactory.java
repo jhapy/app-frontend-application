@@ -9,18 +9,18 @@ import org.jhapy.frontend.components.notification.interfaces.NotificationListene
 public class DefaultNotificationComponentFactory<T extends Notification> implements
     PairComponentFactory<NotificationHolder<T>, T> {
 
-  @Override
-  public Component getComponent(NotificationHolder<T> holder, T info) {
-    return new NotificationView<>(info, holder, new NotificationListener() {
-      @Override
-      public void onClick() {
-        holder.onNotificationClicked(info);
-      }
+    @Override
+    public Component getComponent(NotificationHolder<T> holder, T info) {
+        return new NotificationView<>(info, holder, new NotificationListener() {
+            @Override
+            public void onClick() {
+                holder.onNotificationClicked(info);
+            }
 
-      @Override
-      public void onDismiss() {
-        holder.onNotificationDismissed(info);
-      }
-    }, true);
-  }
+            @Override
+            public void onDismiss() {
+                holder.onNotificationDismissed(info);
+            }
+        }, true);
+    }
 }

@@ -32,12 +32,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class RegistryServices {
 
-  public static EurekaService getEurekaService() {
-    return getApplicationContext().getBean(EurekaService.class);
-  }
+    public static EurekaService getEurekaService() {
+        return getApplicationContext().getBean(EurekaService.class);
+    }
 
-  public static ApplicationContext getApplicationContext() {
-    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-  }
+    public static ApplicationContext getApplicationContext() {
+        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+    }
 }

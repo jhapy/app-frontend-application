@@ -27,22 +27,22 @@ import org.jhapy.frontend.utils.UIUtils;
 @CssImport("./styles/components/brand-expression.css")
 public class BrandExpression extends Div {
 
-  private final String CLASS_NAME = "brand-expression";
+    private final String CLASS_NAME = "brand-expression";
 
-  private final Image logo;
-  private final Label title;
+    private final Image logo;
+    private final Label title;
 
-  public BrandExpression(String text) {
-    setClassName(CLASS_NAME);
+    public BrandExpression(String text) {
+        setClassName(CLASS_NAME);
 
-    logo = new Image(UIUtils.IMG_PATH + "logo.png", "");
-    logo.setAlt(text + " logo");
-    logo.setClassName(CLASS_NAME + "__logo");
+        logo = new Image(UIUtils.IMG_PATH + "logo.png", "");
+        logo.setAlt(text + " logo");
+        logo.setClassName(CLASS_NAME + "__logo");
 
-    title = UIUtils.createH3Label(text);
-    title.addClassName(CLASS_NAME + "__title");
+        title = UIUtils.createH3Label(text);
+        title.addClassName(CLASS_NAME + "__title");
 
-    add(logo, title);
-  }
+        add(logo, title);
+    }
 
 }

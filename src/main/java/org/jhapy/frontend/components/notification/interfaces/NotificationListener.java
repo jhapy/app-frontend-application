@@ -2,8 +2,8 @@ package org.jhapy.frontend.components.notification.interfaces;
 
 public interface NotificationListener {
 
-  void onClick();
+    void onClick();
 
-  void onDismiss();
+    void onDismiss();
 
 }

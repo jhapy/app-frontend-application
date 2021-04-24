@@ -30,28 +30,28 @@ import java.util.stream.Stream;
 public abstract class FilterableSliceDataProvider<T extends Serializable, F> extends
     SliceDataProvider<T, F> {
 
-  private F filter = null;
+    private F filter = null;
 
-  public void setFilter(F filter) {
-    if (filter == null) {
-      throw new IllegalArgumentException("Filter cannot be null");
+    public void setFilter(F filter) {
+        if (filter == null) {
+            throw new IllegalArgumentException("Filter cannot be null");
+        }
+        this.filter = filter;
+        refreshAll();
     }
-    this.filter = filter;
-    refreshAll();
-  }
 
-  @Override
-  public int size(Query<T, F> query) {
-    return super.size(getFilterQuery(query));
-  }
+    @Override
+    public int size(Query<T, F> query) {
+        return super.size(getFilterQuery(query));
+    }
 
-  @Override
-  public Stream<T> fetch(Query<T, F> query) {
-    return super.fetch(getFilterQuery(query));
-  }
+    @Override
+    public Stream<T> fetch(Query<T, F> query) {
+        return super.fetch(getFilterQuery(query));
+    }
 
-  private Query<T, F> getFilterQuery(Query<T, F> t) {
-    return new Query<>(t.getOffset(), t.getLimit(), t.getSortOrders(),
-        t.getInMemorySorting(), filter);
-  }
+    private Query<T, F> getFilterQuery(Query<T, F> t) {
+        return new Query<>(t.getOffset(), t.getLimit(), t.getSortOrders(),
+            t.getInMemorySorting(), filter);
+    }
 }

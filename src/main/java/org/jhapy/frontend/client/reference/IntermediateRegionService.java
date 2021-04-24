@@ -42,21 +42,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface IntermediateRegionService {
 
-  @PostMapping(value = "/findAll")
-  ServiceResult<List<IntermediateRegion>> findAll(@RequestBody BaseRemoteQuery query);
+    @PostMapping(value = "/findAll")
+    ServiceResult<List<IntermediateRegion>> findAll(@RequestBody BaseRemoteQuery query);
 
-  @PostMapping(value = "/findAnyMatching")
-  ServiceResult<Page<IntermediateRegion>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+    @PostMapping(value = "/findAnyMatching")
+    ServiceResult<Page<IntermediateRegion>> findAnyMatching(
+        @RequestBody FindAnyMatchingQuery query);
 
-  @PostMapping(value = "/countAnyMatching")
-  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+    @PostMapping(value = "/countAnyMatching")
+    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-  @PostMapping(value = "/getById")
-  ServiceResult<IntermediateRegion> getById(@RequestBody GetByIdQuery query);
+    @PostMapping(value = "/getById")
+    ServiceResult<IntermediateRegion> getById(@RequestBody GetByIdQuery query);
 
-  @PostMapping(value = "/save")
-  ServiceResult<IntermediateRegion> save(@RequestBody SaveQuery<IntermediateRegion> query);
+    @PostMapping(value = "/save")
+    ServiceResult<IntermediateRegion> save(@RequestBody SaveQuery<IntermediateRegion> query);
 
-  @PostMapping(value = "/delete")
-  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+    @PostMapping(value = "/delete")
+    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 }

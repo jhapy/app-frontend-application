@@ -33,36 +33,37 @@ import org.jhapy.frontend.utils.AppConst;
  */
 public class BooleanOkRenderer<SOURCE> extends ComponentRenderer<Component, SOURCE> {
 
-  protected ValueProvider<SOURCE, Boolean> valueProvider;
-  protected ValueProvider<SOURCE, String> textProvider;
+    protected ValueProvider<SOURCE, Boolean> valueProvider;
+    protected ValueProvider<SOURCE, String> textProvider;
 
-  public BooleanOkRenderer(ValueProvider<SOURCE, Boolean> valueProvider) {
-    this.valueProvider = valueProvider;
-  }
-
-  public BooleanOkRenderer(ValueProvider<SOURCE, Boolean> valueProvider,
-      ValueProvider<SOURCE, String> textProvider) {
-    this.valueProvider = valueProvider;
-    this.textProvider = textProvider;
-  }
-
-  public Component createComponent(SOURCE item) {
-    Image image = new Image();
-
-    Boolean val = valueProvider.apply(item);
-
-    if (val != null && val) {
-      image.setSrc(AppConst.ICON_OK);
-    } else {
-      image.setSrc(AppConst.ICON_BLANK);
+    public BooleanOkRenderer(ValueProvider<SOURCE, Boolean> valueProvider) {
+        this.valueProvider = valueProvider;
     }
 
-    if ( textProvider != null ) {
-      HorizontalLayout horizontalLayout = new HorizontalLayout();
-      horizontalLayout.add(image);
-      horizontalLayout.add(new Span(textProvider.apply(item)));
-      return horizontalLayout;
-    } else
-      return image;
-  }
+    public BooleanOkRenderer(ValueProvider<SOURCE, Boolean> valueProvider,
+        ValueProvider<SOURCE, String> textProvider) {
+        this.valueProvider = valueProvider;
+        this.textProvider = textProvider;
+    }
+
+    public Component createComponent(SOURCE item) {
+        Image image = new Image();
+
+        Boolean val = valueProvider.apply(item);
+
+        if (val != null && val) {
+            image.setSrc(AppConst.ICON_OK);
+        } else {
+            image.setSrc(AppConst.ICON_BLANK);
+        }
+
+        if (textProvider != null) {
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.add(image);
+            horizontalLayout.add(new Span(textProvider.apply(item)));
+            return horizontalLayout;
+        } else {
+            return image;
+        }
+    }
 }

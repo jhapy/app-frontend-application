@@ -26,26 +26,27 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "jhapy")
 public class AppProperties extends org.jhapy.commons.config.AppProperties {
 
-  private final Authorization authorization = new Authorization();
+    private final Authorization authorization = new Authorization();
 
-  private final LoginForm loginForm = new LoginForm();
+    private final LoginForm loginForm = new LoginForm();
 
-  @Data
-  public static class LoginForm {
+    @Data
+    public static class LoginForm {
 
-    private Boolean displaySignup = Boolean.TRUE;
-    private Boolean displayForgetPassword = Boolean.TRUE;
-    private Boolean displaySocialLogin = Boolean.TRUE;
-    private Boolean displayRememberMe = Boolean.TRUE;
-    private Boolean displayLanguage = Boolean.TRUE;
-  }
+        private Boolean displaySignup = Boolean.TRUE;
+        private Boolean displayForgetPassword = Boolean.TRUE;
+        private Boolean displaySocialLogin = Boolean.TRUE;
+        private Boolean displayRememberMe = Boolean.TRUE;
+        private Boolean displayLanguage = Boolean.TRUE;
+    }
 
-  @Data
-  public static final class Authorization {
-    private Boolean forceRealmToHttps = Boolean.FALSE;
-    private String loginRootUrl = "";
-    private String facebookUrl;
-    private String googleUrl;
-    private String publicKey;
-  }
+    @Data
+    public static final class Authorization {
+
+        private Boolean forceRealmToHttps = Boolean.FALSE;
+        private String loginRootUrl = "";
+        private String facebookUrl;
+        private String googleUrl;
+        private String publicKey;
+    }
 }

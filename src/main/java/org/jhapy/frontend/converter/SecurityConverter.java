@@ -29,10 +29,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecurityConverter {
 
-  private final OrikaBeanMapper orikaBeanMapper;
+    private final OrikaBeanMapper orikaBeanMapper;
 
-  public SecurityConverter(OrikaBeanMapper orikaBeanMapper) {
-    this.orikaBeanMapper = orikaBeanMapper;
-  }
+    public SecurityConverter(OrikaBeanMapper orikaBeanMapper) {
+        this.orikaBeanMapper = orikaBeanMapper;
+    }
 
 }

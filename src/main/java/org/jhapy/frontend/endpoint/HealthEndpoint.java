@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HealthEndpoint {
 
-  @GetMapping(value = "/ping", produces = "application/txt")
-  public ResponseEntity<?> ping() {
-    return ResponseEntity.ok("pong");
-  }
+    @GetMapping(value = "/ping", produces = "application/txt")
+    public ResponseEntity<?> ping() {
+        return ResponseEntity.ok("pong");
+    }
 }

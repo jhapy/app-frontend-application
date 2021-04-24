@@ -7,5 +7,5 @@ package org.jhapy.frontend.utils;
  */
 public interface AttributeContextListener {
 
-  void onAttributeContextChanged(String attributeName, Object attributeValue);
+    void onAttributeContextChanged(String attributeName, Object attributeValue);
 }

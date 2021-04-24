@@ -25,68 +25,68 @@ import org.jhapy.frontend.components.FlexBoxLayout;
 @CssImport("./styles/components/details-drawer.css")
 public class DetailsDrawer extends FlexBoxLayout {
 
-  private final String CLASS_NAME = "details-drawer";
+    private final String CLASS_NAME = "details-drawer";
 
-  private final FlexBoxLayout header;
-  private final FlexBoxLayout content;
-  private final FlexBoxLayout footer;
+    private final FlexBoxLayout header;
+    private final FlexBoxLayout content;
+    private final FlexBoxLayout footer;
 
-  public DetailsDrawer(Component... components) {
-    this(null, components);
-  }
-
-  public DetailsDrawer(Position position, Component... components) {
-    setClassName(CLASS_NAME);
-    if (position != null) {
-      setPosition(position);
+    public DetailsDrawer(Component... components) {
+        this(null, components);
     }
 
-    header = new FlexBoxLayout();
-    header.setClassName(CLASS_NAME + "__header");
+    public DetailsDrawer(Position position, Component... components) {
+        setClassName(CLASS_NAME);
+        if (position != null) {
+            setPosition(position);
+        }
 
-    content = new FlexBoxLayout(components);
-    content.setClassName(CLASS_NAME + "__content");
-    content.setFlexDirection(FlexDirection.COLUMN);
+        header = new FlexBoxLayout();
+        header.setClassName(CLASS_NAME + "__header");
 
-    footer = new FlexBoxLayout();
-    footer.setClassName(CLASS_NAME + "__footer");
+        content = new FlexBoxLayout(components);
+        content.setClassName(CLASS_NAME + "__content");
+        content.setFlexDirection(FlexDirection.COLUMN);
 
-    add(header, content, footer);
-  }
+        footer = new FlexBoxLayout();
+        footer.setClassName(CLASS_NAME + "__footer");
 
-  public FlexBoxLayout getHeader() {
-    return this.header;
-  }
+        add(header, content, footer);
+    }
 
-  public void setHeader(Component... components) {
-    this.header.removeAll();
-    this.header.add(components);
-  }
+    public FlexBoxLayout getHeader() {
+        return this.header;
+    }
 
-  public void setContent(Component... components) {
-    this.content.removeAll();
-    this.content.add(components);
-  }
+    public void setHeader(Component... components) {
+        this.header.removeAll();
+        this.header.add(components);
+    }
 
-  public void setFooter(Component... components) {
-    this.footer.removeAll();
-    this.footer.add(components);
-  }
+    public void setContent(Component... components) {
+        this.content.removeAll();
+        this.content.add(components);
+    }
 
-  public void setPosition(Position position) {
-    getElement().setAttribute("position", position.name().toLowerCase());
-  }
+    public void setFooter(Component... components) {
+        this.footer.removeAll();
+        this.footer.add(components);
+    }
 
-  public void hide() {
-    getElement().setAttribute("open", false);
-  }
+    public void setPosition(Position position) {
+        getElement().setAttribute("position", position.name().toLowerCase());
+    }
 
-  public void show() {
-    getElement().setAttribute("open", true);
-  }
+    public void hide() {
+        getElement().setAttribute("open", false);
+    }
 
-  public enum Position {
-    BOTTOM, RIGHT
-  }
+    public void show() {
+        getElement().setAttribute("open", true);
+    }
+
+    public enum Position {
+        BOTTOM, RIGHT
+    }
 
 }

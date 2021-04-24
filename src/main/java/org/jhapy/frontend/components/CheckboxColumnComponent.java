@@ -27,8 +27,8 @@ import com.vaadin.flow.component.checkbox.Checkbox;
  */
 public class CheckboxColumnComponent extends Checkbox {
 
-  public CheckboxColumnComponent(boolean initialValue) {
-    super(initialValue);
-    setReadOnly(false);
-  }
+    public CheckboxColumnComponent(boolean initialValue) {
+        super(initialValue);
+        setReadOnly(false);
+    }
 }

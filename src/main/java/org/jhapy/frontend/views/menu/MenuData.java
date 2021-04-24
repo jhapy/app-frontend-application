@@ -15,31 +15,31 @@ import java.util.stream.Collectors;
  */
 public class MenuData implements Serializable {
 
-  private final List<MenuEntry> menuList = new ArrayList<>();
+    private final List<MenuEntry> menuList = new ArrayList<>();
 
-  public void addMenuEntry(MenuEntry... menuEntries) {
-    menuList.addAll(Arrays.asList(menuEntries));
-  }
+    public void addMenuEntry(MenuEntry... menuEntries) {
+        menuList.addAll(Arrays.asList(menuEntries));
+    }
 
-  public List<MenuEntry> getMenuList() {
-    return menuList;
-  }
+    public List<MenuEntry> getMenuList() {
+        return menuList;
+    }
 
-  public List<MenuEntry> getRootItems() {
-    return menuList.stream()
-        .filter(department -> department.getParentMenuEntry() == null)
-        .collect(Collectors.toList());
-  }
+    public List<MenuEntry> getRootItems() {
+        return menuList.stream()
+            .filter(department -> department.getParentMenuEntry() == null)
+            .collect(Collectors.toList());
+    }
 
-  public List<MenuEntry> getChildItems(MenuEntry parent) {
-    return menuList.stream().filter(
-        menuEntry -> Objects.equals(menuEntry.getParentMenuEntry(), parent))
-        .collect(Collectors.toList());
-  }
+    public List<MenuEntry> getChildItems(MenuEntry parent) {
+        return menuList.stream().filter(
+            menuEntry -> Objects.equals(menuEntry.getParentMenuEntry(), parent))
+            .collect(Collectors.toList());
+    }
 
-  public Optional<MenuEntry> getFirstMenuByTargetId(String targetId) {
-    return menuList.stream().filter(
-        menuEntry -> menuEntry.getTargetId() != null && menuEntry.getTargetId()
-            .equalsIgnoreCase(targetId)).findFirst();
-  }
+    public Optional<MenuEntry> getFirstMenuByTargetId(String targetId) {
+        return menuList.stream().filter(
+            menuEntry -> menuEntry.getTargetId() != null && menuEntry.getTargetId()
+                .equalsIgnoreCase(targetId)).findFirst();
+    }
 }

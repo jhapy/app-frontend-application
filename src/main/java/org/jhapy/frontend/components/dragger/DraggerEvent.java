@@ -14,15 +14,15 @@ import lombok.ToString;
 @DomEvent("dragger-newWidth")
 public class DraggerEvent extends ComponentEvent<Dragger> {
 
-  private final String width;
+    private final String width;
 
-  public DraggerEvent(
-      Dragger source, boolean fromClient, @EventData("event.detail.width") String width) {
-    super(source, fromClient);
-    this.width = width;
-  }
+    public DraggerEvent(
+        Dragger source, boolean fromClient, @EventData("event.detail.width") String width) {
+        super(source, fromClient);
+        this.width = width;
+    }
 
-  public String getWidth() {
-    return width;
-  }
+    public String getWidth() {
+        return width;
+    }
 }

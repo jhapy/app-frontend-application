@@ -15,92 +15,92 @@ import org.jhapy.frontend.components.notification.interfaces.NotificationListene
 
 public class NotificationView<T extends Notification> extends HorizontalLayout {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final VerticalLayout wrapper;
-  private final T info;
-  private final NotificationHolder<T> holder;
-  private final boolean isNotification;
-  private IconButton dismissButton;
-  private DomListenerRegistration registration;
+    private final VerticalLayout wrapper;
+    private final T info;
+    private final NotificationHolder<T> holder;
+    private final boolean isNotification;
+    private IconButton dismissButton;
+    private DomListenerRegistration registration;
 
-  public NotificationView(T info, NotificationHolder<T> holder, NotificationListener listener,
-      boolean isNotification) {
-    this.info = info;
-    this.holder = holder;
-    this.isNotification = isNotification;
-    setWidth("100%");
-    setAlignItems(Alignment.CENTER);
-    Label title = new Label(info.getTitle());
-    title.getElement().getStyle()
-        .set("font-size", "15px")
-        .set("font-weight", "500");
+    public NotificationView(T info, NotificationHolder<T> holder, NotificationListener listener,
+        boolean isNotification) {
+        this.info = info;
+        this.holder = holder;
+        this.isNotification = isNotification;
+        setWidth("100%");
+        setAlignItems(Alignment.CENTER);
+        Label title = new Label(info.getTitle());
+        title.getElement().getStyle()
+            .set("font-size", "15px")
+            .set("font-weight", "500");
 
-    Label dot = new Label("·");
-    dot.getElement().getStyle()
-        .set("margin-left", "5px");
+        Label dot = new Label("·");
+        dot.getElement().getStyle()
+            .set("margin-left", "5px");
 
-    Label timeAgo = new Label(holder.getDateTimeFormatter().apply(info));
-    timeAgo.getElement().getStyle()
-        .set("font-size", "13px")
-        .set("margin-left", "5px")
-        .set("font-weight", "300");
+        Label timeAgo = new Label(holder.getDateTimeFormatter().apply(info));
+        timeAgo.getElement().getStyle()
+            .set("font-size", "13px")
+            .set("margin-left", "5px")
+            .set("font-weight", "300");
 
-    Label description = new Label(info.getDescription());
-    description.setWidth("100%");
-    description.getElement().getStyle()
-        .set("font-size", "15px")
-        .set("font-weight", "400")
-        .set("white-space", "nowrap")
-        .set("text-overflow", "ellipsis")
-        .set("overflow", "hidden");
+        Label description = new Label(info.getDescription());
+        description.setWidth("100%");
+        description.getElement().getStyle()
+            .set("font-size", "15px")
+            .set("font-weight", "400")
+            .set("white-space", "nowrap")
+            .set("text-overflow", "ellipsis")
+            .set("overflow", "hidden");
 
-    HorizontalLayout descriptionWrapper = new HorizontalLayout(description);
+        HorizontalLayout descriptionWrapper = new HorizontalLayout(description);
 
-    descriptionWrapper.setWidth("100%");
-    if (info.getImage() != null) {
-      RoundImage image = new RoundImage(info.getImage());
-      descriptionWrapper.add(image);
+        descriptionWrapper.setWidth("100%");
+        if (info.getImage() != null) {
+            RoundImage image = new RoundImage(info.getImage());
+            descriptionWrapper.add(image);
+        }
+        if (!isNotification) {
+            setHighlightBorder(!info.isRead());
+        }
+        HorizontalLayout headerLine = new HorizontalLayout(title, dot, timeAgo);
+        headerLine.setSpacing(false);
+        headerLine.setAlignItems(FlexComponent.Alignment.CENTER);
+        wrapper = new VerticalLayout(headerLine, descriptionWrapper);
+        wrapper.setMargin(false);
+        wrapper.setPadding(false);
+        wrapper.setSpacing(false);
+        wrapper.getElement().setAttribute("theme", "spacing-s");
+        wrapper.getStyle().set("overflow", "hidden");
+        add(wrapper);
+
+        setNotificationListener(listener);
+        if (!isNotification) {
+            if (info.isDismissable()) {
+                dismissButton = new IconButton(VaadinIcon.CLOSE_SMALL.create(),
+                    paperIconButtonClickEvent -> {
+                        if (listener != null) {
+                            listener.onDismiss();
+                        }
+                    });
+                dismissButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+                dismissButton.setSizeUndefined();
+                add(dismissButton);
+                getElement().getStyle().set("padding-right", "0");
+            }
+        }
     }
-    if (!isNotification) {
-      setHighlightBorder(!info.isRead());
-    }
-    HorizontalLayout headerLine = new HorizontalLayout(title, dot, timeAgo);
-    headerLine.setSpacing(false);
-    headerLine.setAlignItems(FlexComponent.Alignment.CENTER);
-    wrapper = new VerticalLayout(headerLine, descriptionWrapper);
-    wrapper.setMargin(false);
-    wrapper.setPadding(false);
-    wrapper.setSpacing(false);
-    wrapper.getElement().setAttribute("theme", "spacing-s");
-    wrapper.getStyle().set("overflow", "hidden");
-    add(wrapper);
 
-    setNotificationListener(listener);
-    if (!isNotification) {
-      if (info.isDismissable()) {
-        dismissButton = new IconButton(VaadinIcon.CLOSE_SMALL.create(),
-            paperIconButtonClickEvent -> {
-              if (listener != null) {
-                listener.onDismiss();
-              }
-            });
-        dismissButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        dismissButton.setSizeUndefined();
-        add(dismissButton);
-        getElement().getStyle().set("padding-right", "0");
-      }
+    public void setHighlightBorder(boolean highlight) {
+        getStyle().set("border-left",
+            "3px solid " + (highlight ? info.getPriority().getStyle() : "transparent"));
     }
-  }
 
-  public void setHighlightBorder(boolean highlight) {
-    getStyle().set("border-left",
-        "3px solid " + (highlight ? info.getPriority().getStyle() : "transparent"));
-  }
-
-  public void setNotificationListener(NotificationListener listener) {
-    if (listener != null && registration == null) {
-      registration = getElement().addEventListener("click", domEvent -> listener.onClick());
+    public void setNotificationListener(NotificationListener listener) {
+        if (listener != null && registration == null) {
+            registration = getElement().addEventListener("click", domEvent -> listener.onClick());
+        }
     }
-  }
 }

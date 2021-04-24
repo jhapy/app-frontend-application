@@ -46,24 +46,24 @@ public class SecurityUserStringDataProvider extends
     Serializable {
 
 
-  @Override
-  protected Page<SecurityUser> fetchFromBackEnd(Query<SecurityUser, String> query,
-      Pageable pageable) {
+    @Override
+    protected Page<SecurityUser> fetchFromBackEnd(Query<SecurityUser, String> query,
+        Pageable pageable) {
 
-    return SecurityServices.getSecurityUserService().findAnyMatching(
-        new FindAnyMatchingQuery(query.getFilter().orElse(null), true, pageable)).getData();
-  }
+        return SecurityServices.getSecurityUserService().findAnyMatching(
+            new FindAnyMatchingQuery(query.getFilter().orElse(null), true, pageable)).getData();
+    }
 
-  @Override
-  protected List<QuerySortOrder> getDefaultSortOrders() {
-    return Collections.singletonList(new QuerySortOrder("username", SortDirection.ASCENDING));
-  }
+    @Override
+    protected List<QuerySortOrder> getDefaultSortOrders() {
+        return Collections.singletonList(new QuerySortOrder("username", SortDirection.ASCENDING));
+    }
 
 
-  @Override
-  protected int sizeInBackEnd(Query<SecurityUser, String> query) {
-    return SecurityServices.getSecurityUserService()
-        .countAnyMatching(new CountAnyMatchingQuery(query.getFilter().orElse(null), true))
-        .getData().intValue();
-  }
+    @Override
+    protected int sizeInBackEnd(Query<SecurityUser, String> query) {
+        return SecurityServices.getSecurityUserService()
+            .countAnyMatching(new CountAnyMatchingQuery(query.getFilter().orElse(null), true))
+            .getData().intValue();
+    }
 }

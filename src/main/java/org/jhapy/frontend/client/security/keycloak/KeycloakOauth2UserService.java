@@ -52,82 +52,82 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class KeycloakOauth2UserService extends OidcUserService {
 
-  private final OAuth2Error INVALID_REQUEST = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
+    private final OAuth2Error INVALID_REQUEST = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
 
-  private final JwtDecoder jwtDecoder;
+    private final JwtDecoder jwtDecoder;
 
-  private final GrantedAuthoritiesMapper authoritiesMapper;
+    private final GrantedAuthoritiesMapper authoritiesMapper;
 
-  /**
-   * Augments {@link OidcUserService#loadUser(OidcUserRequest)} to add authorities provided by
-   * Keycloak.
-   *
-   * Needed because {@link OidcUserService#loadUser(OidcUserRequest)} (currently) does not provide a
-   * hook for adding custom authorities from a {@link OidcUserRequest}.
-   */
-  @Override
-  public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+    /**
+     * Augments {@link OidcUserService#loadUser(OidcUserRequest)} to add authorities provided by
+     * Keycloak.
+     *
+     * Needed because {@link OidcUserService#loadUser(OidcUserRequest)} (currently) does not provide
+     * a hook for adding custom authorities from a {@link OidcUserRequest}.
+     */
+    @Override
+    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
 
-    OidcUser user = super.loadUser(userRequest);
+        OidcUser user = super.loadUser(userRequest);
 
-    Set<GrantedAuthority> authorities = new LinkedHashSet<>();
-    authorities.addAll(user.getAuthorities());
-    authorities.addAll(extractKeycloakAuthorities(userRequest));
+        Set<GrantedAuthority> authorities = new LinkedHashSet<>();
+        authorities.addAll(user.getAuthorities());
+        authorities.addAll(extractKeycloakAuthorities(userRequest));
 
-    return new DefaultOidcUser(authorities, userRequest.getIdToken(), user.getUserInfo(),
-        "preferred_username");
-  }
-
-  /**
-   * Extracts {@link GrantedAuthority GrantedAuthorities} from the AccessToken in the {@link
-   * OidcUserRequest}.
-   */
-  private Collection<? extends GrantedAuthority> extractKeycloakAuthorities(
-      OidcUserRequest userRequest) {
-
-    Jwt token = parseJwt(userRequest.getAccessToken().getTokenValue());
-
-    // Would be great if Spring Security would provide something like a plugable
-    // OidcUserRequestAuthoritiesExtractor interface to hide the junk below...
-
-    Map<String, Object> claims = token.getClaims();
-    Map<String, Object> resourceMap = (Map<String, Object>) claims.get("resource_access");
-    final Map<String, Object> realmAccess = (Map<String, Object>) token.getClaims()
-        .get("realm_access");
-    String clientId = userRequest.getClientRegistration().getClientId();
-
-    @SuppressWarnings("unchecked")
-    Map<String, Map<String, Object>> clientResource = (Map<String, Map<String, Object>>) resourceMap
-        .get(clientId);
-    if (!CollectionUtils.isEmpty(clientResource)) {
-      List<String> clientRoles = (List<String>) clientResource.get("roles");
-      if (CollectionUtils.isEmpty(clientRoles)) {
-        return Collections.emptyList();
-      }
-      Collection<? extends GrantedAuthority> authorities = AuthorityUtils
-          .createAuthorityList(clientRoles.toArray(new String[0]));
-      if (authoritiesMapper == null) {
-        return authorities;
-      }
-
-      return authoritiesMapper.mapAuthorities(authorities);
-    } else {
-      Collection<String> roles = (Collection<String>) claims.getOrDefault("groups",
-          claims.getOrDefault("roles", realmAccess.getOrDefault("roles", new ArrayList<>())));
-
-      return roles.stream()
-          .filter(role -> role.startsWith("ROLE_"))
-          .map(SimpleGrantedAuthority::new)
-          .collect(Collectors.toList());
+        return new DefaultOidcUser(authorities, userRequest.getIdToken(), user.getUserInfo(),
+            "preferred_username");
     }
-  }
 
-  private Jwt parseJwt(String accessTokenValue) {
-    try {
-      // Token is already verified by spring security infrastructure
-      return jwtDecoder.decode(accessTokenValue);
-    } catch (JwtException e) {
-      throw new OAuth2AuthenticationException(INVALID_REQUEST, e);
+    /**
+     * Extracts {@link GrantedAuthority GrantedAuthorities} from the AccessToken in the {@link
+     * OidcUserRequest}.
+     */
+    private Collection<? extends GrantedAuthority> extractKeycloakAuthorities(
+        OidcUserRequest userRequest) {
+
+        Jwt token = parseJwt(userRequest.getAccessToken().getTokenValue());
+
+        // Would be great if Spring Security would provide something like a plugable
+        // OidcUserRequestAuthoritiesExtractor interface to hide the junk below...
+
+        Map<String, Object> claims = token.getClaims();
+        Map<String, Object> resourceMap = (Map<String, Object>) claims.get("resource_access");
+        final Map<String, Object> realmAccess = (Map<String, Object>) token.getClaims()
+            .get("realm_access");
+        String clientId = userRequest.getClientRegistration().getClientId();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Object>> clientResource = (Map<String, Map<String, Object>>) resourceMap
+            .get(clientId);
+        if (!CollectionUtils.isEmpty(clientResource)) {
+            List<String> clientRoles = (List<String>) clientResource.get("roles");
+            if (CollectionUtils.isEmpty(clientRoles)) {
+                return Collections.emptyList();
+            }
+            Collection<? extends GrantedAuthority> authorities = AuthorityUtils
+                .createAuthorityList(clientRoles.toArray(new String[0]));
+            if (authoritiesMapper == null) {
+                return authorities;
+            }
+
+            return authoritiesMapper.mapAuthorities(authorities);
+        } else {
+            Collection<String> roles = (Collection<String>) claims.getOrDefault("groups",
+                claims.getOrDefault("roles", realmAccess.getOrDefault("roles", new ArrayList<>())));
+
+            return roles.stream()
+                .filter(role -> role.startsWith("ROLE_"))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        }
     }
-  }
+
+    private Jwt parseJwt(String accessTokenValue) {
+        try {
+            // Token is already verified by spring security infrastructure
+            return jwtDecoder.decode(accessTokenValue);
+        } catch (JwtException e) {
+            throw new OAuth2AuthenticationException(INVALID_REQUEST, e);
+        }
+    }
 }

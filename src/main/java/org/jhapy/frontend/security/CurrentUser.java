@@ -28,5 +28,5 @@ import org.jhapy.dto.domain.security.SecurityUser;
 @FunctionalInterface
 public interface CurrentUser {
 
-  SecurityUser getUser();
+    SecurityUser getUser();
 }

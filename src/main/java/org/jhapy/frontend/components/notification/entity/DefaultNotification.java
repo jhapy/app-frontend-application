@@ -9,109 +9,109 @@ import org.jhapy.frontend.components.notification.interfaces.Notification;
  */
 public class DefaultNotification implements Notification {
 
-  /**
-   * The title of the notification
-   */
-  private String title;
-  private String description;
-  private String image;
-  private Priority priority = Priority.MEDIUM;
-  private boolean isSticky = false;
-  private boolean isRead = false;
-  private LocalDateTime creationTime = LocalDateTime.now();
-  private boolean dismissable = true;
+    /**
+     * The title of the notification
+     */
+    private String title;
+    private String description;
+    private String image;
+    private Priority priority = Priority.MEDIUM;
+    private boolean isSticky = false;
+    private boolean isRead = false;
+    private LocalDateTime creationTime = LocalDateTime.now();
+    private boolean dismissable = true;
 
-  /**
-   * Creates a new {@link DefaultNotification} with the given arguments.
-   *
-   * @param title The title for this notification. Must not be <code>null</code>.
-   * @param description The description for this notification. Must not be <code>null</code>.
-   * @throws NullPointerException in case of any argument is <code>null</code>.
-   */
-  public DefaultNotification(String title, String description) {
-    this(title, description, null);
-  }
-
-  public DefaultNotification(String title, String description, Priority priority) {
-    Objects.requireNonNull(title, "The title must not be null.");
-    Objects.requireNonNull(description, "The description must not be null.");
-    this.title = title;
-    this.description = description;
-    if (priority != null) {
-      this.priority = priority;
+    /**
+     * Creates a new {@link DefaultNotification} with the given arguments.
+     *
+     * @param title The title for this notification. Must not be <code>null</code>.
+     * @param description The description for this notification. Must not be <code>null</code>.
+     * @throws NullPointerException in case of any argument is <code>null</code>.
+     */
+    public DefaultNotification(String title, String description) {
+        this(title, description, null);
     }
-  }
 
-  public DefaultNotification(String title, String description, Priority priority,
-      boolean isSticky) {
-    this(title, description, priority);
-    this.isSticky = isSticky;
-  }
+    public DefaultNotification(String title, String description, Priority priority) {
+        Objects.requireNonNull(title, "The title must not be null.");
+        Objects.requireNonNull(description, "The description must not be null.");
+        this.title = title;
+        this.description = description;
+        if (priority != null) {
+            this.priority = priority;
+        }
+    }
 
-  public String getTitle() {
-    return title;
-  }
+    public DefaultNotification(String title, String description, Priority priority,
+        boolean isSticky) {
+        this(title, description, priority);
+        this.isSticky = isSticky;
+    }
 
-  public void setTitle(String title) {
-    Objects.requireNonNull(title, "The title must not be null.");
-    this.title = title;
-  }
+    public String getTitle() {
+        return title;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setTitle(String title) {
+        Objects.requireNonNull(title, "The title must not be null.");
+        this.title = title;
+    }
 
-  public void setDescription(String description) {
-    Objects.requireNonNull(description, "The description must not be null.");
-    this.description = description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public String getImage() {
-    return image;
-  }
+    public void setDescription(String description) {
+        Objects.requireNonNull(description, "The description must not be null.");
+        this.description = description;
+    }
 
-  public void setImage(String image) {
-    this.image = image;
-  }
+    public String getImage() {
+        return image;
+    }
 
-  @Override
-  public boolean isDismissable() {
-    return dismissable;
-  }
+    public void setImage(String image) {
+        this.image = image;
+    }
 
-  @Override
-  public void setDismissable(boolean dismissable) {
-    this.dismissable = dismissable;
-  }
+    @Override
+    public boolean isDismissable() {
+        return dismissable;
+    }
 
-  @Override
-  public Priority getPriority() {
-    return priority;
-  }
+    @Override
+    public void setDismissable(boolean dismissable) {
+        this.dismissable = dismissable;
+    }
 
-  public boolean isSticky() {
-    return isSticky;
-  }
+    @Override
+    public Priority getPriority() {
+        return priority;
+    }
 
-  public boolean isRead() {
-    return isRead;
-  }
+    public boolean isSticky() {
+        return isSticky;
+    }
 
-  public LocalDateTime getCreationTime() {
-    return creationTime;
-  }
+    public boolean isRead() {
+        return isRead;
+    }
 
-  @Override
-  public void setCreationTime(LocalDateTime creationTime) {
-    Objects.requireNonNull(creationTime, "The creationTime must not be null.");
-    this.creationTime = creationTime;
-  }
+    public LocalDateTime getCreationTime() {
+        return creationTime;
+    }
 
-  public void setRead(boolean isRead) {
-    this.isRead = isRead;
-  }
+    @Override
+    public void setCreationTime(LocalDateTime creationTime) {
+        Objects.requireNonNull(creationTime, "The creationTime must not be null.");
+        this.creationTime = creationTime;
+    }
 
-  public void setSticky(boolean isSticky) {
-    this.isSticky = isSticky;
-  }
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
+    }
+
+    public void setSticky(boolean isSticky) {
+        this.isSticky = isSticky;
+    }
 }

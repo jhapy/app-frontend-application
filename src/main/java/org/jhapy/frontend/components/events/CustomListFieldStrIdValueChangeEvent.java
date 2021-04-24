@@ -20,42 +20,40 @@ package org.jhapy.frontend.components.events;
 
 import com.vaadin.flow.component.HasValue;
 import java.util.List;
-import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.domain.BaseEntityStrId;
-import org.jhapy.frontend.customFields.DefaultCustomListField;
 import org.jhapy.frontend.customFields.DefaultCustomListFieldStrId;
 
 public class CustomListFieldStrIdValueChangeEvent<C extends BaseEntityStrId> implements
     HasValue.ValueChangeEvent<List<C>> {
 
-  private final List<C> oldValues;
-  private final List<C> newValues;
-  private final DefaultCustomListFieldStrId src;
+    private final List<C> oldValues;
+    private final List<C> newValues;
+    private final DefaultCustomListFieldStrId src;
 
-  public CustomListFieldStrIdValueChangeEvent(List<C> oldValues, List<C> newValues,
-      DefaultCustomListFieldStrId src) {
-    this.oldValues = oldValues;
-    this.newValues = newValues;
-    this.src = src;
-  }
+    public CustomListFieldStrIdValueChangeEvent(List<C> oldValues, List<C> newValues,
+        DefaultCustomListFieldStrId src) {
+        this.oldValues = oldValues;
+        this.newValues = newValues;
+        this.src = src;
+    }
 
-  @Override
-  public HasValue<?, List<C>> getHasValue() {
-    return src;
-  }
+    @Override
+    public HasValue<?, List<C>> getHasValue() {
+        return src;
+    }
 
-  @Override
-  public boolean isFromClient() {
-    return true;
-  }
+    @Override
+    public boolean isFromClient() {
+        return true;
+    }
 
-  @Override
-  public List<C> getOldValue() {
-    return oldValues;
-  }
+    @Override
+    public List<C> getOldValue() {
+        return oldValues;
+    }
 
-  @Override
-  public List<C> getValue() {
-    return newValues;
-  }
+    @Override
+    public List<C> getValue() {
+        return newValues;
+    }
 }

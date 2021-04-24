@@ -57,128 +57,131 @@ import org.springframework.http.ResponseEntity;
 @Tag("loggersTabContent")
 public class LoggersTabContent extends ActuatorBaseView {
 
-  protected FlexBoxLayout content;
-  protected Component component;
+    protected FlexBoxLayout content;
+    protected Component component;
 
-  public LoggersTabContent(UI ui, String I18N_PREFIX,
-      AuthorizationHeaderUtil authorizationHeaderUtil) {
-    super(ui, I18N_PREFIX + "loggers.", authorizationHeaderUtil);
-  }
-
-  public Component getContent(EurekaInfo eurekaInfo) {
-    content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
-        getTranslation("element." + I18N_PREFIX + "title"),
-        getEurekaInstancesList(true, eurekaInfo.getApplicationList(), this::getDetails)));
-    content.setAlignItems(FlexComponent.Alignment.CENTER);
-    content.setFlexDirection(FlexDirection.COLUMN);
-    content.setSizeFull();
-
-    return content;
-  }
-
-  @Override
-  public void refresh() {
-    String loggerPrefix = getLoggerPrefix("refresh");
-    if (currentEurekaApplicationInstance != null && currentEurekaApplication != null) {
-      logger().debug(loggerPrefix + "Refresh content");
-      getDetails(currentEurekaApplication, currentEurekaApplicationInstance);
-    } else {
-      logger().warn(loggerPrefix + "No application or application instance set, nothing to do");
+    public LoggersTabContent(UI ui, String I18N_PREFIX,
+        AuthorizationHeaderUtil authorizationHeaderUtil) {
+        super(ui, I18N_PREFIX + "loggers.", authorizationHeaderUtil);
     }
-  }
 
-  protected Component getLoggers(List<Logger> allLoggers,
-      List<Loggers.LogLevel> availableLogLevels) {
-    Grid<Logger> loggersGrid = new Grid<>();
-    loggersGrid.addColumn(s -> s.name).setKey("application");
-    loggersGrid.addComponentColumn(logger -> {
-      Select<LogLevel> logLevelSelect = new Select<>();
-      logLevelSelect.setItems(availableLogLevels);
-      logLevelSelect.setValue(logger.effectiveLevel);
-      logLevelSelect.setRenderer(new ComponentRenderer<>(logLevel -> {
-        if (logLevel.equals(LogLevel.TRACE)) {
-          return UIUtils.createLabel(TextColor.HEADER, LogLevel.TRACE.name());
-        } else if (logLevel.equals(LogLevel.DEBUG)) {
-          return UIUtils.createLabel(TextColor.BODY, LogLevel.DEBUG.name());
-        } else if (logLevel.equals(LogLevel.INFO)) {
-          return UIUtils.createLabel(TextColor.PRIMARY, LogLevel.INFO.name());
-        } else if (logLevel.equals(LogLevel.WARN)) {
-          return UIUtils.createLabel(TextColor.TERTIARY, LogLevel.WARN.name());
-        } else if (logLevel.equals(LogLevel.ERROR)) {
-          return UIUtils.createLabel(TextColor.ERROR, LogLevel.ERROR.name());
-        } else if (logLevel.equals(LogLevel.FATAL)) {
-          return UIUtils.createLabel(TextColor.ERROR_CONTRAST, LogLevel.FATAL.name());
-        } else if (logLevel.equals(LogLevel.OFF)) {
-          return UIUtils.createLabel(TextColor.DISABLED, LogLevel.OFF.name());
+    public Component getContent(EurekaInfo eurekaInfo) {
+        content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
+            getTranslation("element." + I18N_PREFIX + "title"),
+            getEurekaInstancesList(true, eurekaInfo.getApplicationList(), this::getDetails)));
+        content.setAlignItems(FlexComponent.Alignment.CENTER);
+        content.setFlexDirection(FlexDirection.COLUMN);
+        content.setSizeFull();
+
+        return content;
+    }
+
+    @Override
+    public void refresh() {
+        String loggerPrefix = getLoggerPrefix("refresh");
+        if (currentEurekaApplicationInstance != null && currentEurekaApplication != null) {
+            logger().debug(loggerPrefix + "Refresh content");
+            getDetails(currentEurekaApplication, currentEurekaApplicationInstance);
         } else {
-          return UIUtils.createLabel(TextColor.DISABLED, logLevel.name());
+            logger()
+                .warn(loggerPrefix + "No application or application instance set, nothing to do");
         }
-      }));
-      return logLevelSelect;
-    });
-    loggersGrid.getColumns().forEach(column -> {
-      if (column.getKey() != null) {
-        column.setHeader(getTranslation("element." + I18N_PREFIX + "loggers." + column.getKey()));
-        column.setResizable(true);
-      }
-    });
-    loggersGrid.setItems(allLoggers);
-    return loggersGrid;
-  }
-
-  protected void getDetails(EurekaApplication eurekaApplication,
-      EurekaApplicationInstance eurekaApplicationInstance) {
-    titleLabel.setText(
-        getTranslation("element." + I18N_PREFIX + "title") + " - " + eurekaApplicationInstance
-            .getInstanceId());
-    try {
-      final HttpHeaders httpHeaders = new HttpHeaders() {{
-        set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
-        setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-      }};
-
-      logger().debug(
-          "Application : " + eurekaApplication.getName() + ", Loggers Url = "
-              + eurekaApplicationInstance.getMetadata().get("management.url") + "/loggers");
-      ResponseEntity<String> aa = restTemplate.exchange(URI.create(
-          eurekaApplicationInstance.getMetadata().get("management.url") + "/loggers"),
-          HttpMethod.GET,
-          new HttpEntity<>(httpHeaders), String.class);
-      String jsonBody = aa.getBody();
-      ObjectMapper mapper = new ObjectMapper();
-      Loggers loggers = mapper.readValue(jsonBody, Loggers.class);
-      logger().debug("Loggers = " + loggers);
-
-      List<LogLevel> availableLogLevels = new ArrayList<>(loggers.getLevels());
-      List<Logger> allLoggers = new ArrayList<>();
-      loggers.getLoggers().keySet().forEach(key -> {
-        allLoggers.add(new Logger(key,
-            loggers.getLoggers().get(key).getConfiguredLevel() == null ? null
-                : Loggers.LogLevel.valueOf(loggers.getLoggers().get(key).getConfiguredLevel()),
-            Loggers.LogLevel.valueOf(loggers.getLoggers().get(key).getEffectiveLevel())));
-      });
-
-      if (content.getChildren().count() > 1) {
-        if (component != null) {
-          content.remove(component);
-        }
-      }
-
-      component = getLoggers(allLoggers, availableLogLevels);
-      content.add(component);
-      content.setFlex("1", component);
-
-    } catch (Throwable t) {
-      t.printStackTrace();
     }
-  }
 
-  @Data
-  @AllArgsConstructor
-  static class Logger {
+    protected Component getLoggers(List<Logger> allLoggers,
+        List<Loggers.LogLevel> availableLogLevels) {
+        Grid<Logger> loggersGrid = new Grid<>();
+        loggersGrid.addColumn(s -> s.name).setKey("application");
+        loggersGrid.addComponentColumn(logger -> {
+            Select<LogLevel> logLevelSelect = new Select<>();
+            logLevelSelect.setItems(availableLogLevels);
+            logLevelSelect.setValue(logger.effectiveLevel);
+            logLevelSelect.setRenderer(new ComponentRenderer<>(logLevel -> {
+                if (logLevel.equals(LogLevel.TRACE)) {
+                    return UIUtils.createLabel(TextColor.HEADER, LogLevel.TRACE.name());
+                } else if (logLevel.equals(LogLevel.DEBUG)) {
+                    return UIUtils.createLabel(TextColor.BODY, LogLevel.DEBUG.name());
+                } else if (logLevel.equals(LogLevel.INFO)) {
+                    return UIUtils.createLabel(TextColor.PRIMARY, LogLevel.INFO.name());
+                } else if (logLevel.equals(LogLevel.WARN)) {
+                    return UIUtils.createLabel(TextColor.TERTIARY, LogLevel.WARN.name());
+                } else if (logLevel.equals(LogLevel.ERROR)) {
+                    return UIUtils.createLabel(TextColor.ERROR, LogLevel.ERROR.name());
+                } else if (logLevel.equals(LogLevel.FATAL)) {
+                    return UIUtils.createLabel(TextColor.ERROR_CONTRAST, LogLevel.FATAL.name());
+                } else if (logLevel.equals(LogLevel.OFF)) {
+                    return UIUtils.createLabel(TextColor.DISABLED, LogLevel.OFF.name());
+                } else {
+                    return UIUtils.createLabel(TextColor.DISABLED, logLevel.name());
+                }
+            }));
+            return logLevelSelect;
+        });
+        loggersGrid.getColumns().forEach(column -> {
+            if (column.getKey() != null) {
+                column.setHeader(
+                    getTranslation("element." + I18N_PREFIX + "loggers." + column.getKey()));
+                column.setResizable(true);
+            }
+        });
+        loggersGrid.setItems(allLoggers);
+        return loggersGrid;
+    }
 
-    private String name;
-    private LogLevel configuredLevel;
-    private LogLevel effectiveLevel;
-  }
+    protected void getDetails(EurekaApplication eurekaApplication,
+        EurekaApplicationInstance eurekaApplicationInstance) {
+        titleLabel.setText(
+            getTranslation("element." + I18N_PREFIX + "title") + " - " + eurekaApplicationInstance
+                .getInstanceId());
+        try {
+            final HttpHeaders httpHeaders = new HttpHeaders() {{
+                set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
+                setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            }};
+
+            logger().debug(
+                "Application : " + eurekaApplication.getName() + ", Loggers Url = "
+                    + eurekaApplicationInstance.getMetadata().get("management.url") + "/loggers");
+            ResponseEntity<String> aa = restTemplate.exchange(URI.create(
+                eurekaApplicationInstance.getMetadata().get("management.url") + "/loggers"),
+                HttpMethod.GET,
+                new HttpEntity<>(httpHeaders), String.class);
+            String jsonBody = aa.getBody();
+            ObjectMapper mapper = new ObjectMapper();
+            Loggers loggers = mapper.readValue(jsonBody, Loggers.class);
+            logger().debug("Loggers = " + loggers);
+
+            List<LogLevel> availableLogLevels = new ArrayList<>(loggers.getLevels());
+            List<Logger> allLoggers = new ArrayList<>();
+            loggers.getLoggers().keySet().forEach(key -> {
+                allLoggers.add(new Logger(key,
+                    loggers.getLoggers().get(key).getConfiguredLevel() == null ? null
+                        : Loggers.LogLevel
+                            .valueOf(loggers.getLoggers().get(key).getConfiguredLevel()),
+                    Loggers.LogLevel.valueOf(loggers.getLoggers().get(key).getEffectiveLevel())));
+            });
+
+            if (content.getChildren().count() > 1) {
+                if (component != null) {
+                    content.remove(component);
+                }
+            }
+
+            component = getLoggers(allLoggers, availableLogLevels);
+            content.add(component);
+            content.setFlex("1", component);
+
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class Logger {
+
+        private String name;
+        private LogLevel configuredLevel;
+        private LogLevel effectiveLevel;
+    }
 }

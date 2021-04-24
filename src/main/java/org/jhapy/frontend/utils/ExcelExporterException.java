@@ -25,11 +25,11 @@ package org.jhapy.frontend.utils;
  */
 public class ExcelExporterException extends RuntimeException {
 
-  ExcelExporterException(String message) {
-    super(message);
-  }
+    ExcelExporterException(String message) {
+        super(message);
+    }
 
-  ExcelExporterException(String message, Exception e) {
-    super(message, e);
-  }
+    ExcelExporterException(String message, Exception e) {
+        super(message, e);
+    }
 }

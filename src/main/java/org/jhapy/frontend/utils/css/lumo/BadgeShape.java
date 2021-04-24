@@ -20,16 +20,16 @@ package org.jhapy.frontend.utils.css.lumo;
 
 public enum BadgeShape {
 
-  NORMAL("normal"), PILL("pill");
+    NORMAL("normal"), PILL("pill");
 
-  private final String style;
+    private final String style;
 
-  BadgeShape(String style) {
-    this.style = style;
-  }
+    BadgeShape(String style) {
+        this.style = style;
+    }
 
-  public String getThemeName() {
-    return style;
-  }
+    public String getThemeName() {
+        return style;
+    }
 
 }

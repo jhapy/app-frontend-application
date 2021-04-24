@@ -27,7 +27,7 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
  */
 public interface HasConfirmation {
 
-  ConfirmDialog getConfirmDialog();
+    ConfirmDialog getConfirmDialog();
 
-  void setConfirmDialog(ConfirmDialog confirmDialog);
+    void setConfirmDialog(ConfirmDialog confirmDialog);
 }

@@ -36,12 +36,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface I18NService {
 
-  @PostMapping(value = "/getI18NFile")
-  ServiceResult<Byte[]> getI18NFile(@RequestBody BaseRemoteQuery query);
+    @PostMapping(value = "/getI18NFile")
+    ServiceResult<Byte[]> getI18NFile(@RequestBody BaseRemoteQuery query);
 
-  @PostMapping(value = "/importI18NFile")
-  ServiceResult<Void> importI18NFile(@RequestBody ImportI18NFileQuery query);
+    @PostMapping(value = "/importI18NFile")
+    ServiceResult<Void> importI18NFile(@RequestBody ImportI18NFileQuery query);
 
-  @PostMapping(value = "/getExistingLanguages")
-  ServiceResult<List<String>> getExistingLanguages(@RequestBody BaseRemoteQuery query);
+    @PostMapping(value = "/getExistingLanguages")
+    ServiceResult<List<String>> getExistingLanguages(@RequestBody BaseRemoteQuery query);
 }

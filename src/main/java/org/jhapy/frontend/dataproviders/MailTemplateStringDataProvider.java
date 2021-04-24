@@ -46,24 +46,24 @@ public class MailTemplateStringDataProvider extends
     Serializable {
 
 
-  @Override
-  protected Page<MailTemplate> fetchFromBackEnd(Query<MailTemplate, String> query,
-      Pageable pageable) {
+    @Override
+    protected Page<MailTemplate> fetchFromBackEnd(Query<MailTemplate, String> query,
+        Pageable pageable) {
 
-    return NotificationServices.getMailTemplateService().findAnyMatching(
-        new FindAnyMatchingQuery(query.getFilter().orElse(null), true, pageable)).getData();
-  }
+        return NotificationServices.getMailTemplateService().findAnyMatching(
+            new FindAnyMatchingQuery(query.getFilter().orElse(null), true, pageable)).getData();
+    }
 
-  @Override
-  protected List<QuerySortOrder> getDefaultSortOrders() {
-    return Collections.singletonList(new QuerySortOrder("name", SortDirection.ASCENDING));
-  }
+    @Override
+    protected List<QuerySortOrder> getDefaultSortOrders() {
+        return Collections.singletonList(new QuerySortOrder("name", SortDirection.ASCENDING));
+    }
 
 
-  @Override
-  protected int sizeInBackEnd(Query<MailTemplate, String> query) {
-    return NotificationServices.getMailTemplateService()
-        .countAnyMatching(new CountAnyMatchingQuery(query.getFilter().orElse(null), true))
-        .getData().intValue();
-  }
+    @Override
+    protected int sizeInBackEnd(Query<MailTemplate, String> query) {
+        return NotificationServices.getMailTemplateService()
+            .countAnyMatching(new CountAnyMatchingQuery(query.getFilter().orElse(null), true))
+            .getData().intValue();
+    }
 }

@@ -37,51 +37,51 @@ import org.jhapy.frontend.dataproviders.utils.FilterablePageableDataProvider;
 public abstract class DefaultDataProvider<T extends BaseEntity, F extends DefaultFilter> extends
     FilterablePageableDataProvider<T, F> implements Serializable {
 
-  private List<QuerySortOrder> defaultSortOrder;
-  private Consumer<Page<T>> pageObserver;
-  private Query<T, F> currentQuery;
+    private List<QuerySortOrder> defaultSortOrder;
+    private Consumer<Page<T>> pageObserver;
+    private Query<T, F> currentQuery;
 
-  public DefaultDataProvider(DirectionEnum defaultSortDirection, String[] defaultSortFields) {
-    setSortOrder(defaultSortDirection, defaultSortFields);
-  }
-
-  private void setSortOrder(DirectionEnum direction, String[] properties) {
-    QuerySortOrderBuilder builder = new QuerySortOrderBuilder();
-    for (String property : properties) {
-      if (direction.equals(DirectionEnum.ASC)) {
-        builder.thenAsc(property);
-      } else {
-        builder.thenDesc(property);
-      }
+    public DefaultDataProvider(DirectionEnum defaultSortDirection, String[] defaultSortFields) {
+        setSortOrder(defaultSortDirection, defaultSortFields);
     }
-    defaultSortOrder = builder.build();
-  }
 
-  public Query<T, F> getCurrentQuery() {
-    return currentQuery;
-  }
+    private void setSortOrder(DirectionEnum direction, String[] properties) {
+        QuerySortOrderBuilder builder = new QuerySortOrderBuilder();
+        for (String property : properties) {
+            if (direction.equals(DirectionEnum.ASC)) {
+                builder.thenAsc(property);
+            } else {
+                builder.thenDesc(property);
+            }
+        }
+        defaultSortOrder = builder.build();
+    }
 
-  public void setCurrentQuery(
-      Query<T, F> currentQuery) {
-    this.currentQuery = currentQuery;
-  }
+    public Query<T, F> getCurrentQuery() {
+        return currentQuery;
+    }
 
-  @Override
-  protected List<QuerySortOrder> getDefaultSortOrders() {
-    return defaultSortOrder;
-  }
+    public void setCurrentQuery(
+        Query<T, F> currentQuery) {
+        this.currentQuery = currentQuery;
+    }
 
-  public Consumer<Page<T>> getPageObserver() {
-    return pageObserver;
-  }
+    @Override
+    protected List<QuerySortOrder> getDefaultSortOrders() {
+        return defaultSortOrder;
+    }
 
-  public void setPageObserver(Consumer<Page<T>> pageObserver) {
-    this.pageObserver = pageObserver;
-  }
+    public Consumer<Page<T>> getPageObserver() {
+        return pageObserver;
+    }
 
-  @Override
-  public Object getId(T item) {
-    return item.getId();
-  }
+    public void setPageObserver(Consumer<Page<T>> pageObserver) {
+        this.pageObserver = pageObserver;
+    }
+
+    @Override
+    public Object getId(T item) {
+        return item.getId();
+    }
 
 }

@@ -27,11 +27,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SizeConfig {
 
-  private int width;
-  private int height;
+    private int width;
+    private int height;
 
-  public String getJsonString() {
-    return String.format("{\"width\": %d,\"height\": %d }", width, height);
-  }
+    public String getJsonString() {
+        return String.format("{\"width\": %d,\"height\": %d }", width, height);
+    }
 
 }

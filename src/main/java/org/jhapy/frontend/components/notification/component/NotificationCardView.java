@@ -7,20 +7,21 @@ import org.jhapy.frontend.components.notification.interfaces.NotificationListene
 
 public class NotificationCardView<T extends Notification> extends RippleClickableCard {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final NotificationView<T> notfication;
+    private final NotificationView<T> notfication;
 
-  public NotificationCardView(T info, NotificationHolder<T> holder, NotificationListener listener) {
-    notfication = new NotificationView<>(info, holder, listener, false);
-    notfication.setPadding(true);
-    setBackground("var(--lumo-base-color)");
-    add(notfication);
-    //setWidthFull();
-    setMinWidth("40%");
-  }
+    public NotificationCardView(T info, NotificationHolder<T> holder,
+        NotificationListener listener) {
+        notfication = new NotificationView<>(info, holder, listener, false);
+        notfication.setPadding(true);
+        setBackground("var(--lumo-base-color)");
+        add(notfication);
+        //setWidthFull();
+        setMinWidth("40%");
+    }
 
-  public NotificationView<T> getNotfication() {
-    return notfication;
-  }
+    public NotificationView<T> getNotfication() {
+        return notfication;
+    }
 }

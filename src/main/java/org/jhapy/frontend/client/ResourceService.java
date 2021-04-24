@@ -37,18 +37,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface ResourceService {
 
-  @PostMapping(value = "/save")
-  ServiceResult<StoredFile> save(@RequestBody SaveQuery<StoredFile> query);
+    @PostMapping(value = "/save")
+    ServiceResult<StoredFile> save(@RequestBody SaveQuery<StoredFile> query);
 
-  @PostMapping(value = "/getById")
-  ServiceResult<StoredFile> getById(@RequestBody GetByStrIdQuery query);
+    @PostMapping(value = "/getById")
+    ServiceResult<StoredFile> getById(@RequestBody GetByStrIdQuery query);
 
-  @PostMapping(value = "/getByIdNoContent")
-  ServiceResult<StoredFile> getByIdNoContent(@RequestBody GetByStrIdQuery query);
+    @PostMapping(value = "/getByIdNoContent")
+    ServiceResult<StoredFile> getByIdNoContent(@RequestBody GetByStrIdQuery query);
 
-  @PostMapping(value = "/getByIdPdfContent")
-  ServiceResult<StoredFile> getByIdPdfContent(@RequestBody GetByStrIdQuery query);
+    @PostMapping(value = "/getByIdPdfContent")
+    ServiceResult<StoredFile> getByIdPdfContent(@RequestBody GetByStrIdQuery query);
 
-  @PostMapping(value = "/delete")
-  ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
+    @PostMapping(value = "/delete")
+    ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 }

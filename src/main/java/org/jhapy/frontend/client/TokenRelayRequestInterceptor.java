@@ -27,18 +27,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenRelayRequestInterceptor implements RequestInterceptor {
 
-  public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION = "Authorization";
 
-  private final AuthorizationHeaderUtil authorizationHeaderUtil;
+    private final AuthorizationHeaderUtil authorizationHeaderUtil;
 
-  public TokenRelayRequestInterceptor(AuthorizationHeaderUtil authorizationHeaderUtil) {
-    super();
-    this.authorizationHeaderUtil = authorizationHeaderUtil;
-  }
+    public TokenRelayRequestInterceptor(AuthorizationHeaderUtil authorizationHeaderUtil) {
+        super();
+        this.authorizationHeaderUtil = authorizationHeaderUtil;
+    }
 
-  @Override
-  public void apply(RequestTemplate template) {
-    Optional<String> authorizationHeader = authorizationHeaderUtil.getAuthorizationHeader();
-    authorizationHeader.ifPresent(s -> template.header(AUTHORIZATION, s));
-  }
+    @Override
+    public void apply(RequestTemplate template) {
+        Optional<String> authorizationHeader = authorizationHeaderUtil.getAuthorizationHeader();
+        authorizationHeader.ifPresent(s -> template.header(AUTHORIZATION, s));
+    }
 }

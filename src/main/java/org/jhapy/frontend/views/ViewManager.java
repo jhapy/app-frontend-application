@@ -33,12 +33,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Component
 public class ViewManager {
 
-  public static ApplicationContext getApplicationContext() {
-    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-  }
+    public static ApplicationContext getApplicationContext() {
+        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+    }
 
-  public static LoginView getLoginView() {
-    return getApplicationContext().getBean(LoginView.class);
-  }
+    public static LoginView getLoginView() {
+        return getApplicationContext().getBean(LoginView.class);
+    }
 }

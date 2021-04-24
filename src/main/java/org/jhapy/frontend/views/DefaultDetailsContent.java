@@ -11,14 +11,14 @@ import org.jhapy.frontend.utils.css.Overflow;
  */
 public class DefaultDetailsContent extends FlexBoxLayout {
 
-  public DefaultDetailsContent(Component... components) {
-    super(components);
-    setSizeFull();
-    setOverflow(Overflow.SCROLL);
-  }
+    public DefaultDetailsContent(Component... components) {
+        super(components);
+        setSizeFull();
+        setOverflow(Overflow.SCROLL);
+    }
 
-  public void setContent(Component... components) {
-    removeAll();
-    add(components);
-  }
+    public void setContent(Component... components) {
+        removeAll();
+        add(components);
+    }
 }

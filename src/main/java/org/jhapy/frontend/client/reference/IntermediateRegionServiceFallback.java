@@ -40,46 +40,46 @@ import org.springframework.stereotype.Component;
 @Component
 public class IntermediateRegionServiceFallback implements IntermediateRegionService, HasLogger {
 
-  @Override
-  public ServiceResult<List<IntermediateRegion>> findAll(BaseRemoteQuery query) {
-    logger().error(getLoggerPrefix("findAll") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<List<IntermediateRegion>> findAll(BaseRemoteQuery query) {
+        logger().error(getLoggerPrefix("findAll") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server",
-        Collections.emptyList());
-  }
+        return new ServiceResult<>(false, "Cannot connect to server",
+            Collections.emptyList());
+    }
 
-  @Override
-  public ServiceResult<Page<IntermediateRegion>> findAnyMatching(FindAnyMatchingQuery query) {
-    logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<Page<IntermediateRegion>> findAnyMatching(FindAnyMatchingQuery query) {
+        logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
+    }
 
-  @Override
-  public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
-    logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
+        logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", 0L);
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", 0L);
+    }
 
-  @Override
-  public ServiceResult<IntermediateRegion> getById(GetByIdQuery query) {
-    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<IntermediateRegion> getById(GetByIdQuery query) {
+        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", null);
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", null);
+    }
 
-  @Override
-  public ServiceResult<IntermediateRegion> save(SaveQuery<IntermediateRegion> query) {
-    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<IntermediateRegion> save(SaveQuery<IntermediateRegion> query) {
+        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", null);
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", null);
+    }
 
-  @Override
-  public ServiceResult<Void> delete(DeleteByIdQuery query) {
-    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<Void> delete(DeleteByIdQuery query) {
+        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", null);
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", null);
+    }
 }

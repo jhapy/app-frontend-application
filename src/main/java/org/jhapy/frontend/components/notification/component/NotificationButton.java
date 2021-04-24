@@ -21,63 +21,63 @@ public class NotificationButton<T extends Notification> extends
     ComponentBadgeWrapper<Button> implements
     NotificationComponent {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final NotificationsOverlayView<T> notificationOverlay;
-  private NotificationHolder<T> holder;
+    private final NotificationsOverlayView<T> notificationOverlay;
+    private NotificationHolder<T> holder;
 
-  public NotificationButton() {
-    this(VaadinIcon.SEARCH);
-  }
+    public NotificationButton() {
+        this(VaadinIcon.SEARCH);
+    }
 
-  public NotificationButton(VaadinIcon icon) {
-    this(icon.create());
-  }
+    public NotificationButton(VaadinIcon icon) {
+        this(icon.create());
+    }
 
-  public NotificationButton(Component icon) {
-    super(new IconButton(icon));
-    notificationOverlay = new NotificationsOverlayView<>();
-    addClickListener(event -> notificationOverlay.open());
-  }
+    public NotificationButton(Component icon) {
+        super(new IconButton(icon));
+        notificationOverlay = new NotificationsOverlayView<>();
+        addClickListener(event -> notificationOverlay.open());
+    }
 
-  public NotificationButton(VaadinIcon icon, NotificationHolder<T> holder) {
-    this(icon.create());
-    this.holder = holder;
-    notificationOverlay.setHolder(holder);
-    setClassName("app-bar-notification-button");
-    holder.addNotificationsChangeListener(new NotificationsChangeListener<T>() {
-      @Override
-      public void onNotificationChanges(NotificationHolder<T> holder) {
+    public NotificationButton(VaadinIcon icon, NotificationHolder<T> holder) {
+        this(icon.create());
+        this.holder = holder;
+        notificationOverlay.setHolder(holder);
+        setClassName("app-bar-notification-button");
+        holder.addNotificationsChangeListener(new NotificationsChangeListener<T>() {
+            @Override
+            public void onNotificationChanges(NotificationHolder<T> holder) {
+                refreshNotifications();
+            }
+        });
+        holder.bind(getBadge());
+        holder.registerNotificationComponent(this);
         refreshNotifications();
-      }
-    });
-    holder.bind(getBadge());
-    holder.registerNotificationComponent(this);
-    refreshNotifications();
-  }
+    }
 
-  public void refreshNotifications() {
-    notificationOverlay.refreshNotificationViews();
-  }
+    public void refreshNotifications() {
+        notificationOverlay.refreshNotificationViews();
+    }
 
-  @Override
-  protected void onDetach(DetachEvent detachEvent) {
-    super.onDetach(detachEvent);
-    notificationOverlay.getElement().removeFromParent();
-  }
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        super.onDetach(detachEvent);
+        notificationOverlay.getElement().removeFromParent();
+    }
 
-  @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
-    attachEvent.getUI().add(notificationOverlay);
-  }
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        attachEvent.getUI().add(notificationOverlay);
+    }
 
-  public NotificationsOverlayView<T> getNotificationOverlay() {
-    return notificationOverlay;
-  }
+    public NotificationsOverlayView<T> getNotificationOverlay() {
+        return notificationOverlay;
+    }
 
-  @Override
-  public boolean isDisplayingNotifications() {
-    return notificationOverlay.getOpened();
-  }
+    @Override
+    public boolean isDisplayingNotifications() {
+        return notificationOverlay.getOpened();
+    }
 }

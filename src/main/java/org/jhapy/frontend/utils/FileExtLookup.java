@@ -9,26 +9,26 @@ import java.io.InputStream;
  */
 public class FileExtLookup {
 
-  private static FileExtLookup instance;
+    private static FileExtLookup instance;
 
-  private FileExtLookup() {
-  }
-
-  public static final FileExtLookup getInstance() {
-    if (instance == null) {
-      instance = new FileExtLookup();
+    private FileExtLookup() {
     }
-    return instance;
-  }
 
-  public boolean doesExtExists(String ext) {
-    ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-    try {
-      InputStream found = classLoader
-          .getResourceAsStream("META-INF/resources/images/filesExt/" + ext);
-      return found != null;
-    } catch (Exception e) {
-      return false;
+    public static final FileExtLookup getInstance() {
+        if (instance == null) {
+            instance = new FileExtLookup();
+        }
+        return instance;
     }
-  }
+
+    public boolean doesExtExists(String ext) {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        try {
+            InputStream found = classLoader
+                .getResourceAsStream("META-INF/resources/images/filesExt/" + ext);
+            return found != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

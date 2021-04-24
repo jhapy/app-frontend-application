@@ -54,113 +54,116 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 public abstract class BaseApplication implements InitializingBean, HasLogger {
 
-  private static final Logger logger = LoggerFactory.getLogger(BaseApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseApplication.class);
 
-  private final Environment env;
+    private final Environment env;
 
-  private AppProperties appProperties;
+    private final AppProperties appProperties;
 
-  public BaseApplication(Environment env, AppProperties appProperties) {
-    this.env = env;
-    this.appProperties = appProperties;
-  }
-
-  protected static void logApplicationStartup(Environment env) {
-    String protocol = "http";
-    if (env.getProperty("server.ssl.key-store") != null) {
-      protocol = "https";
+    public BaseApplication(Environment env, AppProperties appProperties) {
+        this.env = env;
+        this.appProperties = appProperties;
     }
-    String serverPort = env.getProperty("server.port");
-    String contextPath = env.getProperty("server.servlet.context-path");
-    if (StringUtils.isBlank(contextPath)) {
-      contextPath = "/";
+
+    protected static void logApplicationStartup(Environment env) {
+        String protocol = "http";
+        if (env.getProperty("server.ssl.key-store") != null) {
+            protocol = "https";
+        }
+        String serverPort = env.getProperty("server.port");
+        String contextPath = env.getProperty("server.servlet.context-path");
+        if (StringUtils.isBlank(contextPath)) {
+            contextPath = "/";
+        }
+        String hostAddress = "localhost";
+        try {
+            hostAddress = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            logger.warn("The host name could not be determined, using `localhost` as fallback");
+        }
+        logger.info("\n----------------------------------------------------------\n\t" +
+                "Application '{}' is running! Access URLs:\n\t" +
+                "Local: \t\t{}://localhost:{}{}\n\t" +
+                "External: \t{}://{}:{}{}\n\t" +
+                "Profile(s): \t{}\n----------------------------------------------------------",
+            env.getProperty("spring.application.name"),
+            protocol,
+            serverPort,
+            contextPath,
+            protocol,
+            hostAddress,
+            serverPort,
+            contextPath,
+            env.getActiveProfiles());
+
+        String configServerStatus = env.getProperty("configserver.status");
+        if (configServerStatus == null) {
+            configServerStatus = "Not found or not setup for this application";
+        }
+        logger.info("\n----------------------------------------------------------\n\t" +
+                "Config Server: \t{}\n----------------------------------------------------------",
+            configServerStatus);
     }
-    String hostAddress = "localhost";
-    try {
-      hostAddress = InetAddress.getLocalHost().getHostAddress();
-    } catch (UnknownHostException e) {
-      logger.warn("The host name could not be determined, using `localhost` as fallback");
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+        if (activeProfiles.contains(SpringProfileConstants.SPRING_PROFILE_DEVELOPMENT)
+            && activeProfiles
+            .contains(SpringProfileConstants.SPRING_PROFILE_PRODUCTION)) {
+            logger.error("You have misconfigured your application! It should not run " +
+                "with both the 'dev' and 'prod' profiles at the same time.");
+        }
     }
-    logger.info("\n----------------------------------------------------------\n\t" +
-            "Application '{}' is running! Access URLs:\n\t" +
-            "Local: \t\t{}://localhost:{}{}\n\t" +
-            "External: \t{}://{}:{}{}\n\t" +
-            "Profile(s): \t{}\n----------------------------------------------------------",
-        env.getProperty("spring.application.name"),
-        protocol,
-        serverPort,
-        contextPath,
-        protocol,
-        hostAddress,
-        serverPort,
-        contextPath,
-        env.getActiveProfiles());
 
-    String configServerStatus = env.getProperty("configserver.status");
-    if (configServerStatus == null) {
-      configServerStatus = "Not found or not setup for this application";
+    @RequestMapping("/")
+    public String forward(@Value("${vaadin.url}") String vaadinUrl) {
+        return "redirect:" + vaadinUrl;
     }
-    logger.info("\n----------------------------------------------------------\n\t" +
-            "Config Server: \t{}\n----------------------------------------------------------",
-        configServerStatus);
-  }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-    if (activeProfiles.contains(SpringProfileConstants.SPRING_PROFILE_DEVELOPMENT) && activeProfiles
-        .contains(SpringProfileConstants.SPRING_PROFILE_PRODUCTION)) {
-      logger.error("You have misconfigured your application! It should not run " +
-          "with both the 'dev' and 'prod' profiles at the same time.");
+    @RequestMapping("/sw.js")
+    public String forwardSW(@Value("${vaadin.url}") String vaadinUrl) {
+        return "forward:" + vaadinUrl + "sw.js";
     }
-  }
 
-  @RequestMapping("/")
-  public String forward(@Value("${vaadin.url}") String vaadinUrl) {
-    return "redirect:" + vaadinUrl;
-  }
+    @Bean
+    public ServletRegistrationBean<SpringServlet> springServlet(
+        ApplicationContext applicationContext,
+        @Value("${vaadin.urlMapping}") String vaadinUrlMapping) {
 
-  @RequestMapping("/sw.js")
-  public String forwardSW(@Value("${vaadin.url}") String vaadinUrl) {
-    return "forward:" + vaadinUrl + "sw.js";
-  }
+        SpringServlet servlet = buildSpringServlet(applicationContext);
+        ServletRegistrationBean<SpringServlet> registrationBean =
+            new ServletRegistrationBean<>(servlet, vaadinUrlMapping, "/frontend/*");
+        registrationBean.setLoadOnStartup(1);
+        //registrationBean.addInitParameter(Constants.SERVLET_PARAMETER_SYNC_ID_CHECK, "false");
 
-  @Bean
-  public ServletRegistrationBean<SpringServlet> springServlet(
-      ApplicationContext applicationContext,
-      @Value("${vaadin.urlMapping}") String vaadinUrlMapping) {
+        return registrationBean;
+    }
 
-    SpringServlet servlet = buildSpringServlet(applicationContext);
-    ServletRegistrationBean<SpringServlet> registrationBean =
-        new ServletRegistrationBean<>(servlet, vaadinUrlMapping, "/frontend/*");
-    registrationBean.setLoadOnStartup(1);
-    //registrationBean.addInitParameter(Constants.SERVLET_PARAMETER_SYNC_ID_CHECK, "false");
+    private SpringServlet buildSpringServlet(ApplicationContext applicationContext) {
+        return new SpringServlet(applicationContext, true) {
+            @Override
+            protected VaadinServletService createServletService(
+                DeploymentConfiguration deploymentConfiguration) throws
+                ServiceException {
+                SpringVaadinServletService service =
+                    buildSpringVaadinServletService(this, deploymentConfiguration,
+                        applicationContext);
+                service.init();
+                return service;
+            }
+        };
+    }
 
-    return registrationBean;
-  }
+    private SpringVaadinServletService buildSpringVaadinServletService(SpringServlet servlet,
+        DeploymentConfiguration deploymentConfiguration,
+        ApplicationContext applicationContext) {
+        return new SpringVaadinServletService(servlet, deploymentConfiguration,
+            applicationContext) {
 
-  private SpringServlet buildSpringServlet(ApplicationContext applicationContext) {
-    return new SpringServlet(applicationContext, true) {
-      @Override
-      protected VaadinServletService createServletService(
-          DeploymentConfiguration deploymentConfiguration) throws
-          ServiceException {
-        SpringVaadinServletService service =
-            buildSpringVaadinServletService(this, deploymentConfiguration, applicationContext);
-        service.init();
-        return service;
-      }
-    };
-  }
-
-  private SpringVaadinServletService buildSpringVaadinServletService(SpringServlet servlet,
-      DeploymentConfiguration deploymentConfiguration,
-      ApplicationContext applicationContext) {
-    return new SpringVaadinServletService(servlet, deploymentConfiguration, applicationContext) {
-
-      @Override
-      public void requestStart(VaadinRequest request, VaadinResponse response) {
-        super.requestStart(request, response);
+            @Override
+            public void requestStart(VaadinRequest request, VaadinResponse response) {
+                super.requestStart(request, response);
 
         /*
         //logger().debug("Current Locale = " + request.getLocale().getLanguage());
@@ -175,64 +178,71 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
               .setCurrentUsername(((UsernamePasswordAuthenticationToken) principal).getName());
         }
          */
-      }
+            }
 
-      @Override
-      public void requestEnd(
-          VaadinRequest request, VaadinResponse response, VaadinSession session) {
-        if (session != null) {
-          try {
-            session.lock();
-            writeToHttpSession(request.getWrappedSession(), session);
-          } finally {
-            session.unlock();
-          }
+            @Override
+            public void requestEnd(
+                VaadinRequest request, VaadinResponse response, VaadinSession session) {
+                if (session != null) {
+                    try {
+                        session.lock();
+                        writeToHttpSession(request.getWrappedSession(), session);
+                    } finally {
+                        session.unlock();
+                    }
+                }
+                super.requestEnd(request, response, session);
+            }
+        };
+    }
+
+    @PostConstruct
+    void postConstruct() {
+        if (StringUtils
+            .isNotBlank(appProperties.getSecurity().getTrustStore().getTrustStorePath())) {
+            File trustStoreFilePath = new File(
+                appProperties.getSecurity().getTrustStore().getTrustStorePath());
+            String tsp = trustStoreFilePath.getAbsolutePath();
+            logger.info("Use trustStore " + tsp + ", with password : " + appProperties.getSecurity()
+                .getTrustStore().getTrustStorePassword() + ", with type : " + appProperties
+                .getSecurity()
+                .getTrustStore()
+                .getTrustStoreType());
+
+            System.setProperty("javax.net.ssl.trustStore", tsp);
+            System.setProperty("javax.net.ssl.trustStorePassword",
+                appProperties.getSecurity().getTrustStore().getTrustStorePassword());
+            if (StringUtils
+                .isNotBlank(appProperties.getSecurity().getTrustStore().getTrustStoreType())) {
+                System.setProperty("javax.net.ssl.trustStoreType",
+                    appProperties.getSecurity().getTrustStore().getTrustStoreType());
+            }
         }
-        super.requestEnd(request, response, session);
-      }
-    };
-  }
+        if (StringUtils.isNotBlank(appProperties.getSecurity().getKeyStore().getKeyStorePath())) {
+            File keyStoreFilePath = new File(
+                appProperties.getSecurity().getKeyStore().getKeyStorePath());
+            String ksp = keyStoreFilePath.getAbsolutePath();
+            logger.info(
+                "Use keyStore " + ksp + ", with password : " + appProperties.getSecurity()
+                    .getKeyStore()
+                    .getKeyStorePassword() + ", with type : " + appProperties.getSecurity()
+                    .getKeyStore()
+                    .getKeyStoreType());
 
-  @PostConstruct
-  void postConstruct() {
-    if (StringUtils.isNotBlank(appProperties.getSecurity().getTrustStore().getTrustStorePath())) {
-      File trustStoreFilePath = new File(
-          appProperties.getSecurity().getTrustStore().getTrustStorePath());
-      String tsp = trustStoreFilePath.getAbsolutePath();
-      logger.info("Use trustStore " + tsp + ", with password : " + appProperties.getSecurity()
-          .getTrustStore().getTrustStorePassword() + ", with type : " + appProperties.getSecurity()
-          .getTrustStore()
-          .getTrustStoreType());
-
-      System.setProperty("javax.net.ssl.trustStore", tsp);
-      System.setProperty("javax.net.ssl.trustStorePassword",
-          appProperties.getSecurity().getTrustStore().getTrustStorePassword());
-      if (StringUtils.isNotBlank(appProperties.getSecurity().getTrustStore().getTrustStoreType())) {
-        System.setProperty("javax.net.ssl.trustStoreType",
-            appProperties.getSecurity().getTrustStore().getTrustStoreType());
-      }
+            System.setProperty("javax.net.ssl.keyStore", ksp);
+            System.setProperty("javax.net.ssl.keyStorePassword",
+                appProperties.getSecurity().getKeyStore().getKeyStorePassword());
+            if (StringUtils
+                .isNotBlank(appProperties.getSecurity().getKeyStore().getKeyStoreType())) {
+                System.setProperty("javax.net.ssl.keyStoreType",
+                    appProperties.getSecurity().getKeyStore().getKeyStoreType());
+            }
+        }
+        if (appProperties.getSecurity().getTrustStore().getDebug() != null
+            || appProperties.getSecurity().getKeyStore().getDebug() != null) {
+            System.setProperty("javax.net.debug",
+                Boolean.toString(appProperties.getSecurity().getTrustStore().getDebug() != null
+                    || appProperties.getSecurity().getKeyStore().getDebug() != null));
+        }
     }
-    if (StringUtils.isNotBlank(appProperties.getSecurity().getKeyStore().getKeyStorePath())) {
-      File keyStoreFilePath = new File(appProperties.getSecurity().getKeyStore().getKeyStorePath());
-      String ksp = keyStoreFilePath.getAbsolutePath();
-      logger.info(
-          "Use keyStore " + ksp + ", with password : " + appProperties.getSecurity().getKeyStore()
-              .getKeyStorePassword() + ", with type : " + appProperties.getSecurity().getKeyStore()
-              .getKeyStoreType());
-
-      System.setProperty("javax.net.ssl.keyStore", ksp);
-      System.setProperty("javax.net.ssl.keyStorePassword",
-          appProperties.getSecurity().getKeyStore().getKeyStorePassword());
-      if (StringUtils.isNotBlank(appProperties.getSecurity().getKeyStore().getKeyStoreType())) {
-        System.setProperty("javax.net.ssl.keyStoreType",
-            appProperties.getSecurity().getKeyStore().getKeyStoreType());
-      }
-    }
-    if (appProperties.getSecurity().getTrustStore().getDebug() != null
-        || appProperties.getSecurity().getKeyStore().getDebug() != null) {
-      System.setProperty("javax.net.debug",
-          Boolean.toString(appProperties.getSecurity().getTrustStore().getDebug() != null
-              || appProperties.getSecurity().getKeyStore().getDebug() != null));
-    }
-  }
 }

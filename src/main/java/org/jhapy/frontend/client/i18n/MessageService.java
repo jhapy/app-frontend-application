@@ -40,18 +40,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface MessageService {
 
-  @PostMapping(value = "/findAnyMatching")
-  ServiceResult<Page<Message>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+    @PostMapping(value = "/findAnyMatching")
+    ServiceResult<Page<Message>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  @PostMapping(value = "/countAnyMatching")
-  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+    @PostMapping(value = "/countAnyMatching")
+    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-  @PostMapping(value = "/getById")
-  ServiceResult<Message> getById(@RequestBody GetByIdQuery query);
+    @PostMapping(value = "/getById")
+    ServiceResult<Message> getById(@RequestBody GetByIdQuery query);
 
-  @PostMapping(value = "/save")
-  ServiceResult<Message> save(@RequestBody SaveQuery<Message> query);
+    @PostMapping(value = "/save")
+    ServiceResult<Message> save(@RequestBody SaveQuery<Message> query);
 
-  @PostMapping(value = "/delete")
-  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+    @PostMapping(value = "/delete")
+    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 }

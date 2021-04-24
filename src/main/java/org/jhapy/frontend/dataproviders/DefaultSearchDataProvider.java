@@ -31,49 +31,49 @@ import org.jhapy.dto.serviceQuery.SearchQueryResult;
 public abstract class DefaultSearchDataProvider<T extends SearchQueryResult, F extends SearchQuery> extends
     AbstractBackEndDataProvider<T, F> implements Serializable {
 
-  public DefaultSearchDataProvider() {
-  }
-
-  @Override
-  public Object getId(T item) {
-    return item.getId();
-  }
-
-  public static class DefaultFilter implements Serializable {
-
-    private String filter;
-    private Boolean showInactive;
-
-    public DefaultFilter() {
+    public DefaultSearchDataProvider() {
     }
 
-    public DefaultFilter(String filter) {
-      this(filter, null);
+    @Override
+    public Object getId(T item) {
+        return item.getId();
     }
 
-    public DefaultFilter(String filter, Boolean showInactive) {
-      this.filter = filter;
-      this.showInactive = showInactive;
-    }
+    public static class DefaultFilter implements Serializable {
 
-    public static DefaultFilter getEmptyFilter() {
-      return new DefaultFilter(null, null);
-    }
+        private String filter;
+        private Boolean showInactive;
 
-    public String getFilter() {
-      return filter;
-    }
+        public DefaultFilter() {
+        }
 
-    public void setFilter(String filter) {
-      this.filter = filter;
-    }
+        public DefaultFilter(String filter) {
+            this(filter, null);
+        }
 
-    public Boolean isShowInactive() {
-      return showInactive;
-    }
+        public DefaultFilter(String filter, Boolean showInactive) {
+            this.filter = filter;
+            this.showInactive = showInactive;
+        }
 
-    public void setShowInactive(Boolean showInactive) {
-      this.showInactive = showInactive;
+        public static DefaultFilter getEmptyFilter() {
+            return new DefaultFilter(null, null);
+        }
+
+        public String getFilter() {
+            return filter;
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+        }
+
+        public Boolean isShowInactive() {
+            return showInactive;
+        }
+
+        public void setShowInactive(Boolean showInactive) {
+            this.showInactive = showInactive;
+        }
     }
-  }
 }

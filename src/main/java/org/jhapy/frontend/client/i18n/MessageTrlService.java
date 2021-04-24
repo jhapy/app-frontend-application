@@ -42,24 +42,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface MessageTrlService {
 
-  @PostMapping(value = "/findByMessage")
-  ServiceResult<List<MessageTrl>> findByMessage(@RequestBody FindByMessageQuery query);
+    @PostMapping(value = "/findByMessage")
+    ServiceResult<List<MessageTrl>> findByMessage(@RequestBody FindByMessageQuery query);
 
-  @PostMapping(value = "/countByMessage")
-  ServiceResult<Long> countByMessage(@RequestBody CountByMessageQuery query);
+    @PostMapping(value = "/countByMessage")
+    ServiceResult<Long> countByMessage(@RequestBody CountByMessageQuery query);
 
-  @PostMapping(value = "/findByIso3")
-  ServiceResult<List<MessageTrl>> findByIso3(@RequestBody FindByIso3Query query);
+    @PostMapping(value = "/findByIso3")
+    ServiceResult<List<MessageTrl>> findByIso3(@RequestBody FindByIso3Query query);
 
-  @PostMapping(value = "/getByNameAndIso3")
-  ServiceResult<MessageTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
+    @PostMapping(value = "/getByNameAndIso3")
+    ServiceResult<MessageTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
 
-  @PostMapping(value = "/getById")
-  ServiceResult<MessageTrl> getById(@RequestBody GetByIdQuery query);
+    @PostMapping(value = "/getById")
+    ServiceResult<MessageTrl> getById(@RequestBody GetByIdQuery query);
 
-  @PostMapping(value = "/save")
-  ServiceResult<MessageTrl> save(@RequestBody SaveQuery<MessageTrl> query);
+    @PostMapping(value = "/save")
+    ServiceResult<MessageTrl> save(@RequestBody SaveQuery<MessageTrl> query);
 
-  @PostMapping(value = "/delete")
-  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+    @PostMapping(value = "/delete")
+    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 }

@@ -33,54 +33,55 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ErrorEndpoint implements ErrorController, HasLogger {
 
-  @RequestMapping("/error")
-  public ResponseEntity<?> handleError(HttpServletRequest httpRequest) {
-    String loggerPrefix = getLoggerPrefix("handleError");
-    String errorMsg = "";
-    int httpErrorCode = getErrorCode(httpRequest);
-    Exception exception = (Exception) httpRequest.getAttribute("javax.servlet.error.exception");
-    String errorMessage = (String) httpRequest.getAttribute("javax.servlet.error.message");
-    switch (httpErrorCode) {
-      case -1: {
-        errorMsg = errorMessage;
-        break;
-      }
-      case 400: {
-        errorMsg = "Http Error Code: 400. Bad Request";
-        break;
-      }
-      case 401: {
-        errorMsg = "Http Error Code: 401. Unauthorized";
-        break;
-      }
-      case 404: {
-        errorMsg = "Http Error Code: 404. Resource not found " + httpRequest
-            .getAttribute("javax.servlet.error.request_uri");
-        break;
-      }
-      case 500: {
-        errorMsg = "Http Error Code: 500. Internal Server Error";
-        break;
-      }
+    @RequestMapping("/error")
+    public ResponseEntity<?> handleError(HttpServletRequest httpRequest) {
+        String loggerPrefix = getLoggerPrefix("handleError");
+        String errorMsg = "";
+        int httpErrorCode = getErrorCode(httpRequest);
+        Exception exception = (Exception) httpRequest.getAttribute("javax.servlet.error.exception");
+        String errorMessage = (String) httpRequest.getAttribute("javax.servlet.error.message");
+        switch (httpErrorCode) {
+            case -1: {
+                errorMsg = errorMessage;
+                break;
+            }
+            case 400: {
+                errorMsg = "Http Error Code: 400. Bad Request";
+                break;
+            }
+            case 401: {
+                errorMsg = "Http Error Code: 401. Unauthorized";
+                break;
+            }
+            case 404: {
+                errorMsg = "Http Error Code: 404. Resource not found " + httpRequest
+                    .getAttribute("javax.servlet.error.request_uri");
+                break;
+            }
+            case 500: {
+                errorMsg = "Http Error Code: 500. Internal Server Error";
+                break;
+            }
+        }
+        logger()
+            .error(
+                loggerPrefix + "Error (" + httpErrorCode + ") : " + errorMessage + " / " + errorMsg,
+                exception);
+
+        return ResponseEntity.ok(errorMessage);
     }
-    logger()
-        .error(loggerPrefix + "Error (" + httpErrorCode + ") : " + errorMessage + " / " + errorMsg,
-            exception);
 
-    return ResponseEntity.ok(errorMessage);
-  }
-
-  @Override
-  public String getErrorPath() {
-    return "/error";
-  }
-
-  private int getErrorCode(HttpServletRequest httpRequest) {
-    if (httpRequest.getAttribute("javax.servlet.error.status_code") != null) {
-      return (Integer) httpRequest
-          .getAttribute("javax.servlet.error.status_code");
-    } else {
-      return -1;
+    @Override
+    public String getErrorPath() {
+        return "/error";
     }
-  }
+
+    private int getErrorCode(HttpServletRequest httpRequest) {
+        if (httpRequest.getAttribute("javax.servlet.error.status_code") != null) {
+            return (Integer) httpRequest
+                .getAttribute("javax.servlet.error.status_code");
+        } else {
+            return -1;
+        }
+    }
 }

@@ -34,27 +34,27 @@ import org.jhapy.commons.utils.HasLogger;
 @JsModule("./dragger/dragger.js")
 public class Dragger extends Component implements HasLogger, HasStyle {
 
-  private final HasStyle drawer;
+    private final HasStyle drawer;
 
-  public Dragger(HasStyle drawer) {
-    this.drawer = drawer;
+    public Dragger(HasStyle drawer) {
+        this.drawer = drawer;
 
-    addListener(DraggerEvent.class, e -> onDraggerEvent(e));
-  }
+        addListener(DraggerEvent.class, e -> onDraggerEvent(e));
+    }
 
-  @ClientCallable
-  public void draggerChanged(String newWidth) {
-    String loggerPrefix = getLoggerPrefix("draggerChanged", newWidth);
-    logger().debug(loggerPrefix + "Event received, set parent width to " + newWidth + "px");
-    drawer.getStyle().set("--navi-drawer-width", newWidth + "px");
-    getStyle().set("--navi-drawer-width", newWidth + "px");
-  }
+    @ClientCallable
+    public void draggerChanged(String newWidth) {
+        String loggerPrefix = getLoggerPrefix("draggerChanged", newWidth);
+        logger().debug(loggerPrefix + "Event received, set parent width to " + newWidth + "px");
+        drawer.getStyle().set("--navi-drawer-width", newWidth + "px");
+        getStyle().set("--navi-drawer-width", newWidth + "px");
+    }
 
-  public void onDraggerEvent(DraggerEvent draggerEvent) {
-    String loggerPrefix = getLoggerPrefix("onDraggerEvent", draggerEvent);
-    logger().debug(
-        loggerPrefix + "Event received, set parent width to " + draggerEvent.getWidth() + "px");
-    drawer.getStyle().set("--navi-drawer-width", draggerEvent.getWidth() + "px");
-    getStyle().set("--navi-drawer-width", draggerEvent.getWidth() + "px");
-  }
+    public void onDraggerEvent(DraggerEvent draggerEvent) {
+        String loggerPrefix = getLoggerPrefix("onDraggerEvent", draggerEvent);
+        logger().debug(
+            loggerPrefix + "Event received, set parent width to " + draggerEvent.getWidth() + "px");
+        drawer.getStyle().set("--navi-drawer-width", draggerEvent.getWidth() + "px");
+        getStyle().set("--navi-drawer-width", draggerEvent.getWidth() + "px");
+    }
 }

@@ -41,64 +41,65 @@ import org.springframework.security.access.annotation.Secured;
 @Secured(SecurityConst.ROLE_ADMIN)
 public class CloudConfigView extends ViewFrame implements HasLogger {
 
-  private final static String I18N_PREFIX = "cloudConfig.";
+    private final static String I18N_PREFIX = "cloudConfig.";
 
-  private final Environment env;
+    private final Environment env;
 
-  private CloudConfigBaseView configurationTabContent;
-  private CloudConfigBaseView encryptionTabContent;
+    private CloudConfigBaseView configurationTabContent;
+    private CloudConfigBaseView encryptionTabContent;
 
-  private Tab configurationTab;
-  private Tab encryptionTab;
+    private Tab configurationTab;
+    private Tab encryptionTab;
 
-  protected UI ui;
+    protected UI ui;
 
-  private final AuthorizationHeaderUtil authorizationHeaderUtil;
+    private final AuthorizationHeaderUtil authorizationHeaderUtil;
 
-  public CloudConfigView(Environment env,
-      AuthorizationHeaderUtil authorizationHeaderUtil) {
-    this.env = env;
-    this.authorizationHeaderUtil = authorizationHeaderUtil;
-  }
-
-  @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
-
-    ui = attachEvent.getUI();
-
-    this.configurationTabContent = new CloudConfigurationTabContent(env, ui, I18N_PREFIX,
-        authorizationHeaderUtil);
-    this.encryptionTabContent = new EncryptionTabContent(env, ui, I18N_PREFIX,
-        authorizationHeaderUtil);
-
-    initAppBar();
-  }
-
-  private void initAppBar() {
-    AppBar appBar = JHapyMainView3.get().getAppBar();
-    configurationTab = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.cloudConfig"));
-    encryptionTab = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.encryption"));
-
-    appBar.addTabSelectionListener(e -> {
-      if (e.getPreviousTab() != null) {
-        getTab(e.getPreviousTab()).setRefreshRate(null);
-      }
-
-      setViewContent(getTab(e.getSelectedTab()).getContent());
-
-    });
-    setViewContent(configurationTabContent.getContent());
-    appBar.centerTabs();
-  }
-
-  protected CloudConfigBaseView getTab(Tab tab) {
-    if (tab.equals(configurationTab)) {
-      return configurationTabContent;
-    } else if (tab.equals(encryptionTab)) {
-      return encryptionTabContent;
-    } else {
-      return null;
+    public CloudConfigView(Environment env,
+        AuthorizationHeaderUtil authorizationHeaderUtil) {
+        this.env = env;
+        this.authorizationHeaderUtil = authorizationHeaderUtil;
     }
-  }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+
+        ui = attachEvent.getUI();
+
+        this.configurationTabContent = new CloudConfigurationTabContent(env, ui, I18N_PREFIX,
+            authorizationHeaderUtil);
+        this.encryptionTabContent = new EncryptionTabContent(env, ui, I18N_PREFIX,
+            authorizationHeaderUtil);
+
+        initAppBar();
+    }
+
+    private void initAppBar() {
+        AppBar appBar = JHapyMainView3.get().getAppBar();
+        configurationTab = appBar
+            .addTab(getTranslation("element." + I18N_PREFIX + "tab.cloudConfig"));
+        encryptionTab = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.encryption"));
+
+        appBar.addTabSelectionListener(e -> {
+            if (e.getPreviousTab() != null) {
+                getTab(e.getPreviousTab()).setRefreshRate(null);
+            }
+
+            setViewContent(getTab(e.getSelectedTab()).getContent());
+
+        });
+        setViewContent(configurationTabContent.getContent());
+        appBar.centerTabs();
+    }
+
+    protected CloudConfigBaseView getTab(Tab tab) {
+        if (tab.equals(configurationTab)) {
+            return configurationTabContent;
+        } else if (tab.equals(encryptionTab)) {
+            return encryptionTabContent;
+        } else {
+            return null;
+        }
+    }
 }

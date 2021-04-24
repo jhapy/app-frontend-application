@@ -28,21 +28,21 @@ import com.vaadin.flow.component.Html;
  */
 public class SecondaryLabelHtmlComponent extends Html implements WhiteSpaceLabel {
 
-  public SecondaryLabelHtmlComponent(String text) {
-    super(text);
-    init();
-  }
+    public SecondaryLabelHtmlComponent(String text) {
+        super(text);
+        init();
+    }
 
-  private void init() {
-    getElement().getStyle()
-        .set("font-size", "var(--lumo-font-size-s)")
-        .set("text-overflow", "ellipsis")
-        .set("overflow", "scroll")
-        .set("color", "var(--lumo-secondary-text-color)")
-        .set("width", "100%")
-        .set("min-height", "100px")
-        .set("max-height", "200px");
-  }
+    private void init() {
+        getElement().getStyle()
+            .set("font-size", "var(--lumo-font-size-s)")
+            .set("text-overflow", "ellipsis")
+            .set("overflow", "scroll")
+            .set("color", "var(--lumo-secondary-text-color)")
+            .set("width", "100%")
+            .set("min-height", "100px")
+            .set("max-height", "200px");
+    }
 
 }
 

@@ -40,82 +40,82 @@ import org.jhapy.frontend.views.JHapyMainView3;
 @CssImport("./styles/components/view-frame.css")
 public class SplitViewFrame extends Composite<Div> implements HasStyle {
 
-  private final String CLASS_NAME = "view-frame";
+    private final String CLASS_NAME = "view-frame";
 
-  private final Div header;
+    private final Div header;
 
-  private final FlexBoxLayout wrapper;
-  private final Div content;
-  private final Div details;
+    private final FlexBoxLayout wrapper;
+    private final Div content;
+    private final Div details;
 
-  private final Div footer;
+    private final Div footer;
 
-  public SplitViewFrame() {
-    setClassName(CLASS_NAME);
+    public SplitViewFrame() {
+        setClassName(CLASS_NAME);
 
-    header = new Div();
-    header.setClassName(CLASS_NAME + "__header");
-    wrapper = new FlexBoxLayout();
-    wrapper.setClassName(CLASS_NAME + "__wrapper");
-    content = new Div();
-    content.setClassName(CLASS_NAME + "__content");
-    details = new Div();
-    details.setClassName(CLASS_NAME + "__details");
-    footer = new Div();
-    footer.setClassName(CLASS_NAME + "__footer");
+        header = new Div();
+        header.setClassName(CLASS_NAME + "__header");
+        wrapper = new FlexBoxLayout();
+        wrapper.setClassName(CLASS_NAME + "__wrapper");
+        content = new Div();
+        content.setClassName(CLASS_NAME + "__content");
+        details = new Div();
+        details.setClassName(CLASS_NAME + "__details");
+        footer = new Div();
+        footer.setClassName(CLASS_NAME + "__footer");
 
-    wrapper.add(content, details);
-    getContent().add(header, wrapper, footer);
-  }
-
-  /**
-   * Sets the header slot's components.
-   */
-  public void setViewHeader(Component... components) {
-    header.removeAll();
-    header.add(components);
-  }
-
-  /**
-   * Sets the content slot's components.
-   */
-  public void setViewContent(Component... components) {
-    content.removeAll();
-    content.add(components);
-  }
-
-  /**
-   * Sets the detail slot's components.
-   */
-  public void setViewDetails(Component... components) {
-    details.removeAll();
-    details.add(components);
-  }
-
-  public void setViewDetailsPosition(Position position) {
-    if (position.equals(Position.RIGHT)) {
-      wrapper.setFlexDirection(FlexDirection.ROW);
-
-    } else if (position.equals(Position.BOTTOM)) {
-      wrapper.setFlexDirection(FlexDirection.COLUMN);
+        wrapper.add(content, details);
+        getContent().add(header, wrapper, footer);
     }
-  }
 
-  /**
-   * Sets the footer slot's components.
-   */
-  public void setViewFooter(Component... components) {
-    footer.removeAll();
-    footer.add(components);
-  }
+    /**
+     * Sets the header slot's components.
+     */
+    public void setViewHeader(Component... components) {
+        header.removeAll();
+        header.add(components);
+    }
 
-  @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
-    JHapyMainView3.get().getAppBar().reset();
-  }
+    /**
+     * Sets the content slot's components.
+     */
+    public void setViewContent(Component... components) {
+        content.removeAll();
+        content.add(components);
+    }
 
-  public enum Position {
-    RIGHT, BOTTOM
-  }
+    /**
+     * Sets the detail slot's components.
+     */
+    public void setViewDetails(Component... components) {
+        details.removeAll();
+        details.add(components);
+    }
+
+    public void setViewDetailsPosition(Position position) {
+        if (position.equals(Position.RIGHT)) {
+            wrapper.setFlexDirection(FlexDirection.ROW);
+
+        } else if (position.equals(Position.BOTTOM)) {
+            wrapper.setFlexDirection(FlexDirection.COLUMN);
+        }
+    }
+
+    /**
+     * Sets the footer slot's components.
+     */
+    public void setViewFooter(Component... components) {
+        footer.removeAll();
+        footer.add(components);
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        JHapyMainView3.get().getAppBar().reset();
+    }
+
+    public enum Position {
+        RIGHT, BOTTOM
+    }
 }

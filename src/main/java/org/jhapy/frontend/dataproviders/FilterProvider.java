@@ -28,5 +28,5 @@ import java.io.Serializable;
 @FunctionalInterface
 public interface FilterProvider extends Serializable {
 
-  String getFilter();
+    String getFilter();
 }

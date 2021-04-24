@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.DirectionEnum;
-import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Slice;
-import org.jhapy.frontend.dataproviders.utils.FilterablePageableDataProvider;
 import org.jhapy.frontend.dataproviders.utils.FilterableSliceDataProvider;
 
 /**
@@ -39,50 +37,51 @@ import org.jhapy.frontend.dataproviders.utils.FilterableSliceDataProvider;
 public abstract class DefaultSliceDataProvider<T extends BaseEntity, F extends DefaultFilter> extends
     FilterableSliceDataProvider<T, F> implements Serializable {
 
-  private List<QuerySortOrder> defaultSortOrder;
-  private Consumer<Slice<T>> pageObserver;
-  private Query<T, F> currentQuery;
+    private List<QuerySortOrder> defaultSortOrder;
+    private Consumer<Slice<T>> pageObserver;
+    private Query<T, F> currentQuery;
 
-  public DefaultSliceDataProvider(DirectionEnum defaultSortDirection, String[] defaultSortFields) {
-    setSortOrder(defaultSortDirection, defaultSortFields);
-  }
-
-  private void setSortOrder(DirectionEnum direction, String[] properties) {
-    QuerySortOrderBuilder builder = new QuerySortOrderBuilder();
-    for (String property : properties) {
-      if (direction.equals(DirectionEnum.ASC)) {
-        builder.thenAsc(property);
-      } else {
-        builder.thenDesc(property);
-      }
+    public DefaultSliceDataProvider(DirectionEnum defaultSortDirection,
+        String[] defaultSortFields) {
+        setSortOrder(defaultSortDirection, defaultSortFields);
     }
-    defaultSortOrder = builder.build();
-  }
 
-  public Query<T, F> getCurrentQuery() {
-    return currentQuery;
-  }
+    private void setSortOrder(DirectionEnum direction, String[] properties) {
+        QuerySortOrderBuilder builder = new QuerySortOrderBuilder();
+        for (String property : properties) {
+            if (direction.equals(DirectionEnum.ASC)) {
+                builder.thenAsc(property);
+            } else {
+                builder.thenDesc(property);
+            }
+        }
+        defaultSortOrder = builder.build();
+    }
 
-  public void setCurrentQuery(
-      Query<T, F> currentQuery) {
-    this.currentQuery = currentQuery;
-  }
+    public Query<T, F> getCurrentQuery() {
+        return currentQuery;
+    }
 
-  @Override
-  protected List<QuerySortOrder> getDefaultSortOrders() {
-    return defaultSortOrder;
-  }
+    public void setCurrentQuery(
+        Query<T, F> currentQuery) {
+        this.currentQuery = currentQuery;
+    }
 
-  public Consumer<Slice<T>> getPageObserver() {
-    return pageObserver;
-  }
+    @Override
+    protected List<QuerySortOrder> getDefaultSortOrders() {
+        return defaultSortOrder;
+    }
 
-  public void setPageObserver(Consumer<Slice<T>> pageObserver) {
-    this.pageObserver = pageObserver;
-  }
+    public Consumer<Slice<T>> getPageObserver() {
+        return pageObserver;
+    }
 
-  @Override
-  public Object getId(T item) {
-    return item.getId();
-  }
+    public void setPageObserver(Consumer<Slice<T>> pageObserver) {
+        this.pageObserver = pageObserver;
+    }
+
+    @Override
+    public Object getId(T item) {
+        return item.getId();
+    }
 }

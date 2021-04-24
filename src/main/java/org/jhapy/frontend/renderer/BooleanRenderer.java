@@ -30,25 +30,25 @@ import org.jhapy.frontend.utils.AppConst;
  */
 public class BooleanRenderer<SOURCE> extends ComponentRenderer<Image, SOURCE> {
 
-  protected ValueProvider<SOURCE, Boolean> valueProvider;
+    protected ValueProvider<SOURCE, Boolean> valueProvider;
 
-  public BooleanRenderer(ValueProvider<SOURCE, Boolean> valueProvider) {
-    this.valueProvider = valueProvider;
-  }
-
-  public Image createComponent(SOURCE item) {
-    Image image = new Image();
-
-    Boolean val = valueProvider.apply(item);
-
-    if (val != null && val) {
-      image.setSrc(AppConst.ICON_OK);
-    } else if (val != null) {
-      image.setSrc(AppConst.ICON_KO);
-    } else {
-      image.setSrc(AppConst.ICON_BLANK);
+    public BooleanRenderer(ValueProvider<SOURCE, Boolean> valueProvider) {
+        this.valueProvider = valueProvider;
     }
 
-    return image;
-  }
+    public Image createComponent(SOURCE item) {
+        Image image = new Image();
+
+        Boolean val = valueProvider.apply(item);
+
+        if (val != null && val) {
+            image.setSrc(AppConst.ICON_OK);
+        } else if (val != null) {
+            image.setSrc(AppConst.ICON_KO);
+        } else {
+            image.setSrc(AppConst.ICON_BLANK);
+        }
+
+        return image;
+    }
 }

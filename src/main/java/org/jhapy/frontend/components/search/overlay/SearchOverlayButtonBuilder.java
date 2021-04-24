@@ -13,52 +13,53 @@ import org.jhapy.frontend.dataproviders.DefaultSearchDataProvider;
  */
 public class SearchOverlayButtonBuilder<T extends SearchQueryResult, F extends SearchQuery> {
 
-  private Function<SearchOverlayView.SearchQuery, Query<T, F>> queryFunction;
-  private Function<T, ClickNotifier> dataViewProvider;
-  private DefaultSearchDataProvider<T, F> dataProvider;
-  private Consumer<T> queryResultListener;
-  private Boolean closeOnQueryResult;
+    private Function<SearchOverlayView.SearchQuery, Query<T, F>> queryFunction;
+    private Function<T, ClickNotifier> dataViewProvider;
+    private DefaultSearchDataProvider<T, F> dataProvider;
+    private Consumer<T> queryResultListener;
+    private Boolean closeOnQueryResult;
 
-  public SearchOverlayButtonBuilder() {
-  }
-
-  public SearchOverlayButtonBuilder<T, F> withQueryProvider(
-      Function<SearchOverlayView.SearchQuery, Query<T, F>> queryFunction) {
-    this.queryFunction = queryFunction;
-    return this;
-  }
-
-  public SearchOverlayButtonBuilder<T, F> withDataViewProvider(
-      Function<T, ClickNotifier> dataViewProvider) {
-    this.dataViewProvider = dataViewProvider;
-    return this;
-  }
-
-  public SearchOverlayButtonBuilder<T, F> withDataProvider(
-      DefaultSearchDataProvider<T, F> dataProvider) {
-    this.dataProvider = dataProvider;
-    return this;
-  }
-
-  public SearchOverlayButton<T, F> build() {
-    SearchOverlayButton<T, F> appBarSearchButton = new SearchOverlayButton<>();
-    appBarSearchButton.setQueryProvider(queryFunction);
-    appBarSearchButton.setDataViewProvider(dataViewProvider);
-    appBarSearchButton.setDataProvider(dataProvider);
-    appBarSearchButton.setQueryResultListener(queryResultListener);
-    if (closeOnQueryResult != null) {
-      appBarSearchButton.setCloseOnQueryResult(closeOnQueryResult);
+    public SearchOverlayButtonBuilder() {
     }
-    return appBarSearchButton;
-  }
 
-  public SearchOverlayButtonBuilder<T, F> withQueryResultListener(Consumer<T> queryResultListener) {
-    this.queryResultListener = queryResultListener;
-    return this;
-  }
+    public SearchOverlayButtonBuilder<T, F> withQueryProvider(
+        Function<SearchOverlayView.SearchQuery, Query<T, F>> queryFunction) {
+        this.queryFunction = queryFunction;
+        return this;
+    }
 
-  public SearchOverlayButtonBuilder<T, F> withCloseOnQueryResult(boolean closeOnQueryResult) {
-    this.closeOnQueryResult = closeOnQueryResult;
-    return this;
-  }
+    public SearchOverlayButtonBuilder<T, F> withDataViewProvider(
+        Function<T, ClickNotifier> dataViewProvider) {
+        this.dataViewProvider = dataViewProvider;
+        return this;
+    }
+
+    public SearchOverlayButtonBuilder<T, F> withDataProvider(
+        DefaultSearchDataProvider<T, F> dataProvider) {
+        this.dataProvider = dataProvider;
+        return this;
+    }
+
+    public SearchOverlayButton<T, F> build() {
+        SearchOverlayButton<T, F> appBarSearchButton = new SearchOverlayButton<>();
+        appBarSearchButton.setQueryProvider(queryFunction);
+        appBarSearchButton.setDataViewProvider(dataViewProvider);
+        appBarSearchButton.setDataProvider(dataProvider);
+        appBarSearchButton.setQueryResultListener(queryResultListener);
+        if (closeOnQueryResult != null) {
+            appBarSearchButton.setCloseOnQueryResult(closeOnQueryResult);
+        }
+        return appBarSearchButton;
+    }
+
+    public SearchOverlayButtonBuilder<T, F> withQueryResultListener(
+        Consumer<T> queryResultListener) {
+        this.queryResultListener = queryResultListener;
+        return this;
+    }
+
+    public SearchOverlayButtonBuilder<T, F> withCloseOnQueryResult(boolean closeOnQueryResult) {
+        this.closeOnQueryResult = closeOnQueryResult;
+        return this;
+    }
 }

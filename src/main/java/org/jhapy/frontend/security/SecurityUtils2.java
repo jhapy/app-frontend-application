@@ -39,105 +39,105 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 public final class SecurityUtils2 {
 
-  private SecurityUtils2() {
-  }
-
-  /**
-   * Get the login of the current user.
-   *
-   * @return the login of the current user.
-   */
-  public static Optional<String> getCurrentUserLogin() {
-    SecurityContext securityContext = SecurityContextHolder.getContext();
-    return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
-  }
-
-  public static Optional<String> getCurrentUserPicture() {
-    SecurityContext securityContext = SecurityContextHolder.getContext();
-    Authentication authentication = securityContext.getAuthentication();
-    if (authentication.getPrincipal() instanceof DefaultOidcUser) {
-      Map<String, Object> attributes = ((DefaultOidcUser) authentication.getPrincipal())
-          .getAttributes();
-      if (attributes.containsKey("picture")) {
-        return Optional.ofNullable((String) attributes.get("picture"));
-      }
+    private SecurityUtils2() {
     }
-    return Optional.empty();
-  }
 
-  private static String extractPrincipal(Authentication authentication) {
-    if (authentication == null) {
-      return null;
-    } else if (authentication.getPrincipal() instanceof UserDetails) {
-      UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
-      return springSecurityUser.getUsername();
-    } else if (authentication instanceof JwtAuthenticationToken) {
-      return (String) ((JwtAuthenticationToken) authentication).getToken().getClaims()
-          .get("preferred_username");
-    } else if (authentication.getPrincipal() instanceof DefaultOidcUser) {
-      Map<String, Object> attributes = ((DefaultOidcUser) authentication.getPrincipal())
-          .getAttributes();
-      if (attributes.containsKey("preferred_username")) {
-        return (String) attributes.get("preferred_username");
-      }
-    } else if (authentication.getPrincipal() instanceof String) {
-      return (String) authentication.getPrincipal();
+    /**
+     * Get the login of the current user.
+     *
+     * @return the login of the current user.
+     */
+    public static Optional<String> getCurrentUserLogin() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
-    return null;
-  }
+
+    public static Optional<String> getCurrentUserPicture() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication.getPrincipal() instanceof DefaultOidcUser) {
+            Map<String, Object> attributes = ((DefaultOidcUser) authentication.getPrincipal())
+                .getAttributes();
+            if (attributes.containsKey("picture")) {
+                return Optional.ofNullable((String) attributes.get("picture"));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static String extractPrincipal(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        } else if (authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
+            return springSecurityUser.getUsername();
+        } else if (authentication instanceof JwtAuthenticationToken) {
+            return (String) ((JwtAuthenticationToken) authentication).getToken().getClaims()
+                .get("preferred_username");
+        } else if (authentication.getPrincipal() instanceof DefaultOidcUser) {
+            Map<String, Object> attributes = ((DefaultOidcUser) authentication.getPrincipal())
+                .getAttributes();
+            if (attributes.containsKey("preferred_username")) {
+                return (String) attributes.get("preferred_username");
+            }
+        } else if (authentication.getPrincipal() instanceof String) {
+            return (String) authentication.getPrincipal();
+        }
+        return null;
+    }
 
 
-  /**
-   * Check if a user is authenticated.
-   *
-   * @return true if the user is authenticated, false otherwise.
-   */
-  public static boolean isAuthenticated() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return authentication != null &&
-        getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
-  }
+    /**
+     * Check if a user is authenticated.
+     *
+     * @return true if the user is authenticated, false otherwise.
+     */
+    public static boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null &&
+            getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
+    }
 
-  /**
-   * If the current user has a specific authority (security role).
-   * <p>
-   * The name of this method comes from the {@code isUserInRole()} method in the Servlet API.
-   *
-   * @param authority the authority to check.
-   * @return true if the current user has the authority, false otherwise.
-   */
-  public static boolean isCurrentUserInRole(String authority) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return authentication != null &&
-        getAuthorities(authentication).anyMatch(authority::equals);
-  }
+    /**
+     * If the current user has a specific authority (security role).
+     * <p>
+     * The name of this method comes from the {@code isUserInRole()} method in the Servlet API.
+     *
+     * @param authority the authority to check.
+     * @return true if the current user has the authority, false otherwise.
+     */
+    public static boolean isCurrentUserInRole(String authority) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null &&
+            getAuthorities(authentication).anyMatch(authority::equals);
+    }
 
-  private static Stream<String> getAuthorities(Authentication authentication) {
-    Collection<? extends GrantedAuthority> authorities =
-        authentication instanceof JwtAuthenticationToken ?
-            extractAuthorityFromClaims(
-                ((JwtAuthenticationToken) authentication).getToken().getClaims())
-            : authentication.getAuthorities();
-    return authorities.stream()
-        .map(GrantedAuthority::getAuthority);
-  }
+    private static Stream<String> getAuthorities(Authentication authentication) {
+        Collection<? extends GrantedAuthority> authorities =
+            authentication instanceof JwtAuthenticationToken ?
+                extractAuthorityFromClaims(
+                    ((JwtAuthenticationToken) authentication).getToken().getClaims())
+                : authentication.getAuthorities();
+        return authorities.stream()
+            .map(GrantedAuthority::getAuthority);
+    }
 
-  public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
-    return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
-  }
+    public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
+        return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
+    }
 
-  @SuppressWarnings("unchecked")
-  private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
-    final Map<String, Object> realmAccess = (Map<String, Object>) claims.get("realm_access");
+    @SuppressWarnings("unchecked")
+    private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
+        final Map<String, Object> realmAccess = (Map<String, Object>) claims.get("realm_access");
 
-    return (Collection<String>) claims.getOrDefault("groups",
-        claims.getOrDefault("roles", realmAccess.getOrDefault("roles", new ArrayList<>())));
-  }
+        return (Collection<String>) claims.getOrDefault("groups",
+            claims.getOrDefault("roles", realmAccess.getOrDefault("roles", new ArrayList<>())));
+    }
 
-  private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
-    return roles.stream()
-        .filter(role -> role.startsWith("ROLE_"))
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
-  }
+    private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
+        return roles.stream()
+            .filter(role -> role.startsWith("ROLE_"))
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
+    }
 }

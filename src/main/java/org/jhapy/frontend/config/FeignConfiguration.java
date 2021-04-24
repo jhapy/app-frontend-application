@@ -16,18 +16,24 @@
  * limitations under the License.
  */
 
-package org.jhapy.frontend.utils;
+package org.jhapy.frontend.config;
 
-import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignClientsConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
-@Data
-@AllArgsConstructor
-public class MapPosition implements Serializable {
+@Configuration
+@EnableFeignClients
+@Import(FeignClientsConfiguration.class)
+public class FeignConfiguration {
 
-    private Double latitude;
-    private Double longitude;
-
-    private String placeId;
+    /**
+     * Set the Feign specific log level to log client REST requests.
+     */
+    @Bean
+    feign.Logger.Level feignLoggerLevel() {
+        return feign.Logger.Level.BASIC;
+    }
 }

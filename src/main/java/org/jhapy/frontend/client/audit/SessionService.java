@@ -39,12 +39,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface SessionService {
 
-  @PostMapping(value = "/findAnyMatching")
-  ServiceResult<Page<Session>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+    @PostMapping(value = "/findAnyMatching")
+    ServiceResult<Page<Session>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  @PostMapping(value = "/countAnyMatching")
-  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+    @PostMapping(value = "/countAnyMatching")
+    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-  @PostMapping(value = "/getById")
-  ServiceResult<Session> getById(@RequestBody GetByStrIdQuery query);
+    @PostMapping(value = "/getById")
+    ServiceResult<Session> getById(@RequestBody GetByStrIdQuery query);
 }

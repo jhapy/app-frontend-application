@@ -40,28 +40,28 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 //@Primary
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-  private final SecurityUserService securityUserService;
+    private final SecurityUserService securityUserService;
 
-  @Autowired
-  public UserDetailsServiceImpl(SecurityUserService securityUserService) {
-    this.securityUserService = securityUserService;
-  }
-
-  /**
-   * Recovers the {@link SecurityUser} from the database using the e-mail address supplied in the
-   * login screen. If the user is found, returns a {@link org.springframework.security.core.userdetails.User}.
-   *
-   * @param username User's e-mail address
-   */
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    SecurityUser securityUser = securityUserService
-        .getSecurityUserByUsername(new GetSecurityUserByUsernameQuery(username)).getData();
-
-    if (securityUser != null) {
-      return securityUser;
-    } else {
-      throw new UsernameNotFoundException("No user present with username: " + username);
+    @Autowired
+    public UserDetailsServiceImpl(SecurityUserService securityUserService) {
+        this.securityUserService = securityUserService;
     }
-  }
+
+    /**
+     * Recovers the {@link SecurityUser} from the database using the e-mail address supplied in the
+     * login screen. If the user is found, returns a {@link org.springframework.security.core.userdetails.User}.
+     *
+     * @param username User's e-mail address
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        SecurityUser securityUser = securityUserService
+            .getSecurityUserByUsername(new GetSecurityUserByUsernameQuery(username)).getData();
+
+        if (securityUser != null) {
+            return securityUser;
+        } else {
+            throw new UsernameNotFoundException("No user present with username: " + username);
+        }
+    }
 }

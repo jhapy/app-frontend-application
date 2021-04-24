@@ -28,7 +28,6 @@ import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.dto.utils.Pageable;
 import org.jhapy.frontend.client.security.SecurityServices;
-import org.jhapy.frontend.dataproviders.DefaultFilter;
 import org.jhapy.frontend.utils.AppConst;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,35 +42,37 @@ public class SecurityRoleKeycloakDataProvider extends
     DefaultDataProvider<SecurityKeycloakRole, DefaultFilter> implements
     Serializable {
 
-  @Autowired
-  public SecurityRoleKeycloakDataProvider() {
-    super(AppConst.DEFAULT_SORT_DIRECTION,
-        AppConst.DEFAULT_SORT_FIELDS);
-  }
-
-  @Override
-  protected Page<SecurityKeycloakRole> fetchFromBackEnd(
-      Query<SecurityKeycloakRole, DefaultFilter> query,
-      Pageable pageable) {
-    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-    String filterStr = filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
-
-    Page<SecurityKeycloakRole> page = SecurityServices.getKeycloakClient().findRoles(
-        new FindAnyMatchingQuery(filterStr, filter.isShowInactive(), pageable)).getData();
-    if (getPageObserver() != null) {
-      getPageObserver().accept(page);
+    @Autowired
+    public SecurityRoleKeycloakDataProvider() {
+        super(AppConst.DEFAULT_SORT_DIRECTION,
+            AppConst.DEFAULT_SORT_FIELDS);
     }
-    return page;
-  }
+
+    @Override
+    protected Page<SecurityKeycloakRole> fetchFromBackEnd(
+        Query<SecurityKeycloakRole, DefaultFilter> query,
+        Pageable pageable) {
+        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+        String filterStr =
+            filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+
+        Page<SecurityKeycloakRole> page = SecurityServices.getKeycloakClient().findRoles(
+            new FindAnyMatchingQuery(filterStr, filter.isShowInactive(), pageable)).getData();
+        if (getPageObserver() != null) {
+            getPageObserver().accept(page);
+        }
+        return page;
+    }
 
 
-  @Override
-  protected int sizeInBackEnd(Query<SecurityKeycloakRole, DefaultFilter> query) {
-    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-    String filterStr = filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+    @Override
+    protected int sizeInBackEnd(Query<SecurityKeycloakRole, DefaultFilter> query) {
+        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+        String filterStr =
+            filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
 
-    return SecurityServices.getKeycloakClient()
-        .countRoles(new CountAnyMatchingQuery(filterStr, true))
-        .getData().intValue();
-  }
+        return SecurityServices.getKeycloakClient()
+            .countRoles(new CountAnyMatchingQuery(filterStr, true))
+            .getData().intValue();
+    }
 }

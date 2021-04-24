@@ -31,36 +31,36 @@ import org.jhapy.frontend.utils.UIUtils;
 
 public class PlacesAdminDetailsDrawerFooter extends FlexBoxLayout {
 
-  private final Button create;
-  private final Button cancel;
+    private final Button create;
+    private final Button cancel;
 
-  public PlacesAdminDetailsDrawerFooter() {
-    setBackgroundColor(LumoStyles.Color.Contrast._5);
-    setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
-    setSpacing(Right.S);
-    setWidthFull();
+    public PlacesAdminDetailsDrawerFooter() {
+        setBackgroundColor(LumoStyles.Color.Contrast._5);
+        setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
+        setSpacing(Right.S);
+        setWidthFull();
 
-    create = UIUtils.createPrimaryButton(getTranslation("action.global.create"));
-    cancel = UIUtils.createTertiaryButton(getTranslation("action.global.cancel"));
+        create = UIUtils.createPrimaryButton(getTranslation("action.global.create"));
+        cancel = UIUtils.createTertiaryButton(getTranslation("action.global.cancel"));
 
-    add(create, cancel);
-  }
+        add(create, cancel);
+    }
 
-  public Registration addCreateListener(
-      ComponentEventListener<ClickEvent<Button>> listener) {
-    return create.addClickListener(listener);
-  }
+    public Registration addCreateListener(
+        ComponentEventListener<ClickEvent<Button>> listener) {
+        return create.addClickListener(listener);
+    }
 
-  public Registration addCancelListener(
-      ComponentEventListener<ClickEvent<Button>> listener) {
-    return cancel.addClickListener(listener);
-  }
+    public Registration addCancelListener(
+        ComponentEventListener<ClickEvent<Button>> listener) {
+        return cancel.addClickListener(listener);
+    }
 
-  public void setCreateButtonVisible(boolean isVisible) {
-    create.setVisible(isVisible);
-  }
+    public void setCreateButtonVisible(boolean isVisible) {
+        create.setVisible(isVisible);
+    }
 
-  public void setCancelButtonVisible(boolean isVisible) {
-    cancel.setVisible(isVisible);
-  }
+    public void setCancelButtonVisible(boolean isVisible) {
+        cancel.setVisible(isVisible);
+    }
 }

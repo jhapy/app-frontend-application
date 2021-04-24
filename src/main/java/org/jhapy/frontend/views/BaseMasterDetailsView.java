@@ -47,135 +47,135 @@ import org.jhapy.frontend.utils.css.BoxSizing;
  */
 public abstract class BaseMasterDetailsView<T, F extends DefaultFilter> extends SplitViewFrame {
 
-  protected final String I18N_PREFIX;
-  protected Grid<T> grid;
-  protected DetailsDrawer detailsDrawer;
-  protected DetailsDrawerHeader detailsDrawerHeader;
-  protected DetailsDrawerFooter detailsDrawerFooter;
-  protected Binder<T> binder;
-  private T currentEditing;
-  private final Class<T> entityType;
+    protected final String I18N_PREFIX;
+    protected Grid<T> grid;
+    protected DetailsDrawer detailsDrawer;
+    protected DetailsDrawerHeader detailsDrawerHeader;
+    protected DetailsDrawerFooter detailsDrawerFooter;
+    protected Binder<T> binder;
+    private T currentEditing;
+    private final Class<T> entityType;
 
-  public BaseMasterDetailsView(String I18N_PREFIX, Class<T> entityType) {
-    this.I18N_PREFIX = I18N_PREFIX;
-    this.entityType = entityType;
-    this.binder = new BeanValidationBinder<>(entityType);
-  }
-
-  @Override
-  protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
-
-    initHeader();
-    setViewContent(createContent());
-    setViewDetails(createDetailsDrawer());
-
-    filter(null);
-
-    if (currentEditing != null) {
-      showDetails(currentEditing);
+    public BaseMasterDetailsView(String I18N_PREFIX, Class<T> entityType) {
+        this.I18N_PREFIX = I18N_PREFIX;
+        this.entityType = entityType;
+        this.binder = new BeanValidationBinder<>(entityType);
     }
-  }
 
-  protected T getCurrentEditing() {
-    return currentEditing;
-  }
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
 
-  protected void setCurrentEditing(T currentEditing) {
-    this.currentEditing = currentEditing;
-  }
+        initHeader();
+        setViewContent(createContent());
+        setViewDetails(createDetailsDrawer());
 
-  protected void initHeader() {
-    AppBar appBar = JHapyMainView3.get().getAppBar();
-    appBar.setNaviMode(NaviMode.MENU);
+        filter(null);
 
-    initSearchBar();
-  }
-
-  protected void showDetails() {
-    try {
-      showDetails(entityType.getDeclaredConstructor().newInstance());
-
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+        if (currentEditing != null) {
+            showDetails(currentEditing);
+        }
     }
-  }
 
-  protected void initSearchBar() {
-    AppBar appBar = JHapyMainView3.get().getAppBar();
-    appBar.disableGlobalSearch();
-    Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
-    searchButton.addClickListener(event -> appBar.searchModeOn());
-    appBar.addSearchListener(event -> filter((String) event.getValue()));
-    appBar.setSearchPlaceholder(getTranslation("element.global.search"));
-    appBar.addActionItem(searchButton);
-  }
-
-  private Component createContent() {
-    FlexBoxLayout content = new FlexBoxLayout();
-    content.setFlexDirection(FlexDirection.COLUMN);
-    Component header = createHeader();
-    if (header != null) {
-      content.add(header);
+    protected T getCurrentEditing() {
+        return currentEditing;
     }
-    content.add(createGrid());
-    content.setBoxSizing(BoxSizing.BORDER_BOX);
-    content.setHeightFull();
-    content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
-    return content;
-  }
 
-  protected abstract Grid createGrid();
+    protected void setCurrentEditing(T currentEditing) {
+        this.currentEditing = currentEditing;
+    }
 
-  protected Component createHeader() {
-    return null;
-  }
+    protected void initHeader() {
+        AppBar appBar = JHapyMainView3.get().getAppBar();
+        appBar.setNaviMode(NaviMode.MENU);
 
-  protected DetailsDrawer.Position getDetailsDrawerPosition() {
-    return DetailsDrawer.Position.RIGHT;
-  }
+        initSearchBar();
+    }
 
-  protected Position getSplitViewFramePosition() {
-    return Position.RIGHT;
-  }
+    protected void showDetails() {
+        try {
+            showDetails(entityType.getDeclaredConstructor().newInstance());
 
-  private DetailsDrawer createDetailsDrawer() {
-    detailsDrawer = new DetailsDrawer(getDetailsDrawerPosition());
-    setViewDetailsPosition(getSplitViewFramePosition());
-    // Header
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+        }
+    }
 
-    detailsDrawerHeader = new DetailsDrawerHeader(
-        getTranslation("element." + I18N_PREFIX + "className"));
-    detailsDrawerHeader.addCloseListener(e -> {
-      detailsDrawer.hide();
-      currentEditing = null;
-    });
-    detailsDrawer.setHeader(detailsDrawerHeader);
+    protected void initSearchBar() {
+        AppBar appBar = JHapyMainView3.get().getAppBar();
+        appBar.disableGlobalSearch();
+        Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
+        searchButton.addClickListener(event -> appBar.searchModeOn());
+        appBar.addSearchListener(event -> filter((String) event.getValue()));
+        appBar.setSearchPlaceholder(getTranslation("element.global.search"));
+        appBar.addActionItem(searchButton);
+    }
 
-    // Footer
-    detailsDrawerFooter = new DetailsDrawerFooter();
-    detailsDrawerFooter.setSaveButtonVisible(false);
-    detailsDrawerFooter.setSaveAndNewButtonVisible(false);
-    detailsDrawerFooter.setDeleteButtonVisible(false);
+    private Component createContent() {
+        FlexBoxLayout content = new FlexBoxLayout();
+        content.setFlexDirection(FlexDirection.COLUMN);
+        Component header = createHeader();
+        if (header != null) {
+            content.add(header);
+        }
+        content.add(createGrid());
+        content.setBoxSizing(BoxSizing.BORDER_BOX);
+        content.setHeightFull();
+        content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
+        return content;
+    }
 
-    detailsDrawerFooter.addCancelListener(e -> {
-      detailsDrawer.hide();
-      currentEditing = null;
-    });
-    detailsDrawer.setFooter(detailsDrawerFooter);
+    protected abstract Grid createGrid();
 
-    return detailsDrawer;
-  }
+    protected Component createHeader() {
+        return null;
+    }
 
-  protected void showDetails(T entity) {
-    this.binder = new BeanValidationBinder<>(entityType);
+    protected DetailsDrawer.Position getDetailsDrawerPosition() {
+        return DetailsDrawer.Position.RIGHT;
+    }
 
-    currentEditing = entity;
-    detailsDrawer.setContent(createDetails(entity));
-    detailsDrawer.show();
-  }
+    protected Position getSplitViewFramePosition() {
+        return Position.RIGHT;
+    }
 
-  protected abstract Component createDetails(T entity);
+    private DetailsDrawer createDetailsDrawer() {
+        detailsDrawer = new DetailsDrawer(getDetailsDrawerPosition());
+        setViewDetailsPosition(getSplitViewFramePosition());
+        // Header
 
-  protected void filter(String filter) {
-  }
+        detailsDrawerHeader = new DetailsDrawerHeader(
+            getTranslation("element." + I18N_PREFIX + "className"));
+        detailsDrawerHeader.addCloseListener(e -> {
+            detailsDrawer.hide();
+            currentEditing = null;
+        });
+        detailsDrawer.setHeader(detailsDrawerHeader);
+
+        // Footer
+        detailsDrawerFooter = new DetailsDrawerFooter();
+        detailsDrawerFooter.setSaveButtonVisible(false);
+        detailsDrawerFooter.setSaveAndNewButtonVisible(false);
+        detailsDrawerFooter.setDeleteButtonVisible(false);
+
+        detailsDrawerFooter.addCancelListener(e -> {
+            detailsDrawer.hide();
+            currentEditing = null;
+        });
+        detailsDrawer.setFooter(detailsDrawerFooter);
+
+        return detailsDrawer;
+    }
+
+    protected void showDetails(T entity) {
+        this.binder = new BeanValidationBinder<>(entityType);
+
+        currentEditing = entity;
+        detailsDrawer.setContent(createDetails(entity));
+        detailsDrawer.show();
+    }
+
+    protected abstract Component createDetails(T entity);
+
+    protected void filter(String filter) {
+    }
 }

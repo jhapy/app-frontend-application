@@ -33,20 +33,20 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class SecurityServices {
 
-  public static SecurityUserService getSecurityUserService() {
-    return getApplicationContext().getBean(SecurityUserService.class);
-  }
+    public static SecurityUserService getSecurityUserService() {
+        return getApplicationContext().getBean(SecurityUserService.class);
+    }
 
-  public static SecurityRoleService getSecurityRoleService() {
-    return getApplicationContext().getBean(SecurityRoleService.class);
-  }
+    public static SecurityRoleService getSecurityRoleService() {
+        return getApplicationContext().getBean(SecurityRoleService.class);
+    }
 
-  public static KeycloakClient getKeycloakClient() {
-    return getApplicationContext().getBean(KeycloakClient.class);
-  }
+    public static KeycloakClient getKeycloakClient() {
+        return getApplicationContext().getBean(KeycloakClient.class);
+    }
 
-  public static ApplicationContext getApplicationContext() {
-    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-  }
+    public static ApplicationContext getApplicationContext() {
+        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+    }
 }

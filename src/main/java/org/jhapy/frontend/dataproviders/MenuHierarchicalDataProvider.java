@@ -14,40 +14,40 @@ import org.jhapy.frontend.views.menu.MenuEntry;
 public abstract class MenuHierarchicalDataProvider extends
     AbstractBackEndHierarchicalDataProvider<MenuEntry, Void> {
 
-  protected MenuData rootMenu;
-  protected JHapyMainView3 mainView;
+    protected MenuData rootMenu;
+    protected JHapyMainView3 mainView;
 
-  protected Consumer<MenuData> dataObserver;
+    protected Consumer<MenuData> dataObserver;
 
-  public MenuHierarchicalDataProvider() {
-  }
+    public MenuHierarchicalDataProvider() {
+    }
 
-  public JHapyMainView3 getMainView() {
-    return mainView;
-  }
+    public JHapyMainView3 getMainView() {
+        return mainView;
+    }
 
-  public void setMainView(JHapyMainView3 mainView) {
-    this.mainView = mainView;
-  }
+    public void setMainView(JHapyMainView3 mainView) {
+        this.mainView = mainView;
+    }
 
-  public MenuHierarchicalDataProvider(MenuData rootMenu) {
-    this.rootMenu = rootMenu;
-  }
+    public MenuHierarchicalDataProvider(MenuData rootMenu) {
+        this.rootMenu = rootMenu;
+    }
 
-  public MenuData getRootMenu() {
-    return rootMenu;
-  }
+    public MenuData getRootMenu() {
+        return rootMenu;
+    }
 
-  public void setRootMenu(MenuData rootMenu) {
-    this.rootMenu = rootMenu;
-  }
+    public void setRootMenu(MenuData rootMenu) {
+        this.rootMenu = rootMenu;
+    }
 
-  public Consumer<MenuData> getDataObserver() {
-    return dataObserver;
-  }
+    public Consumer<MenuData> getDataObserver() {
+        return dataObserver;
+    }
 
-  public void setDataObserver(
-      Consumer<MenuData> dataObserver) {
-    this.dataObserver = dataObserver;
-  }
+    public void setDataObserver(
+        Consumer<MenuData> dataObserver) {
+        this.dataObserver = dataObserver;
+    }
 }

@@ -29,5 +29,5 @@ import java.util.Locale;
 @FunctionalInterface
 public interface LocaleProvider extends Serializable {
 
-  Locale getLocale();
+    Locale getLocale();
 }

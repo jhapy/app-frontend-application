@@ -27,9 +27,9 @@ import java.text.DecimalFormat;
  */
 public class NumberUtils {
 
-  private static final DecimalFormat numberFormat = new DecimalFormat("#.0");
+    private static final DecimalFormat numberFormat = new DecimalFormat("#.0");
 
-  public static String formatRangeNumner(double value) {
-    return numberFormat.format(value);
-  }
+    public static String formatRangeNumner(double value) {
+        return numberFormat.format(value);
+    }
 }

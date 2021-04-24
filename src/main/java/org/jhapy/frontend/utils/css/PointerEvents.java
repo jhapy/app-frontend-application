@@ -20,15 +20,15 @@ package org.jhapy.frontend.utils.css;
 
 public enum PointerEvents {
 
-  AUTO("auto"), NONE("none");
+    AUTO("auto"), NONE("none");
 
-  private final String value;
+    private final String value;
 
-  PointerEvents(String value) {
-    this.value = value;
-  }
+    PointerEvents(String value) {
+        this.value = value;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public String getValue() {
+        return value;
+    }
 }

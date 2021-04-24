@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.StoredFile;
@@ -48,165 +48,166 @@ import org.jhapy.frontend.views.JHapyMainView;
  */
 public class ExcelExporter<T extends BaseEntity, F extends DefaultFilter> implements HasLogger {
 
-  private static final String TMP_FILE_NAME = "tmp";
+    private static final String TMP_FILE_NAME = "tmp";
 
-  private File file;
-  private final DefaultDataProvider<T, F> dataProvider;
-  private final Grid<T> grid;
-  private final Class<T> entityType;
+    private File file;
+    private final DefaultDataProvider<T, F> dataProvider;
+    private final Grid<T> grid;
+    private final Class<T> entityType;
 
-  private PropertySet<T> propertySet;
+    private PropertySet<T> propertySet;
 
-  public ExcelExporter(Grid<T> grid, DefaultDataProvider<T, F> dataProvider, Class<T> entityType) {
-    this(grid, dataProvider, entityType, null);
-  }
-
-  public ExcelExporter(Grid<T> grid, DefaultDataProvider<T, F> dataProvider, Class<T> entityType,
-      List<String> excludedColumns) {
-    this.dataProvider = dataProvider;
-    this.entityType = entityType;
-    this.grid = grid;
-  }
-
-  public InputStream build() {
-    try {
-      initTempFile();
-      resetContent();
-      buildFileContent();
-      writeToFile();
-      return new FileInputStream(file);
-    } catch (Exception e) {
-      throw new ExcelExporterException("An error happened during exporting your Grid", e);
+    public ExcelExporter(Grid<T> grid, DefaultDataProvider<T, F> dataProvider,
+        Class<T> entityType) {
+        this(grid, dataProvider, entityType, null);
     }
-  }
 
-  private void initTempFile() throws IOException {
-    if (file == null || file.delete()) {
-      file = createTempFile();
+    public ExcelExporter(Grid<T> grid, DefaultDataProvider<T, F> dataProvider, Class<T> entityType,
+        List<String> excludedColumns) {
+        this.dataProvider = dataProvider;
+        this.entityType = entityType;
+        this.grid = grid;
     }
-  }
 
-  private File createTempFile() throws IOException {
-    return File.createTempFile(TMP_FILE_NAME, getFileExtension());
-  }
-
-  protected void resetContent() {
-
-  }
-
-  private void buildFileContent() {
-    buildHeaderRow();
-    buildRows();
-    buildFooter();
-  }
-
-  private void buildHeaderRow() {
-    onNewRow();
-
-    Method[] methods = entityType.getDeclaredMethods();
-    String className = WordUtils.uncapitalize(entityType.getSimpleName());
-    for (Method method : methods) {
-      if (method.getName().startsWith("get")
-          && !Collection.class.isAssignableFrom(method.getReturnType())
-          && !method.getReturnType().isArray()
-          && !method.getReturnType().equals(StoredFile.class)
-          && !BaseEntity.class.isAssignableFrom(method.getReturnType())) {
-        onNewCell();
-        String attrName = WordUtils.uncapitalize(method.getName().substring(3));
-        buildColumnHeaderCell("element." + className + "." + attrName);
-      }
-    }
-  }
-
-  void buildColumnHeaderCell(String header) {
-    String loggerPrefix = getLoggerPrefix("buildColumnHeaderCell");
-
-    logger().debug(
-        loggerPrefix + "Build header for column name " + header + " : " + JHapyMainView.get()
-            .getTranslation(header));
-  }
-
-  private void buildRows() {
-    String loggerPrefix = getLoggerPrefix("buildRows");
-    Object filter = null;
-
-    Query<T, F> streamQuery = new Query(0, dataProvider.size(dataProvider.getCurrentQuery()),
-        grid.getDataCommunicator().getBackEndSorting(),
-        grid.getDataCommunicator().getInMemorySorting(),
-        dataProvider.getCurrentQuery().getFilter());
-    Stream<T> dataStream = getDataStream(streamQuery);
-
-    dataStream.forEach(t -> {
-      buildRow(t);
-    });
-  }
-
-  void buildFooter() {
-
-  }
-
-  void writeToFile() {
-
-  }
-
-  private void buildRow(T item) {
-    onNewRow();
-    Map<String, Object> values = new HashMap();
-    Method[] methods = item.getClass().getMethods();
-    for (Method method : methods) {
-      try {
-        if (method.getName().startsWith("get")
-            && !Collection.class.isAssignableFrom(method.getReturnType())
-            && !method.getReturnType().isArray()
-            && !method.getReturnType().equals(StoredFile.class)) {
-          String attrName = WordUtils.uncapitalize(method.getName().substring(3));
-          values.put(attrName, method.invoke(item));
+    public InputStream build() {
+        try {
+            initTempFile();
+            resetContent();
+            buildFileContent();
+            writeToFile();
+            return new FileInputStream(file);
+        } catch (Exception e) {
+            throw new ExcelExporterException("An error happened during exporting your Grid", e);
         }
-      } catch (IllegalAccessException e) {
-        e.printStackTrace();
-      } catch (InvocationTargetException e) {
-        e.printStackTrace();
-      }
     }
 
-    values.forEach((s, o) -> {
-      onNewCell();
-      buildCell(o);
-    });
-  }
-
-  String getFileExtension() {
-    return ".xlsx";
-  }
-
-  void buildCell(Object value) {
-    String loggerPrefix = getLoggerPrefix("buildCell");
-
-    logger().debug(loggerPrefix + "Build cell with value " + value);
-  }
-
-  void onNewRow() {
-    String loggerPrefix = getLoggerPrefix("onNewRow");
-
-    logger().debug(loggerPrefix + "New Row");
-  }
-
-  void onNewCell() {
-    String loggerPrefix = getLoggerPrefix("onNewCell");
-
-    logger().debug(loggerPrefix + "New Cell");
-  }
-
-  private Stream<T> getDataStream(Query newQuery) {
-    String loggerPrefix = getLoggerPrefix("getDataStream");
-    Stream<T> stream = grid.getDataProvider().fetch(newQuery);
-    if (stream.isParallel()) {
-      logger().debug("Data provider {} has returned "
-              + "parallel stream on 'fetch' call",
-          grid.getDataProvider().getClass());
-      stream = stream.collect(Collectors.toList()).stream();
-      assert !stream.isParallel();
+    private void initTempFile() throws IOException {
+        if (file == null || file.delete()) {
+            file = createTempFile();
+        }
     }
-    return stream;
-  }
+
+    private File createTempFile() throws IOException {
+        return File.createTempFile(TMP_FILE_NAME, getFileExtension());
+    }
+
+    protected void resetContent() {
+
+    }
+
+    private void buildFileContent() {
+        buildHeaderRow();
+        buildRows();
+        buildFooter();
+    }
+
+    private void buildHeaderRow() {
+        onNewRow();
+
+        Method[] methods = entityType.getDeclaredMethods();
+        String className = WordUtils.uncapitalize(entityType.getSimpleName());
+        for (Method method : methods) {
+            if (method.getName().startsWith("get")
+                && !Collection.class.isAssignableFrom(method.getReturnType())
+                && !method.getReturnType().isArray()
+                && !method.getReturnType().equals(StoredFile.class)
+                && !BaseEntity.class.isAssignableFrom(method.getReturnType())) {
+                onNewCell();
+                String attrName = WordUtils.uncapitalize(method.getName().substring(3));
+                buildColumnHeaderCell("element." + className + "." + attrName);
+            }
+        }
+    }
+
+    void buildColumnHeaderCell(String header) {
+        String loggerPrefix = getLoggerPrefix("buildColumnHeaderCell");
+
+        logger().debug(
+            loggerPrefix + "Build header for column name " + header + " : " + JHapyMainView.get()
+                .getTranslation(header));
+    }
+
+    private void buildRows() {
+        String loggerPrefix = getLoggerPrefix("buildRows");
+        Object filter = null;
+
+        Query<T, F> streamQuery = new Query(0, dataProvider.size(dataProvider.getCurrentQuery()),
+            grid.getDataCommunicator().getBackEndSorting(),
+            grid.getDataCommunicator().getInMemorySorting(),
+            dataProvider.getCurrentQuery().getFilter());
+        Stream<T> dataStream = getDataStream(streamQuery);
+
+        dataStream.forEach(t -> {
+            buildRow(t);
+        });
+    }
+
+    void buildFooter() {
+
+    }
+
+    void writeToFile() {
+
+    }
+
+    private void buildRow(T item) {
+        onNewRow();
+        Map<String, Object> values = new HashMap();
+        Method[] methods = item.getClass().getMethods();
+        for (Method method : methods) {
+            try {
+                if (method.getName().startsWith("get")
+                    && !Collection.class.isAssignableFrom(method.getReturnType())
+                    && !method.getReturnType().isArray()
+                    && !method.getReturnType().equals(StoredFile.class)) {
+                    String attrName = WordUtils.uncapitalize(method.getName().substring(3));
+                    values.put(attrName, method.invoke(item));
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        values.forEach((s, o) -> {
+            onNewCell();
+            buildCell(o);
+        });
+    }
+
+    String getFileExtension() {
+        return ".xlsx";
+    }
+
+    void buildCell(Object value) {
+        String loggerPrefix = getLoggerPrefix("buildCell");
+
+        logger().debug(loggerPrefix + "Build cell with value " + value);
+    }
+
+    void onNewRow() {
+        String loggerPrefix = getLoggerPrefix("onNewRow");
+
+        logger().debug(loggerPrefix + "New Row");
+    }
+
+    void onNewCell() {
+        String loggerPrefix = getLoggerPrefix("onNewCell");
+
+        logger().debug(loggerPrefix + "New Cell");
+    }
+
+    private Stream<T> getDataStream(Query newQuery) {
+        String loggerPrefix = getLoggerPrefix("getDataStream");
+        Stream<T> stream = grid.getDataProvider().fetch(newQuery);
+        if (stream.isParallel()) {
+            logger().debug("Data provider {} has returned "
+                    + "parallel stream on 'fetch' call",
+                grid.getDataProvider().getClass());
+            stream = stream.collect(Collectors.toList()).stream();
+            assert !stream.isParallel();
+        }
+        return stream;
+    }
 }

@@ -21,14 +21,10 @@ package org.jhapy.frontend.config.metric;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
-import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jhapy.commons.utils.HasLogger;
-import org.jhapy.dto.domain.security.SecurityUser;
-import org.jhapy.frontend.security.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jHapy Lead Dev.
@@ -39,30 +35,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SessionCountGaugeServiceInitListener implements VaadinServiceInitListener, HasLogger {
 
 
-  private final MeterRegistry meterRegistry;
+    private final MeterRegistry meterRegistry;
 
-  public SessionCountGaugeServiceInitListener(MeterRegistry meterRegistry) {
-    this.meterRegistry = meterRegistry;
-  }
+    public SessionCountGaugeServiceInitListener(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+    }
 
-  @Override
-  public void serviceInit(ServiceInitEvent event) {
+    @Override
+    public void serviceInit(ServiceInitEvent event) {
 
-    final AtomicInteger sessionsCount = meterRegistry
-        .gauge("vaadin.sessions", new AtomicInteger(0));
+        final AtomicInteger sessionsCount = meterRegistry
+            .gauge("vaadin.sessions", new AtomicInteger(0));
 
-    final VaadinService vaadinService = event.getSource();
+        final VaadinService vaadinService = event.getSource();
 
-    vaadinService.addSessionInitListener(e -> {
-      String loggerPrefix = getLoggerPrefix("sessionInit");
-      logger().info(loggerPrefix + "New Vaadin session created. Current count is: " + sessionsCount
-          .incrementAndGet());
-    });
-    vaadinService.addSessionDestroyListener(e -> {
-      String loggerPrefix = getLoggerPrefix("sessionDestroy");
-      logger().info(loggerPrefix + "Vaadin session destroyed. Current count is: " + sessionsCount
-          .decrementAndGet());
-    });
-  }
+        vaadinService.addSessionInitListener(e -> {
+            String loggerPrefix = getLoggerPrefix("sessionInit");
+            logger().info(
+                loggerPrefix + "New Vaadin session created. Current count is: " + sessionsCount
+                    .incrementAndGet());
+        });
+        vaadinService.addSessionDestroyListener(e -> {
+            String loggerPrefix = getLoggerPrefix("sessionDestroy");
+            logger()
+                .info(loggerPrefix + "Vaadin session destroyed. Current count is: " + sessionsCount
+                    .decrementAndGet());
+        });
+    }
 }
 

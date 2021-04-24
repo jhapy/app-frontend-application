@@ -38,28 +38,28 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  */
 public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-  private final SecurityUserService securityUserService;
-  private final AuditServiceQueue auditServiceQueue;
+    private final SecurityUserService securityUserService;
+    private final AuditServiceQueue auditServiceQueue;
 
-  public AuthenticationSuccessHandler(
-      SecurityUserService securityUserService, AuditServiceQueue auditServiceQueue) {
-    this.securityUserService = securityUserService;
-    this.auditServiceQueue = auditServiceQueue;
-  }
+    public AuthenticationSuccessHandler(
+        SecurityUserService securityUserService, AuditServiceQueue auditServiceQueue) {
+        this.securityUserService = securityUserService;
+        this.auditServiceQueue = auditServiceQueue;
+    }
 
-  @Override
-  public void onAuthenticationSuccess(HttpServletRequest request,
-      HttpServletResponse response, Authentication authentication)
-      throws ServletException, IOException {
-    SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-    securityUser.setLastSuccessfulLogin(Instant.now());
-    securityUser.setIsAccountLocked(false);
-    securityUser.setFailedLoginAttempts(0);
-    securityUserService.save(new SaveQuery<>(securityUser));
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request,
+        HttpServletResponse response, Authentication authentication)
+        throws ServletException, IOException {
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+        securityUser.setLastSuccessfulLogin(Instant.now());
+        securityUser.setIsAccountLocked(false);
+        securityUser.setFailedLoginAttempts(0);
+        securityUserService.save(new SaveQuery<>(securityUser));
 
-    auditServiceQueue.newSession(
-        new NewSession(request.getRequestedSessionId(), securityUser.getUsername(), null,
-            Instant.now(), true, null));
-    super.onAuthenticationSuccess(request, response, authentication);
-  }
+        auditServiceQueue.newSession(
+            new NewSession(request.getRequestedSessionId(), securityUser.getUsername(), null,
+                Instant.now(), true, null));
+        super.onAuthenticationSuccess(request, response, authentication);
+    }
 }

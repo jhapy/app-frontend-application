@@ -17,50 +17,50 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 public class CustomOAuth2AuthorizationRequestResolver implements
     OAuth2AuthorizationRequestResolver, HasLogger {
 
-  private OAuth2AuthorizationRequestResolver defaultResolver;
-  private boolean forceHttps;
+    private final OAuth2AuthorizationRequestResolver defaultResolver;
+    private final boolean forceHttps;
 
-  public CustomOAuth2AuthorizationRequestResolver(
-      ClientRegistrationRepository repo, String authorizationRequestBaseUri, boolean forceHttps) {
-    this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(repo,
-        authorizationRequestBaseUri);
-    this.forceHttps = forceHttps;
-  }
-
-  @Override
-  public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-    OAuth2AuthorizationRequest req = defaultResolver.resolve(request);
-    if (req != null) {
-      req = customizeAuthorizationRequest(req);
+    public CustomOAuth2AuthorizationRequestResolver(
+        ClientRegistrationRepository repo, String authorizationRequestBaseUri, boolean forceHttps) {
+        this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(repo,
+            authorizationRequestBaseUri);
+        this.forceHttps = forceHttps;
     }
-    return req;
-  }
 
-  @Override
-  public OAuth2AuthorizationRequest resolve(HttpServletRequest request,
-      String clientRegistrationId) {
-    OAuth2AuthorizationRequest req = defaultResolver.resolve(request, clientRegistrationId);
-    if (req != null) {
-      req = customizeAuthorizationRequest(req);
+    @Override
+    public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+        OAuth2AuthorizationRequest req = defaultResolver.resolve(request);
+        if (req != null) {
+            req = customizeAuthorizationRequest(req);
+        }
+        return req;
     }
-    return req;
-  }
 
-  private OAuth2AuthorizationRequest customizeAuthorizationRequest(
-      OAuth2AuthorizationRequest req) {
-    String loggerPrefix = getLoggerPrefix("customizeAuthorizationRequest", forceHttps);
-    logger().debug(loggerPrefix + "Initial Redirect URI = " + req.getRedirectUri());
-    if (forceHttps) {
-      URI uri = null;
-      try {
-        uri = new URI(req.getRedirectUri());
-        String newRedirectUri = "https://" + uri.getAuthority() + uri.getPath();
-        logger().debug(loggerPrefix + "New redirect URI = " + newRedirectUri);
-        return OAuth2AuthorizationRequest.from(req).redirectUri(newRedirectUri).build();
-      } catch (URISyntaxException e) {
-        logger().error(loggerPrefix + "Unexpected error : " + e.getMessage(), e);
-      }
+    @Override
+    public OAuth2AuthorizationRequest resolve(HttpServletRequest request,
+        String clientRegistrationId) {
+        OAuth2AuthorizationRequest req = defaultResolver.resolve(request, clientRegistrationId);
+        if (req != null) {
+            req = customizeAuthorizationRequest(req);
+        }
+        return req;
     }
-    return OAuth2AuthorizationRequest.from(req).build();
-  }
+
+    private OAuth2AuthorizationRequest customizeAuthorizationRequest(
+        OAuth2AuthorizationRequest req) {
+        String loggerPrefix = getLoggerPrefix("customizeAuthorizationRequest", forceHttps);
+        logger().debug(loggerPrefix + "Initial Redirect URI = " + req.getRedirectUri());
+        if (forceHttps) {
+            URI uri = null;
+            try {
+                uri = new URI(req.getRedirectUri());
+                String newRedirectUri = "https://" + uri.getAuthority() + uri.getPath();
+                logger().debug(loggerPrefix + "New redirect URI = " + newRedirectUri);
+                return OAuth2AuthorizationRequest.from(req).redirectUri(newRedirectUri).build();
+            } catch (URISyntaxException e) {
+                logger().error(loggerPrefix + "Unexpected error : " + e.getMessage(), e);
+            }
+        }
+        return OAuth2AuthorizationRequest.from(req).build();
+    }
 }

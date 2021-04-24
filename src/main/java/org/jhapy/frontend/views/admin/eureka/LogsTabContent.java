@@ -46,79 +46,80 @@ import org.springframework.http.ResponseEntity;
 @Tag("logsTabContent")
 public class LogsTabContent extends ActuatorBaseView {
 
-  protected FlexBoxLayout content;
-  protected Component component;
+    protected FlexBoxLayout content;
+    protected Component component;
 
-  public LogsTabContent(UI ui, String I18N_PREFIX,
-      AuthorizationHeaderUtil authorizationHeaderUtil) {
-    super(ui, I18N_PREFIX + "logs.", authorizationHeaderUtil);
-  }
-
-  public Component getContent(EurekaInfo eurekaInfo) {
-    content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
-        getTranslation("element." + I18N_PREFIX + "title"),
-        getEurekaInstancesList(true, eurekaInfo.getApplicationList(), this::getDetails)));
-    content.setAlignItems(FlexComponent.Alignment.CENTER);
-    content.setFlexDirection(FlexDirection.COLUMN);
-    content.setSizeFull();
-
-    return content;
-  }
-
-  @Override
-  public void refresh() {
-    String loggerPrefix = getLoggerPrefix("refresh");
-    if (currentEurekaApplicationInstance != null && currentEurekaApplication != null) {
-      logger().debug(loggerPrefix + "Refresh content");
-      getDetails(currentEurekaApplication, currentEurekaApplicationInstance);
-    } else {
-      logger().warn(loggerPrefix + "No application or application instance set, nothing to do");
+    public LogsTabContent(UI ui, String I18N_PREFIX,
+        AuthorizationHeaderUtil authorizationHeaderUtil) {
+        super(ui, I18N_PREFIX + "logs.", authorizationHeaderUtil);
     }
-  }
 
-  protected Component getLogs(String logFile) {
-    TextArea loggerArea = new TextArea();
-    loggerArea.setValue(logFile);
-    loggerArea.setSizeFull();
+    public Component getContent(EurekaInfo eurekaInfo) {
+        content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
+            getTranslation("element." + I18N_PREFIX + "title"),
+            getEurekaInstancesList(true, eurekaInfo.getApplicationList(), this::getDetails)));
+        content.setAlignItems(FlexComponent.Alignment.CENTER);
+        content.setFlexDirection(FlexDirection.COLUMN);
+        content.setSizeFull();
 
-    return loggerArea;
-  }
+        return content;
+    }
 
-  protected void getDetails(EurekaApplication eurekaApplication,
-      EurekaApplicationInstance eurekaApplicationInstance) {
-    titleLabel.setText(
-        getTranslation("element." + I18N_PREFIX + "title") + " - " + eurekaApplicationInstance
-            .getInstanceId());
-    try {
-      final HttpHeaders httpHeaders = new HttpHeaders() {{
-        set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
-        setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-      }};
-
-      logger().debug(
-          "Application : " + eurekaApplication.getName() + ", Loggers Url = "
-              + eurekaApplicationInstance.getMetadata().get("management.url") + "/logfile");
-      ResponseEntity<String> aa = restTemplate.exchange(URI.create(
-          eurekaApplicationInstance.getMetadata().get("management.url") + "/logfile"),
-          HttpMethod.GET,
-          new HttpEntity<>(httpHeaders), String.class);
-      String logFile = aa.getBody();
-
-      logger().debug("Logs = " + logFile);
-
-      if (content.getChildren().count() > 1) {
-        if (component != null) {
-          content.remove(component);
+    @Override
+    public void refresh() {
+        String loggerPrefix = getLoggerPrefix("refresh");
+        if (currentEurekaApplicationInstance != null && currentEurekaApplication != null) {
+            logger().debug(loggerPrefix + "Refresh content");
+            getDetails(currentEurekaApplication, currentEurekaApplicationInstance);
+        } else {
+            logger()
+                .warn(loggerPrefix + "No application or application instance set, nothing to do");
         }
-      }
-
-      component = getLogs(logFile);
-      content.add(component);
-      content.setFlex("1", component);
-    } catch (Throwable t) {
-      t.printStackTrace();
     }
 
-  }
+    protected Component getLogs(String logFile) {
+        TextArea loggerArea = new TextArea();
+        loggerArea.setValue(logFile);
+        loggerArea.setSizeFull();
+
+        return loggerArea;
+    }
+
+    protected void getDetails(EurekaApplication eurekaApplication,
+        EurekaApplicationInstance eurekaApplicationInstance) {
+        titleLabel.setText(
+            getTranslation("element." + I18N_PREFIX + "title") + " - " + eurekaApplicationInstance
+                .getInstanceId());
+        try {
+            final HttpHeaders httpHeaders = new HttpHeaders() {{
+                set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
+                setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+            }};
+
+            logger().debug(
+                "Application : " + eurekaApplication.getName() + ", Loggers Url = "
+                    + eurekaApplicationInstance.getMetadata().get("management.url") + "/logfile");
+            ResponseEntity<String> aa = restTemplate.exchange(URI.create(
+                eurekaApplicationInstance.getMetadata().get("management.url") + "/logfile"),
+                HttpMethod.GET,
+                new HttpEntity<>(httpHeaders), String.class);
+            String logFile = aa.getBody();
+
+            logger().debug("Logs = " + logFile);
+
+            if (content.getChildren().count() > 1) {
+                if (component != null) {
+                    content.remove(component);
+                }
+            }
+
+            component = getLogs(logFile);
+            content.add(component);
+            content.setFlex("1", component);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
+    }
 
 }

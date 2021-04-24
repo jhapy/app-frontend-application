@@ -45,12 +45,9 @@ import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.authentification.ClearRememberMeTokenQuery;
 import org.jhapy.dto.serviceQuery.authentification.CreateRememberMeTokenQuery;
 import org.jhapy.dto.serviceQuery.authentification.GetSecurityUserByRememberMeTokenQuery;
-import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.audit.AuditServices;
-import org.jhapy.frontend.client.security.SecurityServices;
-import org.jhapy.frontend.utils.AppConst;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -73,253 +70,258 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
  */
 public final class SecurityUtils {
 
-  public static final String SESSION_USERNAME = "username";
-  private static final String COOKIE_NAME = "remember-me";
+    public static final String SESSION_USERNAME = "username";
+    private static final String COOKIE_NAME = "remember-me";
 
 
-  private SecurityUtils() {
-    // Util methods only
-  }
-
-  /**
-   * Gets the user name of the currently signed in user.
-   *
-   * @return the user name of the current user or <code>null</code> if the user has not signed in
-   */
-  public static String getUsername() {
-    SecurityContext context = SecurityContextHolder.getContext();
-    if (!isUserLoggedIn()) {
-      return "Anonymous";
-    }
-    Object principal = context.getAuthentication().getPrincipal();
-    if (principal instanceof UserDetails) {
-      UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
-      return userDetails.getUsername();
-    }
-    // Anonymous or no authentication.
-    return "Anonymous";
-  }
-
-  public static SecurityUser getSecurityUser() {
-    SecurityContext context = SecurityContextHolder.getContext();
-    if (!isUserLoggedIn()) {
-      return null;
-    }
-    if (VaadinSession.getCurrent() != null
-        && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
-      return (SecurityUser) VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE);
-    }
-    Object principal = context.getAuthentication().getPrincipal();
-    if (principal instanceof DefaultOidcUser) {
-      Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
-      SecurityUser securityUser = new SecurityUser();
-      securityUser.setEmail(attributes.get("email").toString());
-      securityUser.setFirstName(attributes.get("given_name").toString());
-      securityUser.setLastName(attributes.get("family_name").toString());
-      securityUser.setUsername(attributes.get("preferred_username").toString());
-      VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
-      return securityUser;
-    } else if (principal instanceof SecurityUser) {
-      return (SecurityUser) principal;
-    }
-    // Anonymous or no authentication.
-    return null;
-  }
-
-  public static SecurityUser getSecurityUser(Authentication authentication) {
-    if (authentication == null) {
-      return null;
-    }
-    Object principal = authentication.getPrincipal();
-    if (principal instanceof DefaultOidcUser) {
-      Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
-      SecurityUser securityUser = new SecurityUser();
-      securityUser.setEmail(attributes.get("email").toString());
-      securityUser.setFirstName(attributes.get("given_name").toString());
-      securityUser.setLastName(attributes.get("family_name").toString());
-      securityUser.setUsername(attributes.get("preferred_username").toString());
-      return securityUser;
-    } else if (principal instanceof SecurityUser) {
-      return (SecurityUser) principal;
-    }
-    // Anonymous or no authentication.
-    return null;
-  }
-
-  /**
-   * Checks if access is granted for the current user for the given secured view, defined by the
-   * view class.
-   *
-   * @param viewClass View class
-   * @return true if access is granted, false otherwise.
-   */
-  public static boolean isAccessGranted(Class<?> viewClass) {
-    // Always allow access to public views
-    PublicView publicView = AnnotationUtils.findAnnotation(viewClass, PublicView.class);
-    if (publicView != null) {
-      return true;
+    private SecurityUtils() {
+        // Util methods only
     }
 
-    Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // All other views require authentication
-    if (!isUserLoggedIn(userAuthentication)) {
-      return false;
+    /**
+     * Gets the user name of the currently signed in user.
+     *
+     * @return the user name of the current user or <code>null</code> if the user has not signed in
+     */
+    public static String getUsername() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (!isUserLoggedIn()) {
+            return "Anonymous";
+        }
+        Object principal = context.getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
+            return userDetails.getUsername();
+        }
+        // Anonymous or no authentication.
+        return "Anonymous";
     }
 
-    // Allow if no roles are required.
-    Secured secured = AnnotationUtils.findAnnotation(viewClass, Secured.class);
-    if (secured == null) {
-      return true;
+    public static SecurityUser getSecurityUser() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (!isUserLoggedIn()) {
+            return null;
+        }
+        if (VaadinSession.getCurrent() != null
+            && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
+            return (SecurityUser) VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE);
+        }
+        Object principal = context.getAuthentication().getPrincipal();
+        if (principal instanceof DefaultOidcUser) {
+            Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
+            SecurityUser securityUser = new SecurityUser();
+            securityUser.setEmail(attributes.get("email").toString());
+            securityUser.setFirstName(attributes.get("given_name").toString());
+            securityUser.setLastName(attributes.get("family_name").toString());
+            securityUser.setUsername(attributes.get("preferred_username").toString());
+            securityUser.setId(attributes.get("sub"));
+            VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
+            return securityUser;
+        } else if (principal instanceof SecurityUser) {
+            return (SecurityUser) principal;
+        }
+        // Anonymous or no authentication.
+        return null;
     }
 
-    List<String> allowedRoles = Arrays.asList(secured.value());
-    return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-        .anyMatch(allowedRoles::contains);
-  }
-
-  public static boolean hasRole(String role) {
-    Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // All other views require authentication
-    if (!isUserLoggedIn(userAuthentication)) {
-      return false;
+    public static SecurityUser getSecurityUser(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof DefaultOidcUser) {
+            Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
+            SecurityUser securityUser = new SecurityUser();
+            securityUser.setEmail(attributes.get("email").toString());
+            securityUser.setFirstName(attributes.get("given_name").toString());
+            securityUser.setLastName(attributes.get("family_name").toString());
+            securityUser.setUsername(attributes.get("preferred_username").toString());
+            return securityUser;
+        } else if (principal instanceof SecurityUser) {
+            return (SecurityUser) principal;
+        }
+        // Anonymous or no authentication.
+        return null;
     }
 
-    return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-        .anyMatch(s -> s.equals(role));
-  }
+    /**
+     * Checks if access is granted for the current user for the given secured view, defined by the
+     * view class.
+     *
+     * @param viewClass View class
+     * @return true if access is granted, false otherwise.
+     */
+    public static boolean isAccessGranted(Class<?> viewClass) {
+        // Always allow access to public views
+        PublicView publicView = AnnotationUtils.findAnnotation(viewClass, PublicView.class);
+        if (publicView != null) {
+            return true;
+        }
 
-  /**
-   * Checks if the user is logged in.
-   *
-   * @return true if the user is logged in. False otherwise.
-   */
-  public static boolean isUserLoggedIn() {
-    return isUserLoggedIn(SecurityContextHolder.getContext().getAuthentication());
-  }
+        Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
 
-  private static boolean isUserLoggedIn(Authentication authentication) {
-    return (authentication != null
-        && !(authentication instanceof AnonymousAuthenticationToken)) || loginRememberedUser();
-  }
+        // All other views require authentication
+        if (!isUserLoggedIn(userAuthentication)) {
+            return false;
+        }
 
-  /**
-   * Tests if the request is an internal framework request. The test consists of checking if the
-   * request parameter is present and if its value is consistent with any of the request types
-   * know.
-   *
-   * @param request {@link HttpServletRequest}
-   * @return true if is an internal framework request. False otherwise.
-   */
-  static public boolean isFrameworkInternalRequest(HttpServletRequest request) {
-    final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
-    return parameterValue != null
-        && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
-  }
+        // Allow if no roles are required.
+        Secured secured = AnnotationUtils.findAnnotation(viewClass, Secured.class);
+        if (secured == null) {
+            return true;
+        }
 
-  public static void newSession(SecurityUser securityUser, boolean rememberMe) {
-    SecurityContextHolder.getContext()
-        .setAuthentication(new UsernamePasswordAuthenticationToken(securityUser, null,
-            securityUser.getAuthorities()));
+        List<String> allowedRoles = Arrays.asList(secured.value());
+        return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+            .anyMatch(allowedRoles::contains);
+    }
 
-    VaadinSession.getCurrent().getSession()
-        .setAttribute(SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
-    VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
+    public static boolean hasRole(String role) {
+        Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
 
-    AuditServices.getAuditServiceQueue().newSession(
-        new NewSession(VaadinRequest.getCurrent().getWrappedSession().getId(),
-            securityUser.getUsername(), VaadinRequest.getCurrent().getRemoteAddr(), Instant.now(),
-            true, null));
+        // All other views require authentication
+        if (!isUserLoggedIn(userAuthentication)) {
+            return false;
+        }
 
-    if (rememberMe) {
-      ServiceResult<RememberMeToken> _rememberMeToken = BaseServices
-          .getAuthService()
-          .createRememberMeToken(new CreateRememberMeTokenQuery(securityUser.getId()));
+        return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+            .anyMatch(s -> s.equals(role));
+    }
 
-      if (_rememberMeToken.getIsSuccess()) {
-        RememberMeToken rememberMeToken = _rememberMeToken.getData();
+    /**
+     * Checks if the user is logged in.
+     *
+     * @return true if the user is logged in. False otherwise.
+     */
+    public static boolean isUserLoggedIn() {
+        return isUserLoggedIn(SecurityContextHolder.getContext().getAuthentication());
+    }
 
-        Cookie cookie = new Cookie(COOKIE_NAME, rememberMeToken.getToken());
-        cookie.setPath("/");
-        cookie.setMaxAge(
-            (int) (rememberMeToken.getExpiryDate().getTime() - System.currentTimeMillis() * 1000));
-        cookie.setHttpOnly(true);
+    private static boolean isUserLoggedIn(Authentication authentication) {
+        return (authentication != null
+            && !(authentication instanceof AnonymousAuthenticationToken)) || loginRememberedUser();
+    }
+
+    /**
+     * Tests if the request is an internal framework request. The test consists of checking if the
+     * request parameter is present and if its value is consistent with any of the request types
+     * know.
+     *
+     * @param request {@link HttpServletRequest}
+     * @return true if is an internal framework request. False otherwise.
+     */
+    static public boolean isFrameworkInternalRequest(HttpServletRequest request) {
+        final String parameterValue = request
+            .getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
+        return parameterValue != null
+            && Stream.of(RequestType.values())
+            .anyMatch(r -> r.getIdentifier().equals(parameterValue));
+    }
+
+    public static void newSession(SecurityUser securityUser, boolean rememberMe) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken(securityUser, null,
+                securityUser.getAuthorities()));
+
+        VaadinSession.getCurrent().getSession()
+            .setAttribute(SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+        VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
+
+        AuditServices.getAuditServiceQueue().newSession(
+            new NewSession(VaadinRequest.getCurrent().getWrappedSession().getId(),
+                securityUser.getUsername(), VaadinRequest.getCurrent().getRemoteAddr(),
+                Instant.now(),
+                true, null));
+
+        if (rememberMe) {
+            ServiceResult<RememberMeToken> _rememberMeToken = BaseServices
+                .getAuthService()
+                .createRememberMeToken(new CreateRememberMeTokenQuery(securityUser.getId()));
+
+            if (_rememberMeToken.getIsSuccess()) {
+                RememberMeToken rememberMeToken = _rememberMeToken.getData();
+
+                Cookie cookie = new Cookie(COOKIE_NAME, rememberMeToken.getToken());
+                cookie.setPath("/");
+                cookie.setMaxAge(
+                    (int) (rememberMeToken.getExpiryDate().getTime()
+                        - System.currentTimeMillis() * 1000));
+                cookie.setHttpOnly(true);
+                VaadinService.getCurrentResponse().addCookie(cookie);
+            }
+        }
+    }
+
+    public static void endSession(String jSessionId) {
+        Optional<Cookie> cookie = getRememberMeCookie();
+        if (cookie.isPresent()) {
+            String id = cookie.get().getValue();
+            BaseServices.getAuthService().clearRememberMeToken(new ClearRememberMeTokenQuery(id));
+            deleteRememberMeCookie(cookie.get());
+        }
+        AuditServices.getAuditServiceQueue().endSession(new EndSession(jSessionId, Instant.now()));
+
+        // VaadinSession.getCurrent().close();
+    }
+
+    private static Optional<Cookie> getRememberMeCookie() {
+        if (VaadinService.getCurrentRequest() == null) {
+            return Optional.empty();
+        }
+
+        Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
+        if (cookies != null) {
+            return Arrays.stream(cookies).filter(c -> c.getName().equals(COOKIE_NAME)).findFirst();
+        }
+
+        return Optional.empty();
+    }
+
+    private static boolean loginRememberedUser() {
+        Optional<Cookie> rememberMeCookie = getRememberMeCookie();
+
+        if (rememberMeCookie.isPresent()) {
+            String id = rememberMeCookie.get().getValue();
+            ServiceResult<SecurityUser> _securityUser = BaseServices.getAuthService()
+                .getSecurityUserByRememberMeToken(new GetSecurityUserByRememberMeTokenQuery(id));
+
+            if (_securityUser != null && _securityUser.getIsSuccess()) {
+                newSession(_securityUser.getData(), true);
+                return true;
+            } else {
+                deleteRememberMeCookie(rememberMeCookie.get());
+            }
+        }
+
+        return false;
+    }
+
+    private static void deleteRememberMeCookie(Cookie existing) {
+        Cookie cookie = new Cookie(existing.getName(), null);
+        if (existing.getPath() != null) {
+            cookie.setPath(existing.getPath());
+        }
+        if (existing.getDomain() != null) {
+            cookie.setDomain(existing.getDomain());
+        }
+        cookie.setMaxAge(0);
         VaadinService.getCurrentResponse().addCookie(cookie);
-      }
-    }
-  }
-
-  public static void endSession(String jSessionId) {
-    Optional<Cookie> cookie = getRememberMeCookie();
-    if (cookie.isPresent()) {
-      String id = cookie.get().getValue();
-      BaseServices.getAuthService().clearRememberMeToken(new ClearRememberMeTokenQuery(id));
-      deleteRememberMeCookie(cookie.get());
-    }
-    AuditServices.getAuditServiceQueue().endSession(new EndSession(jSessionId, Instant.now()));
-
-    // VaadinSession.getCurrent().close();
-  }
-
-  private static Optional<Cookie> getRememberMeCookie() {
-    if (VaadinService.getCurrentRequest() == null) {
-      return Optional.empty();
     }
 
-    Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
-    if (cookies != null) {
-      return Arrays.stream(cookies).filter(c -> c.getName().equals(COOKIE_NAME)).findFirst();
+    public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
+        return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
     }
 
-    return Optional.empty();
-  }
-
-  private static boolean loginRememberedUser() {
-    Optional<Cookie> rememberMeCookie = getRememberMeCookie();
-
-    if (rememberMeCookie.isPresent()) {
-      String id = rememberMeCookie.get().getValue();
-      ServiceResult<SecurityUser> _securityUser = BaseServices.getAuthService()
-          .getSecurityUserByRememberMeToken(new GetSecurityUserByRememberMeTokenQuery(id));
-
-      if (_securityUser != null && _securityUser.getIsSuccess()) {
-        newSession(_securityUser.getData(), true);
-        return true;
-      } else {
-        deleteRememberMeCookie(rememberMeCookie.get());
-      }
+    @SuppressWarnings("unchecked")
+    private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
+        return (Collection<String>) claims.getOrDefault("groups",
+            claims.getOrDefault("roles", new ArrayList<>()));
     }
 
-    return false;
-  }
-
-  private static void deleteRememberMeCookie(Cookie existing) {
-    Cookie cookie = new Cookie(existing.getName(), null);
-    if (existing.getPath() != null) {
-      cookie.setPath(existing.getPath());
+    private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
+        return roles.stream()
+            .filter(role -> role.startsWith("ROLE_"))
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
     }
-    if (existing.getDomain() != null) {
-      cookie.setDomain(existing.getDomain());
-    }
-    cookie.setMaxAge(0);
-    VaadinService.getCurrentResponse().addCookie(cookie);
-  }
-
-  public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
-    return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
-  }
-
-  @SuppressWarnings("unchecked")
-  private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
-    return (Collection<String>) claims.getOrDefault("groups",
-        claims.getOrDefault("roles", new ArrayList<>()));
-  }
-
-  private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
-    return roles.stream()
-        .filter(role -> role.startsWith("ROLE_"))
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
-  }
 }

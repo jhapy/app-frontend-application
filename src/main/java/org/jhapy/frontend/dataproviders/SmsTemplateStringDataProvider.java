@@ -46,24 +46,24 @@ public class SmsTemplateStringDataProvider extends
     Serializable {
 
 
-  @Override
-  protected Page<SmsTemplate> fetchFromBackEnd(Query<SmsTemplate, String> query,
-      Pageable pageable) {
+    @Override
+    protected Page<SmsTemplate> fetchFromBackEnd(Query<SmsTemplate, String> query,
+        Pageable pageable) {
 
-    return NotificationServices.getSmsTemplateService().findAnyMatching(
-        new FindAnyMatchingQuery(query.getFilter().orElse(null), true, pageable)).getData();
-  }
+        return NotificationServices.getSmsTemplateService().findAnyMatching(
+            new FindAnyMatchingQuery(query.getFilter().orElse(null), true, pageable)).getData();
+    }
 
-  @Override
-  protected List<QuerySortOrder> getDefaultSortOrders() {
-    return Collections.singletonList(new QuerySortOrder("name", SortDirection.ASCENDING));
-  }
+    @Override
+    protected List<QuerySortOrder> getDefaultSortOrders() {
+        return Collections.singletonList(new QuerySortOrder("name", SortDirection.ASCENDING));
+    }
 
 
-  @Override
-  protected int sizeInBackEnd(Query<SmsTemplate, String> query) {
-    return NotificationServices.getSmsTemplateService()
-        .countAnyMatching(new CountAnyMatchingQuery(query.getFilter().orElse(null), true))
-        .getData().intValue();
-  }
+    @Override
+    protected int sizeInBackEnd(Query<SmsTemplate, String> query) {
+        return NotificationServices.getSmsTemplateService()
+            .countAnyMatching(new CountAnyMatchingQuery(query.getFilter().orElse(null), true))
+            .getData().intValue();
+    }
 }

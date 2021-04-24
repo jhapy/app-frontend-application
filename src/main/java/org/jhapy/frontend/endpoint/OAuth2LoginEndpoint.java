@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class OAuth2LoginEndpoint {
 
-  @GetMapping("/oauth2/redirect")
-  public String redirect(String token) {
+    @GetMapping("/oauth2/redirect")
+    public String redirect(String token) {
 
-    return "redirect:/frontend/myOAuth2/popupCallback.html?access_token=" + token;
-  }
+        return "redirect:/frontend/myOAuth2/popupCallback.html?access_token=" + token;
+    }
 }

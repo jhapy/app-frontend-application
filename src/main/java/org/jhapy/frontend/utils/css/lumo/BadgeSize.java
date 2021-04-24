@@ -20,16 +20,16 @@ package org.jhapy.frontend.utils.css.lumo;
 
 public enum BadgeSize {
 
-  S("small"), M("medium");
+    S("small"), M("medium");
 
-  private final String style;
+    private final String style;
 
-  BadgeSize(String style) {
-    this.style = style;
-  }
+    BadgeSize(String style) {
+        this.style = style;
+    }
 
-  public String getThemeName() {
-    return style;
-  }
+    public String getThemeName() {
+        return style;
+    }
 
 }

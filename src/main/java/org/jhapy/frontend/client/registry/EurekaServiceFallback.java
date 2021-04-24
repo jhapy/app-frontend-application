@@ -18,7 +18,6 @@
 
 package org.jhapy.frontend.client.registry;
 
-import feign.hystrix.FallbackFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.jhapy.dto.registry.EurekaInfo;
 import org.jhapy.dto.registry.EurekaStatus;
 import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
 import org.jhapy.dto.serviceQuery.ServiceResult;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,52 +39,52 @@ import org.springframework.stereotype.Component;
 public class EurekaServiceFallback implements EurekaService, HasLogger,
     FallbackFactory<EurekaServiceFallback> {
 
-  final Throwable cause;
+    final Throwable cause;
 
-  public EurekaServiceFallback() {
-    this(null);
-  }
-
-  EurekaServiceFallback(Throwable cause) {
-    this.cause = cause;
-  }
-
-  @Override
-  public EurekaServiceFallback create(Throwable cause) {
-    if (cause != null) {
-      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-          : "Unknown error occurred : " + cause.toString();
-      // I don't see this log statement
-      logger().debug("Client fallback called for the cause : {}", errMessage);
+    public EurekaServiceFallback() {
+        this(null);
     }
-    return new EurekaServiceFallback(cause);
-  }
 
-  @Override
-  public ServiceResult<EurekaInfo> getApplications(BaseRemoteQuery query) {
-    logger().error(getLoggerPrefix("getApplications") + "Cannot connect to the server");
+    EurekaServiceFallback(Throwable cause) {
+        this.cause = cause;
+    }
 
-    return new ServiceResult<>(false, "Cannot connect to server", null);
-  }
+    @Override
+    public EurekaServiceFallback create(Throwable cause) {
+        if (cause != null) {
+            String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+                : "Unknown error occurred : " + cause;
+            // I don't see this log statement
+            logger().debug("Client fallback called for the cause : {}", errMessage);
+        }
+        return new EurekaServiceFallback(cause);
+    }
 
-  @Override
-  public ServiceResult<Map<String, List<String[]>>> lastn(BaseRemoteQuery query) {
-    logger().error(getLoggerPrefix("lastn") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<EurekaInfo> getApplications(BaseRemoteQuery query) {
+        logger().error(getLoggerPrefix("getApplications") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyMap());
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", null);
+    }
 
-  @Override
-  public ServiceResult<List<String>> replicas(BaseRemoteQuery query) {
-    logger().error(getLoggerPrefix("replicas") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<Map<String, List<String[]>>> lastn(BaseRemoteQuery query) {
+        logger().error(getLoggerPrefix("lastn") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyMap());
+    }
 
-  @Override
-  public ServiceResult<EurekaStatus> status(BaseRemoteQuery query) {
-    logger().error(getLoggerPrefix("status") + "Cannot connect to the server");
+    @Override
+    public ServiceResult<List<String>> replicas(BaseRemoteQuery query) {
+        logger().error(getLoggerPrefix("replicas") + "Cannot connect to the server");
 
-    return new ServiceResult<>(false, "Cannot connect to server", null);
-  }
+        return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
+    }
+
+    @Override
+    public ServiceResult<EurekaStatus> status(BaseRemoteQuery query) {
+        logger().error(getLoggerPrefix("status") + "Cannot connect to the server");
+
+        return new ServiceResult<>(false, "Cannot connect to server", null);
+    }
 }

@@ -12,10 +12,10 @@ import lombok.Data;
 @Data
 public class SessionInfo implements Serializable {
 
-  private String username;
-  private String sourceIp;
-  private LocalDateTime loginDateTime;
-  private LocalDateTime logoutDateTime;
-  private LocalDateTime lastContact;
-  private String jSessionId;
+    private String username;
+    private String sourceIp;
+    private LocalDateTime loginDateTime;
+    private LocalDateTime logoutDateTime;
+    private LocalDateTime lastContact;
+    private String jSessionId;
 }

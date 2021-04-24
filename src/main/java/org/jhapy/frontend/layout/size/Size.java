@@ -20,16 +20,16 @@ package org.jhapy.frontend.layout.size;
 
 public interface Size {
 
-  // Margins and paddings can have multiple attributes (e.g. horizontal and
-  // vertical)
-  String[] getMarginAttributes();
+    // Margins and paddings can have multiple attributes (e.g. horizontal and
+    // vertical)
+    String[] getMarginAttributes();
 
-  String[] getPaddingAttributes();
+    String[] getPaddingAttributes();
 
-  // Spacing is applied via the class attribute
-  String getSpacingClassName();
+    // Spacing is applied via the class attribute
+    String getSpacingClassName();
 
-  // Returns the size variable (Lumo custom property)
-  String getVariable();
+    // Returns the size variable (Lumo custom property)
+    String getVariable();
 
 }
