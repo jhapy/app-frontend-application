@@ -76,6 +76,7 @@ public interface AppConst {
     String PAGE_ADMIN_SWAGGERS = "settings/swaggers";
     String PAGE_ADMIN_SWAGGER_DETAILS = "settings/swagger/detail";
     String PAGE_COUNTRIES = "settings/reference/countries";
+    String PAGE_ACTIVITIES = "settings/activities/activities";
     String PAGE_ACTIVITIES_ADMIN = "settings/activities/activitiesAdmin";
     String PAGE_ACTIVITY_ADMIN = "settings/activities/activitiyAdmin";
 
@@ -164,4 +165,6 @@ public interface AppConst {
     String AVATAR_ATTRIBUTE = "AVATAR";
     String SECURITY_USER_ATTRIBUTE = "SECURITY_USER";
     String THEME_ATTRIBUTE = "THEME";
+
+    String USER_ATTRIBUTE = "USER";
 }
