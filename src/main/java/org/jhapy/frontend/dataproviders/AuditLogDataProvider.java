@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.jhapy.dto.domain.audit.AuditLog;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.auditLog.CountAuditLogQuery;
@@ -87,6 +88,7 @@ public class AuditLogDataProvider extends
     }
 
     @Data
+    @EqualsAndHashCode(callSuper=true)
     @AllArgsConstructor
     public static class AuditLogFilter extends DefaultFilter {
 

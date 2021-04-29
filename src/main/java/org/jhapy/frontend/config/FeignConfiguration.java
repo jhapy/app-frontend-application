@@ -24,9 +24,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-@Configuration
-@EnableFeignClients
-@Import(FeignClientsConfiguration.class)
+//@Configuration
+//@EnableFeignClients
+//@Import(FeignClientsConfiguration.class)
 public class FeignConfiguration {
 
     /**
