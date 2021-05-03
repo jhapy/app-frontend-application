@@ -390,7 +390,7 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
             if (beforeSave(currentEditing)) {
                 ServiceResult<T> result = saveHandler.apply(currentEditing);
-                if (result.getIsSuccess() && result.getData() != null) {
+                if (result != null && result.getIsSuccess() && result.getData() != null) {
                     currentEditing = result.getData();
                 } else {
                     JHapyMainView.get()
