@@ -40,54 +40,54 @@ import java.net.URI;
 @JsModule("./pdf-viewer/pdf-browser-viewer.js")
 public class PdfViewer extends Component {
 
-    private final StreamRegistration streamRegistration;
+  private final StreamRegistration streamRegistration;
 
-    public PdfViewer(StreamResource streamResource) {
-        streamRegistration = VaadinSession.getCurrent().getResourceRegistry()
-            .registerResource(streamResource);
-        URI uri = StreamResourceRegistry.getURI(streamResource);
-        setFile(uri.toASCIIString());
-    }
+  public PdfViewer(StreamResource streamResource) {
+    streamRegistration = VaadinSession.getCurrent().getResourceRegistry()
+        .registerResource(streamResource);
+    URI uri = StreamResourceRegistry.getURI(streamResource);
+    setFile(uri.toASCIIString());
+  }
 
-    public void setFile(String file) {
-        getElement().setAttribute("file", file);
-    }
+  public void setFile(String file) {
+    getElement().setAttribute("file", file);
+  }
 
-    public void setNotSupportedMessage(String message) {
-        getElement().setAttribute("not-supported-message", message);
-    }
+  public void setNotSupportedMessage(String message) {
+    getElement().setAttribute("not-supported-message", message);
+  }
 
-    public void setNotSupportedLinkMessage(String message) {
-        getElement().setAttribute("not-supported-link-message", message);
-    }
+  public void setNotSupportedLinkMessage(String message) {
+    getElement().setAttribute("not-supported-link-message", message);
+  }
 
-    public void setCard(boolean card) {
-        getElement().setAttribute("card", card);
-    }
+  public void setCard(boolean card) {
+    getElement().setAttribute("card", card);
+  }
 
-    public void setDownloadLabel(String label) {
-        getElement().setAttribute("downloadLabel", label);
-    }
+  public void setDownloadLabel(String label) {
+    getElement().setAttribute("downloadLabel", label);
+  }
 
-    public void setElevation(String elevation) {
-        getElement().setAttribute("elevation", elevation);
-    }
+  public void setElevation(String elevation) {
+    getElement().setAttribute("elevation", elevation);
+  }
 
-    public void setHeight(String height) {
-        getElement().setAttribute("height", height);
-        getElement().getStyle().set("height", height);
-    }
+  public void setHeight(String height) {
+    getElement().setAttribute("height", height);
+    getElement().getStyle().set("height", height);
+  }
 
-    public void setWidth(String width) {
-        getElement().setAttribute("width", width);
-        getElement().getStyle().set("width", width);
-    }
+  public void setWidth(String width) {
+    getElement().setAttribute("width", width);
+    getElement().getStyle().set("width", width);
+  }
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        super.onDetach(detachEvent);
-        if (streamRegistration != null) {
-            streamRegistration.unregister();
-        }
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    super.onDetach(detachEvent);
+    if (streamRegistration != null) {
+      streamRegistration.unregister();
     }
+  }
 }

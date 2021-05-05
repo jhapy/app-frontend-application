@@ -34,27 +34,27 @@ import org.springframework.stereotype.Component;
 public class SecurityRoleConverter extends
     BidirectionalConverter<SecurityKeycloakRole, RoleRepresentation> {
 
-    @Override
-    public RoleRepresentation convertTo(SecurityKeycloakRole source,
-        Type<RoleRepresentation> destinationType,
-        MappingContext mappingContext) {
-        RoleRepresentation result = new RoleRepresentation();
-        result.setId(source.getId());
-        result.setName(source.getName());
-        result.setDescription(source.getDescription());
+  @Override
+  public RoleRepresentation convertTo(SecurityKeycloakRole source,
+      Type<RoleRepresentation> destinationType,
+      MappingContext mappingContext) {
+    RoleRepresentation result = new RoleRepresentation();
+    result.setId(source.getId());
+    result.setName(source.getName());
+    result.setDescription(source.getDescription());
 
-        return result;
-    }
+    return result;
+  }
 
-    @Override
-    public SecurityKeycloakRole convertFrom(RoleRepresentation source,
-        Type<SecurityKeycloakRole> destinationType,
-        MappingContext mappingContext) {
-        SecurityKeycloakRole result = new SecurityKeycloakRole();
-        result.setId(source.getId());
-        result.setName(source.getName());
-        result.setDescription(source.getDescription());
+  @Override
+  public SecurityKeycloakRole convertFrom(RoleRepresentation source,
+      Type<SecurityKeycloakRole> destinationType,
+      MappingContext mappingContext) {
+    SecurityKeycloakRole result = new SecurityKeycloakRole();
+    result.setId(source.getId());
+    result.setName(source.getName());
+    result.setDescription(source.getDescription());
 
-        return result;
-    }
+    return result;
+  }
 }

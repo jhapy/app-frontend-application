@@ -41,66 +41,66 @@ import org.springframework.stereotype.Component;
 public class MailTemplateServiceFallback implements MailTemplateService, HasLogger,
     FallbackFactory<MailTemplateServiceFallback> {
 
-    final Throwable cause;
+  final Throwable cause;
 
-    public MailTemplateServiceFallback() {
-        this(null);
+  public MailTemplateServiceFallback() {
+    this(null);
+  }
+
+  MailTemplateServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public MailTemplateServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause;
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
     }
+    return new MailTemplateServiceFallback(cause);
+  }
 
-    MailTemplateServiceFallback(Throwable cause) {
-        this.cause = cause;
-    }
+  @Override
+  public ServiceResult<Page<MailTemplate>> findAnyMatching(FindAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
 
-    @Override
-    public MailTemplateServiceFallback create(Throwable cause) {
-        if (cause != null) {
-            String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-                : "Unknown error occurred : " + cause;
-            // I don't see this log statement
-            logger().debug("Client fallback called for the cause : {}", errMessage);
-        }
-        return new MailTemplateServiceFallback(cause);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
+  }
 
-    @Override
-    public ServiceResult<Page<MailTemplate>> findAnyMatching(FindAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", 0L);
+  }
 
-    @Override
-    public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<MailTemplate> getById(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", 0L);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<MailTemplate> getById(GetByStrIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<MailTemplate> getByMailAction(GetByNameQuery query) {
+    logger().error(getLoggerPrefix("getByMailAction") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<MailTemplate> getByMailAction(GetByNameQuery query) {
-        logger().error(getLoggerPrefix("getByMailAction") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<MailTemplate> save(SaveQuery<MailTemplate> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<MailTemplate> save(SaveQuery<MailTemplate> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
-
-    @Override
-    public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
-
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

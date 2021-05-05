@@ -37,59 +37,59 @@ import org.springframework.stereotype.Component;
 public class ResourceServiceFallback implements ResourceService, HasLogger,
     FallbackFactory<ResourceServiceFallback> {
 
-    final Throwable cause;
+  final Throwable cause;
 
-    public ResourceServiceFallback() {
-        this(null);
+  public ResourceServiceFallback() {
+    this(null);
+  }
+
+  ResourceServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public ResourceServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause;
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
     }
+    return new ResourceServiceFallback(cause);
+  }
 
-    ResourceServiceFallback(Throwable cause) {
-        this.cause = cause;
-    }
+  @Override
+  public ServiceResult<StoredFile> save(SaveQuery query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-    @Override
-    public ResourceServiceFallback create(Throwable cause) {
-        if (cause != null) {
-            String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-                : "Unknown error occurred : " + cause;
-            // I don't see this log statement
-            logger().debug("Client fallback called for the cause : {}", errMessage);
-        }
-        return new ResourceServiceFallback(cause);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<StoredFile> save(SaveQuery query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<StoredFile> getById(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<StoredFile> getById(GetByStrIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<StoredFile> getByIdNoContent(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getByIdNoContent") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<StoredFile> getByIdNoContent(GetByStrIdQuery query) {
-        logger().error(getLoggerPrefix("getByIdNoContent") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<StoredFile> getByIdPdfContent(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getByIdPdfContent") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<StoredFile> getByIdPdfContent(GetByStrIdQuery query) {
-        logger().error(getLoggerPrefix("getByIdPdfContent") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
-
-    @Override
-    public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
-
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

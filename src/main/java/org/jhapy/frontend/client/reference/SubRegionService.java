@@ -41,21 +41,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface SubRegionService {
 
-    @PostMapping(value = "/findAll")
-    ServiceResult<List<SubRegion>> findAll();
+  @PostMapping(value = "/findAll")
+  ServiceResult<List<SubRegion>> findAll();
 
-    @PostMapping(value = "/findAnyMatching")
-    ServiceResult<Page<SubRegion>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+  @PostMapping(value = "/findAnyMatching")
+  ServiceResult<Page<SubRegion>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-    @PostMapping(value = "/countAnyMatching")
-    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+  @PostMapping(value = "/countAnyMatching")
+  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<SubRegion> getById(@RequestBody GetByIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<SubRegion> getById(@RequestBody GetByIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<SubRegion> save(@RequestBody SaveQuery<SubRegion> query);
+  @PostMapping(value = "/save")
+  ServiceResult<SubRegion> save(@RequestBody SaveQuery<SubRegion> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 }

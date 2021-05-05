@@ -39,15 +39,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface MailService {
 
-    @PostMapping(value = "/findAnyMatching")
-    ServiceResult<Page<Mail>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+  @PostMapping(value = "/findAnyMatching")
+  ServiceResult<Page<Mail>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-    @PostMapping(value = "/countAnyMatching")
-    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+  @PostMapping(value = "/countAnyMatching")
+  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<Mail> getById(@RequestBody GetByStrIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<Mail> getById(@RequestBody GetByStrIdQuery query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 }

@@ -20,17 +20,17 @@ package org.jhapy.frontend.utils.css;
 
 public enum Shadow {
 
-    XS("var(--lumo-box-shadow-xs)"), S("var(--lumo-box-shadow-s)"), M(
-        "var(--lumo-box-shadow-m)"), L("var(--lumo-box-shadow-l)"), XL(
-        "var(--lumo-box-shadow-xl)");
+  XS("var(--lumo-box-shadow-xs)"), S("var(--lumo-box-shadow-s)"), M(
+      "var(--lumo-box-shadow-m)"), L("var(--lumo-box-shadow-l)"), XL(
+      "var(--lumo-box-shadow-xl)");
 
-    private final String value;
+  private final String value;
 
-    Shadow(String value) {
-        this.value = value;
-    }
+  Shadow(String value) {
+    this.value = value;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  public String getValue() {
+    return value;
+  }
 }

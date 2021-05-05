@@ -49,129 +49,129 @@ import org.springframework.security.access.annotation.Secured;
 public class MailAdminView extends
     DefaultMasterDetailsView<Mail, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-    protected final AppProperties appProperties;
+  protected final AppProperties appProperties;
 
-    public MailAdminView(MyI18NProvider myI18NProvider,
-        AppProperties appProperties) {
-        super("mail.", Mail.class, new MailDataProvider(), myI18NProvider);
-        this.appProperties = appProperties;
-    }
+  public MailAdminView(MyI18NProvider myI18NProvider,
+      AppProperties appProperties) {
+    super("mail.", Mail.class, new MailDataProvider(), myI18NProvider);
+    this.appProperties = appProperties;
+  }
 
-    protected Grid createGrid() {
-        grid = new Grid<>();
-        grid.setSelectionMode(SelectionMode.SINGLE);
+  protected Grid createGrid() {
+    grid = new Grid<>();
+    grid.setSelectionMode(SelectionMode.SINGLE);
 
-        grid.addSelectionListener(event -> event.getFirstSelectedItem()
-            .ifPresent(this::showDetails));
+    grid.addSelectionListener(event -> event.getFirstSelectedItem()
+        .ifPresent(this::showDetails));
 
-        grid.setDataProvider(dataProvider);
-        grid.setHeight("100%");
+    grid.setDataProvider(dataProvider);
+    grid.setHeight("100%");
 
-        grid.addColumn(Mail::getCreated).setKey("created");
-        //grid.addColumn(Mail::getMailAction).setKey("action");
-        grid.addColumn(Mail::getTo).setKey("to");
-        grid.addColumn(Mail::getMailStatus).setKey("mailStatus");
+    grid.addColumn(Mail::getCreated).setKey("created");
+    //grid.addColumn(Mail::getMailAction).setKey("action");
+    grid.addColumn(Mail::getTo).setKey("to");
+    grid.addColumn(Mail::getMailStatus).setKey("mailStatus");
 
-        grid.getColumns().forEach(column -> {
-            if (column.getKey() != null) {
-                column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-                column.setResizable(true);
-            }
-        });
-        return grid;
-    }
+    grid.getColumns().forEach(column -> {
+      if (column.getKey() != null) {
+        column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+        column.setResizable(true);
+      }
+    });
+    return grid;
+  }
 
-    protected Component createDetails(Mail mail) {
-        boolean isNew = mail.getId() == null;
-        detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
-            : getTranslation("element.global.update") + " : " + mail.getTo());
+  protected Component createDetails(Mail mail) {
+    boolean isNew = mail.getId() == null;
+    detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
+        : getTranslation("element.global.update") + " : " + mail.getTo());
 
-        detailsDrawerFooter.setDeleteButtonVisible(false);
+    detailsDrawerFooter.setDeleteButtonVisible(false);
 
-        TextField fromField = new TextField();
-        fromField.setWidth("100%");
+    TextField fromField = new TextField();
+    fromField.setWidth("100%");
 
-        TextField toField = new TextField();
-        toField.setWidth("100%");
+    TextField toField = new TextField();
+    toField.setWidth("100%");
 
-        TextField copyToField = new TextField();
-        copyToField.setWidth("100%");
+    TextField copyToField = new TextField();
+    copyToField.setWidth("100%");
 
-        TextField subjectField = new TextField();
-        subjectField.setWidth("100%");
+    TextField subjectField = new TextField();
+    subjectField.setWidth("100%");
 
-        TextArea bodyField = new TextArea();
-        bodyField.setWidth("100%");
+    TextArea bodyField = new TextArea();
+    bodyField.setWidth("100%");
 
-        AttachmentField attachmentField = new AttachmentField();
-        attachmentField.setWidth("100%");
+    AttachmentField attachmentField = new AttachmentField();
+    attachmentField.setWidth("100%");
 
-        TextField mailActionField = new TextField();
-        mailActionField.setWidth("100%");
+    TextField mailActionField = new TextField();
+    mailActionField.setWidth("100%");
 
-        ComboBox<MailStatusEnum> mailStatusField = new ComboBox<>();
-        mailStatusField.setItems(MailStatusEnum.values());
+    ComboBox<MailStatusEnum> mailStatusField = new ComboBox<>();
+    mailStatusField.setItems(MailStatusEnum.values());
 
-        TextArea errorMessageField = new TextArea();
-        errorMessageField.setWidth("100%");
+    TextArea errorMessageField = new TextArea();
+    errorMessageField.setWidth("100%");
 
-        NumberField nbRetryField = new NumberField();
+    NumberField nbRetryField = new NumberField();
 
-        // Form layout
-        FormLayout editingForm = new FormLayout();
-        editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
-            LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
-        editingForm.setResponsiveSteps(
-            new FormLayout.ResponsiveStep("0", 1,
-                FormLayout.ResponsiveStep.LabelsPosition.TOP),
-            new FormLayout.ResponsiveStep("26em", 2,
-                FormLayout.ResponsiveStep.LabelsPosition.TOP));
-        FormLayout.FormItem fromFieldItem = editingForm
-            .addFormItem(fromField, getTranslation("element." + I18N_PREFIX + "from"));
-        FormLayout.FormItem toFieldItem = editingForm
-            .addFormItem(toField, getTranslation("element." + I18N_PREFIX + "to"));
-        FormLayout.FormItem copyToFieldItem = editingForm
-            .addFormItem(copyToField, getTranslation("element." + I18N_PREFIX + "copyTo"));
-        FormLayout.FormItem subjectFieldItem = editingForm
-            .addFormItem(subjectField, getTranslation("element." + I18N_PREFIX + "subject"));
-        FormLayout.FormItem bodyFieldItem = editingForm
-            .addFormItem(bodyField, getTranslation("element." + I18N_PREFIX + "body"));
-        FormLayout.FormItem attachmentFieldItem = editingForm
-            .addFormItem(attachmentField, getTranslation("element." + I18N_PREFIX + "attachment"));
-        editingForm
-            .addFormItem(mailActionField, getTranslation("element." + I18N_PREFIX + "mailAction"));
-        editingForm
-            .addFormItem(mailStatusField, getTranslation("element." + I18N_PREFIX + "mailStatus"));
-        editingForm
-            .addFormItem(errorMessageField,
-                getTranslation("element." + I18N_PREFIX + "errorMessage"));
-        editingForm.addFormItem(nbRetryField, getTranslation("element." + I18N_PREFIX + "nbRetry"));
+    // Form layout
+    FormLayout editingForm = new FormLayout();
+    editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
+        LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+    editingForm.setResponsiveSteps(
+        new FormLayout.ResponsiveStep("0", 1,
+            FormLayout.ResponsiveStep.LabelsPosition.TOP),
+        new FormLayout.ResponsiveStep("26em", 2,
+            FormLayout.ResponsiveStep.LabelsPosition.TOP));
+    FormLayout.FormItem fromFieldItem = editingForm
+        .addFormItem(fromField, getTranslation("element." + I18N_PREFIX + "from"));
+    FormLayout.FormItem toFieldItem = editingForm
+        .addFormItem(toField, getTranslation("element." + I18N_PREFIX + "to"));
+    FormLayout.FormItem copyToFieldItem = editingForm
+        .addFormItem(copyToField, getTranslation("element." + I18N_PREFIX + "copyTo"));
+    FormLayout.FormItem subjectFieldItem = editingForm
+        .addFormItem(subjectField, getTranslation("element." + I18N_PREFIX + "subject"));
+    FormLayout.FormItem bodyFieldItem = editingForm
+        .addFormItem(bodyField, getTranslation("element." + I18N_PREFIX + "body"));
+    FormLayout.FormItem attachmentFieldItem = editingForm
+        .addFormItem(attachmentField, getTranslation("element." + I18N_PREFIX + "attachment"));
+    editingForm
+        .addFormItem(mailActionField, getTranslation("element." + I18N_PREFIX + "mailAction"));
+    editingForm
+        .addFormItem(mailStatusField, getTranslation("element." + I18N_PREFIX + "mailStatus"));
+    editingForm
+        .addFormItem(errorMessageField,
+            getTranslation("element." + I18N_PREFIX + "errorMessage"));
+    editingForm.addFormItem(nbRetryField, getTranslation("element." + I18N_PREFIX + "nbRetry"));
 
-        UIUtils
-            .setColSpan(2, fromFieldItem, toFieldItem, copyToFieldItem, subjectFieldItem,
-                bodyFieldItem,
-                attachmentFieldItem);
+    UIUtils
+        .setColSpan(2, fromFieldItem, toFieldItem, copyToFieldItem, subjectFieldItem,
+            bodyFieldItem,
+            attachmentFieldItem);
 
-        binder.setBean(mail);
+    binder.setBean(mail);
 
-        binder.bind(fromField, Mail::getFrom, null);
-        binder.bind(toField, Mail::getTo, null);
-        binder.bind(copyToField, Mail::getCopyTo, null);
-        binder.bind(subjectField, Mail::getSubject, null);
-        binder.bind(bodyField, Mail::getBody, null);
-        // binder.bind(attachmentField, Mail::getAttachements, Mail::setAttachements);
-        //binder.bind(mailActionField, Mail::getMailAction, null);
-        binder.bind(mailStatusField, Mail::getMailStatus, null);
-        binder.bind(errorMessageField, Mail::getErrorMessage, null);
-        binder.bind(nbRetryField, (e) -> e.getNbRetry().doubleValue(), null);
+    binder.bind(fromField, Mail::getFrom, null);
+    binder.bind(toField, Mail::getTo, null);
+    binder.bind(copyToField, Mail::getCopyTo, null);
+    binder.bind(subjectField, Mail::getSubject, null);
+    binder.bind(bodyField, Mail::getBody, null);
+    // binder.bind(attachmentField, Mail::getAttachements, Mail::setAttachements);
+    //binder.bind(mailActionField, Mail::getMailAction, null);
+    binder.bind(mailStatusField, Mail::getMailStatus, null);
+    binder.bind(errorMessageField, Mail::getErrorMessage, null);
+    binder.bind(nbRetryField, (e) -> e.getNbRetry().doubleValue(), null);
 
-        return editingForm;
-    }
+    return editingForm;
+  }
 
-    protected void filter(String filter) {
-        dataProvider
-            .setFilter(new DefaultFilter(
-                StringUtils.isBlank(filter) ? null : "*" + filter + "*",
-                Boolean.TRUE));
-    }
+  protected void filter(String filter) {
+    dataProvider
+        .setFilter(new DefaultFilter(
+            StringUtils.isBlank(filter) ? null : "*" + filter + "*",
+            Boolean.TRUE));
+  }
 }

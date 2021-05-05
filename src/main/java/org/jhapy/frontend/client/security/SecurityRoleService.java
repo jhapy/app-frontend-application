@@ -42,28 +42,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface SecurityRoleService {
 
-    @PostMapping(value = "/getAllowedLoginRoles")
-    ServiceResult<List<SecurityRole>> getAllowedLoginRoles();
+  @PostMapping(value = "/getAllowedLoginRoles")
+  ServiceResult<List<SecurityRole>> getAllowedLoginRoles();
 
-    @PostMapping(value = "/getSecurityRoleByName")
-    ServiceResult<SecurityRole> getSecurityRoleByName(
-        @RequestBody GetSecurityRoleByNameQuery query);
+  @PostMapping(value = "/getSecurityRoleByName")
+  ServiceResult<SecurityRole> getSecurityRoleByName(
+      @RequestBody GetSecurityRoleByNameQuery query);
 
-    @PostMapping(value = "/findAllActive")
-    ServiceResult<List<SecurityRole>> findAllActive();
+  @PostMapping(value = "/findAllActive")
+  ServiceResult<List<SecurityRole>> findAllActive();
 
-    @PostMapping(value = "/findAnyMatching")
-    ServiceResult<Page<SecurityRole>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+  @PostMapping(value = "/findAnyMatching")
+  ServiceResult<Page<SecurityRole>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-    @PostMapping(value = "/countAnyMatching")
-    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+  @PostMapping(value = "/countAnyMatching")
+  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<SecurityRole> getById(@RequestBody GetByStrIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<SecurityRole> getById(@RequestBody GetByStrIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<SecurityRole> save(@RequestBody SaveQuery<SecurityRole> query);
+  @PostMapping(value = "/save")
+  ServiceResult<SecurityRole> save(@RequestBody SaveQuery<SecurityRole> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 }

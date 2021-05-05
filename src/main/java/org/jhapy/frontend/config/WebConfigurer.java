@@ -37,38 +37,38 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class WebConfigurer implements ServletContextInitializer {
 
-    private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
+  private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
 
-    private final Environment env;
+  private final Environment env;
 
-    private final AppProperties appProperties;
+  private final AppProperties appProperties;
 
-    public WebConfigurer(Environment env, AppProperties appProperties) {
-        this.env = env;
-        this.appProperties = appProperties;
+  public WebConfigurer(Environment env, AppProperties appProperties) {
+    this.env = env;
+    this.appProperties = appProperties;
+  }
+
+  @Override
+  public void onStartup(ServletContext servletContext) throws ServletException {
+    if (env.getActiveProfiles().length != 0) {
+      log.info("Web application configuration, using profiles: {}",
+          env.getActiveProfiles());
     }
+    log.info("Web application fully configured");
+  }
 
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        if (env.getActiveProfiles().length != 0) {
-            log.info("Web application configuration, using profiles: {}",
-                env.getActiveProfiles());
-        }
-        log.info("Web application fully configured");
+  @Bean
+  public CorsFilter corsFilter() {
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = appProperties.getCors();
+    if (config.getAllowedOrigins() != null && !config.getAllowedOrigins().isEmpty()) {
+      log.debug("Registering CORS filter");
+      source.registerCorsConfiguration("/api/**", config);
+      source.registerCorsConfiguration("/management/**", config);
+      source.registerCorsConfiguration("/v2/api-docs", config);
+      source.registerCorsConfiguration("/swagger-ui.html**", config);
     }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = appProperties.getCors();
-        if (config.getAllowedOrigins() != null && !config.getAllowedOrigins().isEmpty()) {
-            log.debug("Registering CORS filter");
-            source.registerCorsConfiguration("/api/**", config);
-            source.registerCorsConfiguration("/management/**", config);
-            source.registerCorsConfiguration("/v2/api-docs", config);
-            source.registerCorsConfiguration("/swagger-ui.html**", config);
-        }
-        return new CorsFilter(source);
-    }
+    return new CorsFilter(source);
+  }
 
 }

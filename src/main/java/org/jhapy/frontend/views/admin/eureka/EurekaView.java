@@ -45,143 +45,143 @@ import org.springframework.security.access.annotation.Secured;
 @Secured(SecurityConst.ROLE_ADMIN)
 public class EurekaView extends ViewFrame implements HasLogger {
 
-    private final static String I18N_PREFIX = "eureka.";
-    private EurekaInfo eurekaInfo;
-    private final Environment env;
+  private final static String I18N_PREFIX = "eureka.";
+  private EurekaInfo eurekaInfo;
+  private final Environment env;
 
-    private ActuatorBaseView homeTabContent;
-    private ActuatorBaseView eurekaInstancesTabContent;
-    private ActuatorBaseView eurekaHistoryTabContent;
-    private ActuatorBaseView loggersTabContent;
-    private ActuatorBaseView logsTabContent;
-    private ActuatorBaseView configurationsTabContent;
-    private ActuatorBaseView meticsTabContent;
-    private ActuatorBaseView healthTabContent;
-    private ActuatorBaseView apisTabContent;
+  private ActuatorBaseView homeTabContent;
+  private ActuatorBaseView eurekaInstancesTabContent;
+  private ActuatorBaseView eurekaHistoryTabContent;
+  private ActuatorBaseView loggersTabContent;
+  private ActuatorBaseView logsTabContent;
+  private ActuatorBaseView configurationsTabContent;
+  private ActuatorBaseView meticsTabContent;
+  private ActuatorBaseView healthTabContent;
+  private ActuatorBaseView apisTabContent;
 
-    private Tab home;
-    private Tab eurekaHistory;
-    private Tab instances;
-    private Tab metrics;
-    private Tab healths;
-    private Tab configurations;
-    private Tab loggers;
-    private Tab logs;
-    private Tab apis;
+  private Tab home;
+  private Tab eurekaHistory;
+  private Tab instances;
+  private Tab metrics;
+  private Tab healths;
+  private Tab configurations;
+  private Tab loggers;
+  private Tab logs;
+  private Tab apis;
 
-    protected UI ui;
+  protected UI ui;
 
-    private final AuthorizationHeaderUtil authorizationHeaderUtil;
+  private final AuthorizationHeaderUtil authorizationHeaderUtil;
 
-    public EurekaView(Environment env,
-        AuthorizationHeaderUtil authorizationHeaderUtil) {
-        this.env = env;
-        this.authorizationHeaderUtil = authorizationHeaderUtil;
+  public EurekaView(Environment env,
+      AuthorizationHeaderUtil authorizationHeaderUtil) {
+    this.env = env;
+    this.authorizationHeaderUtil = authorizationHeaderUtil;
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+
+    ui = attachEvent.getUI();
+
+    this.homeTabContent = new HomeTabContent(ui, I18N_PREFIX,
+        authorizationHeaderUtil);
+    this.eurekaInstancesTabContent = new EurekaInstancesTabContent(ui, I18N_PREFIX,
+        authorizationHeaderUtil);
+    this.eurekaHistoryTabContent = new EurekaHistoryTabContent(ui, I18N_PREFIX,
+        authorizationHeaderUtil);
+    this.healthTabContent = new HealthTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
+    this.configurationsTabContent = new ConfigurationTabContent(ui, I18N_PREFIX,
+        authorizationHeaderUtil);
+    this.loggersTabContent = new LoggersTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
+    this.logsTabContent = new LogsTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
+    this.meticsTabContent = new MetricsTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
+    this.apisTabContent = new ApiTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
+
+    lookupData();
+
+    initAppBar();
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    super.onDetach(detachEvent);
+
+    homeTabContent.setRefreshRate(null);
+    eurekaInstancesTabContent.setRefreshRate(null);
+    loggersTabContent.setRefreshRate(null);
+    logsTabContent.setRefreshRate(null);
+    meticsTabContent.setRefreshRate(null);
+    apisTabContent.setRefreshRate(null);
+  }
+
+  private void initAppBar() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    home = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.home"));
+    eurekaHistory = appBar
+        .addTab(getTranslation("element." + I18N_PREFIX + "tab.eurekaHistory"));
+    instances = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.instances"));
+    metrics = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.metrics"));
+    healths = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.healths"));
+    configurations = appBar
+        .addTab(getTranslation("element." + I18N_PREFIX + "tab.configurations"));
+    loggers = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.loggers"));
+    logs = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.logs"));
+    // apis = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.apis"));
+
+    appBar.addTabSelectionListener(e -> {
+      if (e.getPreviousTab() != null) {
+        getTab(e.getPreviousTab()).setRefreshRate(null);
+      }
+
+      setViewContent(getTab(e.getSelectedTab()).getContent(eurekaInfo));
+
+    });
+    setViewContent(homeTabContent.getContent(eurekaInfo));
+    appBar.centerTabs();
+  }
+
+  protected ActuatorBaseView getTab(Tab tab) {
+    if (tab.equals(home)) {
+      return homeTabContent;
+    } else if (tab.equals(eurekaHistory)) {
+      return eurekaHistoryTabContent;
+    } else if (tab.equals(instances)) {
+      return eurekaInstancesTabContent;
+    } else if (tab.equals(metrics)) {
+      return meticsTabContent;
+    } else if (tab.equals(healths)) {
+      return healthTabContent;
+    } else if (tab.equals(configurations)) {
+      return configurationsTabContent;
+    } else if (tab.equals(loggers)) {
+      return loggersTabContent;
+    } else if (tab.equals(logs)) {
+      return logsTabContent;
+    } else if (tab.equals(apis)) {
+      return apisTabContent;
+    } else {
+      return null;
     }
+  }
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
+  protected void lookupData() {
+    ServiceResult<EurekaInfo> applicationServiceResult = RegistryServices.getEurekaService()
+        .getApplications(new BaseRemoteQuery());
 
-        ui = attachEvent.getUI();
+    if (applicationServiceResult.getIsSuccess() && applicationServiceResult.getData() != null) {
+      eurekaInfo = applicationServiceResult.getData();
 
-        this.homeTabContent = new HomeTabContent(ui, I18N_PREFIX,
-            authorizationHeaderUtil);
-        this.eurekaInstancesTabContent = new EurekaInstancesTabContent(ui, I18N_PREFIX,
-            authorizationHeaderUtil);
-        this.eurekaHistoryTabContent = new EurekaHistoryTabContent(ui, I18N_PREFIX,
-            authorizationHeaderUtil);
-        this.healthTabContent = new HealthTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
-        this.configurationsTabContent = new ConfigurationTabContent(ui, I18N_PREFIX,
-            authorizationHeaderUtil);
-        this.loggersTabContent = new LoggersTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
-        this.logsTabContent = new LogsTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
-        this.meticsTabContent = new MetricsTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
-        this.apisTabContent = new ApiTabContent(ui, I18N_PREFIX, authorizationHeaderUtil);
-
-        lookupData();
-
-        initAppBar();
+      ServiceResult<EurekaStatus> statusResult = RegistryServices.getEurekaService()
+          .status(new BaseRemoteQuery());
+      if (statusResult.getIsSuccess() && statusResult.getData() != null) {
+        eurekaInfo.setStatus(statusResult.getData());
+      }
     }
+  }
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        super.onDetach(detachEvent);
-
-        homeTabContent.setRefreshRate(null);
-        eurekaInstancesTabContent.setRefreshRate(null);
-        loggersTabContent.setRefreshRate(null);
-        logsTabContent.setRefreshRate(null);
-        meticsTabContent.setRefreshRate(null);
-        apisTabContent.setRefreshRate(null);
-    }
-
-    private void initAppBar() {
-        AppBar appBar = JHapyMainView3.get().getAppBar();
-        home = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.home"));
-        eurekaHistory = appBar
-            .addTab(getTranslation("element." + I18N_PREFIX + "tab.eurekaHistory"));
-        instances = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.instances"));
-        metrics = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.metrics"));
-        healths = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.healths"));
-        configurations = appBar
-            .addTab(getTranslation("element." + I18N_PREFIX + "tab.configurations"));
-        loggers = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.loggers"));
-        logs = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.logs"));
-        // apis = appBar.addTab(getTranslation("element." + I18N_PREFIX + "tab.apis"));
-
-        appBar.addTabSelectionListener(e -> {
-            if (e.getPreviousTab() != null) {
-                getTab(e.getPreviousTab()).setRefreshRate(null);
-            }
-
-            setViewContent(getTab(e.getSelectedTab()).getContent(eurekaInfo));
-
-        });
-        setViewContent(homeTabContent.getContent(eurekaInfo));
-        appBar.centerTabs();
-    }
-
-    protected ActuatorBaseView getTab(Tab tab) {
-        if (tab.equals(home)) {
-            return homeTabContent;
-        } else if (tab.equals(eurekaHistory)) {
-            return eurekaHistoryTabContent;
-        } else if (tab.equals(instances)) {
-            return eurekaInstancesTabContent;
-        } else if (tab.equals(metrics)) {
-            return meticsTabContent;
-        } else if (tab.equals(healths)) {
-            return healthTabContent;
-        } else if (tab.equals(configurations)) {
-            return configurationsTabContent;
-        } else if (tab.equals(loggers)) {
-            return loggersTabContent;
-        } else if (tab.equals(logs)) {
-            return logsTabContent;
-        } else if (tab.equals(apis)) {
-            return apisTabContent;
-        } else {
-            return null;
-        }
-    }
-
-    protected void lookupData() {
-        ServiceResult<EurekaInfo> applicationServiceResult = RegistryServices.getEurekaService()
-            .getApplications(new BaseRemoteQuery());
-
-        if (applicationServiceResult.getIsSuccess() && applicationServiceResult.getData() != null) {
-            eurekaInfo = applicationServiceResult.getData();
-
-            ServiceResult<EurekaStatus> statusResult = RegistryServices.getEurekaService()
-                .status(new BaseRemoteQuery());
-            if (statusResult.getIsSuccess() && statusResult.getData() != null) {
-                eurekaInfo.setStatus(statusResult.getData());
-            }
-        }
-    }
-
-    protected Component createDetails(EurekaApplication eurekaApplication) {
-        return new FormLayout();
-    }
+  protected Component createDetails(EurekaApplication eurekaApplication) {
+    return new FormLayout();
+  }
 }

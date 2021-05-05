@@ -39,17 +39,17 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(MetricsEndpointAutoConfiguration.class)
 public class JHapyMetricsEndpointConfiguration {
 
-    /**
-     * <p>jHapyMetricsEndpoint.</p>
-     *
-     * @param meterRegistry a {@link MeterRegistry} object.
-     * @return a {@link JHapyMetricsEndpoint} object.
-     */
-    @Bean
-    //@ConditionalOnBean({MeterRegistry.class})
-    @ConditionalOnMissingBean
-    @ConditionalOnAvailableEndpoint
-    public JHapyMetricsEndpoint jHapyMetricsEndpoint(MeterRegistry meterRegistry) {
-        return new JHapyMetricsEndpoint(meterRegistry);
-    }
+  /**
+   * <p>jHapyMetricsEndpoint.</p>
+   *
+   * @param meterRegistry a {@link MeterRegistry} object.
+   * @return a {@link JHapyMetricsEndpoint} object.
+   */
+  @Bean
+  //@ConditionalOnBean({MeterRegistry.class})
+  @ConditionalOnMissingBean
+  @ConditionalOnAvailableEndpoint
+  public JHapyMetricsEndpoint jHapyMetricsEndpoint(MeterRegistry meterRegistry) {
+    return new JHapyMetricsEndpoint(meterRegistry);
+  }
 }

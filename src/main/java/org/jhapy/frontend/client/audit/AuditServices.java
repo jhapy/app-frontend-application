@@ -32,16 +32,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class AuditServices {
 
-    public static AuditServiceQueue getAuditServiceQueue() {
-        return getApplicationContext().getBean(AuditServiceQueue.class);
-    }
+  public static AuditServiceQueue getAuditServiceQueue() {
+    return getApplicationContext().getBean(AuditServiceQueue.class);
+  }
 
-    public static SessionService getSessionService() {
-        return getApplicationContext().getBean(SessionService.class);
-    }
+  public static SessionService getSessionService() {
+    return getApplicationContext().getBean(SessionService.class);
+  }
 
-    public static ApplicationContext getApplicationContext() {
-        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-    }
+  public static ApplicationContext getApplicationContext() {
+    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+  }
 }

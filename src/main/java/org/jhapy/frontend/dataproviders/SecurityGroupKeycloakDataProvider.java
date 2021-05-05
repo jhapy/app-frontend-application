@@ -42,37 +42,37 @@ public class SecurityGroupKeycloakDataProvider extends
     DefaultDataProvider<SecurityKeycloakGroup, DefaultFilter> implements
     Serializable {
 
-    @Autowired
-    public SecurityGroupKeycloakDataProvider() {
-        super(AppConst.DEFAULT_SORT_DIRECTION,
-            AppConst.DEFAULT_SORT_FIELDS);
+  @Autowired
+  public SecurityGroupKeycloakDataProvider() {
+    super(AppConst.DEFAULT_SORT_DIRECTION,
+        AppConst.DEFAULT_SORT_FIELDS);
+  }
+
+  @Override
+  protected Page<SecurityKeycloakGroup> fetchFromBackEnd(
+      Query<SecurityKeycloakGroup, DefaultFilter> query,
+      Pageable pageable) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    String filterStr =
+        filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+
+    Page<SecurityKeycloakGroup> page = SecurityServices.getKeycloakClient().findGroups(
+        new FindAnyMatchingQuery(filterStr, filter.isShowInactive(), pageable)).getData();
+    if (getPageObserver() != null) {
+      getPageObserver().accept(page);
     }
-
-    @Override
-    protected Page<SecurityKeycloakGroup> fetchFromBackEnd(
-        Query<SecurityKeycloakGroup, DefaultFilter> query,
-        Pageable pageable) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        String filterStr =
-            filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
-
-        Page<SecurityKeycloakGroup> page = SecurityServices.getKeycloakClient().findGroups(
-            new FindAnyMatchingQuery(filterStr, filter.isShowInactive(), pageable)).getData();
-        if (getPageObserver() != null) {
-            getPageObserver().accept(page);
-        }
-        return page;
-    }
+    return page;
+  }
 
 
-    @Override
-    protected int sizeInBackEnd(Query<SecurityKeycloakGroup, DefaultFilter> query) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        String filterStr =
-            filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+  @Override
+  protected int sizeInBackEnd(Query<SecurityKeycloakGroup, DefaultFilter> query) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    String filterStr =
+        filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
 
-        return SecurityServices.getKeycloakClient()
-            .countGroups(new CountAnyMatchingQuery(filterStr, filter.isShowInactive())).getData()
-            .intValue();
-    }
+    return SecurityServices.getKeycloakClient()
+        .countGroups(new CountAnyMatchingQuery(filterStr, filter.isShowInactive())).getData()
+        .intValue();
+  }
 }

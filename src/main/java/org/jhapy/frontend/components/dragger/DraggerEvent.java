@@ -10,19 +10,19 @@ import lombok.ToString;
  * @version 1.0
  * @since 02/08/2020
  */
-@ToString(callSuper = false)
+@ToString()
 @DomEvent("dragger-newWidth")
 public class DraggerEvent extends ComponentEvent<Dragger> {
 
-    private final String width;
+  private final String width;
 
-    public DraggerEvent(
-        Dragger source, boolean fromClient, @EventData("event.detail.width") String width) {
-        super(source, fromClient);
-        this.width = width;
-    }
+  public DraggerEvent(
+      Dragger source, boolean fromClient, @EventData("event.detail.width") String width) {
+    super(source, fromClient);
+    this.width = width;
+  }
 
-    public String getWidth() {
-        return width;
-    }
+  public String getWidth() {
+    return width;
+  }
 }

@@ -52,144 +52,142 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultFilter> extends
     ViewFrame {
 
-    protected final String I18N_PREFIX;
-    protected Grid<T> grid;
-    protected DefaultDataProvider<T, F> dataProvider;
-    protected DefaultSliceDataProvider<T, F> sliceProvider;
-    private final Class<T> entityType;
-    private Tabs tabs;
-    private Button newRecordButton;
-    protected final Class entityViewClass;
-    protected final MyI18NProvider myI18NProvider;
+  protected final String I18N_PREFIX;
+  protected Grid<T> grid;
+  protected DefaultDataProvider<T, F> dataProvider;
+  protected DefaultSliceDataProvider<T, F> sliceProvider;
+  private final Class<T> entityType;
+  private Tabs tabs;
+  private Button newRecordButton;
+  protected final Class entityViewClass;
+  protected final MyI18NProvider myI18NProvider;
 
-    public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
-        DefaultDataProvider<T, F> dataProvider, Class entityViewClass,
-        MyI18NProvider myI18NProvider) {
-        super();
-        this.I18N_PREFIX = I18N_PREFIX;
-        this.entityType = entityType;
-        this.dataProvider = dataProvider;
-        this.entityViewClass = entityViewClass;
-        this.myI18NProvider = myI18NProvider;
+  public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
+      DefaultDataProvider<T, F> dataProvider, Class entityViewClass,
+      MyI18NProvider myI18NProvider) {
+    super();
+    this.I18N_PREFIX = I18N_PREFIX;
+    this.entityType = entityType;
+    this.dataProvider = dataProvider;
+    this.entityViewClass = entityViewClass;
+    this.myI18NProvider = myI18NProvider;
+  }
+
+  public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
+      DefaultSliceDataProvider<T, F> sliceProvider, Class entityViewClass,
+      MyI18NProvider myI18NProvider) {
+    super();
+    this.I18N_PREFIX = I18N_PREFIX;
+    this.entityType = entityType;
+    this.sliceProvider = sliceProvider;
+    this.entityViewClass = entityViewClass;
+    this.myI18NProvider = myI18NProvider;
+  }
+
+  protected DataProvider<T, F> getDataProvider() {
+    if (dataProvider != null) {
+      return dataProvider;
+    } else {
+      return sliceProvider;
+    }
+  }
+
+  protected Class<T> getEntityType() {
+    return entityType;
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+
+    initHeader();
+    setViewContent(createContent());
+
+    filter(null);
+  }
+
+  protected void initHeader() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.setNaviMode(NaviMode.MENU);
+
+    initSearchBar();
+
+    String title = getTitle();
+    if (title != null) {
+      appBar.setTitle(title);
     }
 
-    public DefaultMasterView(String I18N_PREFIX, Class<T> entityType,
-        DefaultSliceDataProvider<T, F> sliceProvider, Class entityViewClass,
-        MyI18NProvider myI18NProvider) {
-        super();
-        this.I18N_PREFIX = I18N_PREFIX;
-        this.entityType = entityType;
-        this.sliceProvider = sliceProvider;
-        this.entityViewClass = entityViewClass;
-        this.myI18NProvider = myI18NProvider;
+    if (canCreateRecord()) {
+      newRecordButton = UIUtils
+          .createTertiaryButton(VaadinIcon.PLUS);
+      addNewRecordButtonAction(newRecordButton);
+      appBar.addActionItem(newRecordButton);
     }
 
-    protected DataProvider<T, F> getDataProvider() {
-        if (dataProvider != null) {
-            return dataProvider;
-        } else {
-            return sliceProvider;
-        }
+    Button refreshButton = UIUtils.createTertiaryButton(VaadinIcon.REFRESH);
+    refreshButton.addClickListener(buttonClickEvent -> getDataProvider().refreshAll());
+    appBar.addActionItem(refreshButton);
+  }
+
+  protected void addNewRecordButtonAction(Button newRecordButton) {
+    newRecordButton.addClickListener(event -> {
+      try {
+        showDetails(entityType.getDeclaredConstructor().newInstance());
+      } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+      }
+    });
+  }
+
+  protected String getTitle() {
+    return null;
+  }
+
+  protected boolean canCreateRecord() {
+    return true;
+  }
+
+  protected void initSearchBar() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.disableGlobalSearch();
+    Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
+    searchButton.addClickListener(event -> appBar.searchModeOn());
+    appBar.addSearchListener(event -> filter(appBar.getSearchString()));
+    appBar.setSearchPlaceholder(getTranslation("element.global.search"));
+    appBar.addActionItem(searchButton);
+  }
+
+  private Component createContent() {
+    FlexBoxLayout content = new FlexBoxLayout(createGrid());
+    content.setBoxSizing(BoxSizing.BORDER_BOX);
+    content.setHeightFull();
+    content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
+
+    Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0));
+    dataProvider.setPageObserver(executionPage -> nbRows
+        .setText(getTranslation("element.global.nbRows", executionPage.getTotalElements())));
+
+    FooterRow footerRow = grid.appendFooterRow();
+    footerRow.getCell(grid.getColumns().get(0)).setComponent(nbRows);
+    return content;
+  }
+
+  protected abstract Grid createGrid();
+
+  protected void showDetails(T entity) {
+    UI.getCurrent()
+        .navigate(entityViewClass, entity.getId() == null ? "-1" : entity.getId().toString());
+  }
+
+  protected void filter(String filter) {
+    if (dataProvider != null) {
+      dataProvider
+          .setFilter((F) new DefaultFilter(
+              StringUtils.isBlank(filter) ? null : filter,
+              JHapyMainView3.get().getAppBar().getSearchShowActive()));
+    } else {
+      sliceProvider.setFilter((F) new DefaultFilter(
+          StringUtils.isBlank(filter) ? null : filter,
+          JHapyMainView3.get().getAppBar().getSearchShowActive()));
     }
-
-    protected Class<T> getEntityType() {
-        return entityType;
-    }
-
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-
-        initHeader();
-        setViewContent(createContent());
-
-        filter(null);
-    }
-
-    protected void initHeader() {
-        AppBar appBar = JHapyMainView3.get().getAppBar();
-        appBar.setNaviMode(NaviMode.MENU);
-
-        initSearchBar();
-
-        String title = getTitle();
-        if (title != null) {
-            appBar.setTitle(title);
-        }
-
-        if (canCreateRecord()) {
-            newRecordButton = UIUtils
-                .createTertiaryButton(VaadinIcon.PLUS);
-            addNewRecordButtonAction(newRecordButton);
-            appBar.addActionItem(newRecordButton);
-        }
-
-        Button refreshButton = UIUtils.createTertiaryButton(VaadinIcon.REFRESH);
-        refreshButton.addClickListener(buttonClickEvent -> getDataProvider().refreshAll());
-        appBar.addActionItem(refreshButton);
-    }
-
-    protected void addNewRecordButtonAction(Button newRecordButton) {
-        newRecordButton.addClickListener(event -> {
-            try {
-                showDetails(entityType.getDeclaredConstructor().newInstance());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
-            }
-        });
-    }
-
-    protected String getTitle() {
-        return null;
-    }
-
-    protected boolean canCreateRecord() {
-        return true;
-    }
-
-    protected void initSearchBar() {
-        AppBar appBar = JHapyMainView3.get().getAppBar();
-        appBar.disableGlobalSearch();
-        Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
-        searchButton.addClickListener(event -> appBar.searchModeOn());
-        appBar.addSearchListener(event -> filter(appBar.getSearchString()));
-        appBar.setSearchPlaceholder(getTranslation("element.global.search"));
-        appBar.addActionItem(searchButton);
-    }
-
-    private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout(createGrid());
-        content.setBoxSizing(BoxSizing.BORDER_BOX);
-        content.setHeightFull();
-        content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
-
-        Label nbRows = UIUtils.createH4Label(getTranslation("element.global.nbRows", 0));
-        dataProvider.setPageObserver(executionPage -> {
-            nbRows
-                .setText(getTranslation("element.global.nbRows", executionPage.getTotalElements()));
-        });
-
-        FooterRow footerRow = grid.appendFooterRow();
-        footerRow.getCell(grid.getColumns().get(0)).setComponent(nbRows);
-        return content;
-    }
-
-    protected abstract Grid createGrid();
-
-    protected void showDetails(T entity) {
-        UI.getCurrent()
-            .navigate(entityViewClass, entity.getId() == null ? "-1" : entity.getId().toString());
-    }
-
-    protected void filter(String filter) {
-        if (dataProvider != null) {
-            dataProvider
-                .setFilter((F) new DefaultFilter(
-                    StringUtils.isBlank(filter) ? null : filter,
-                    JHapyMainView3.get().getAppBar().getSearchShowActive()));
-        } else {
-            sliceProvider.setFilter((F) new DefaultFilter(
-                StringUtils.isBlank(filter) ? null : filter,
-                JHapyMainView3.get().getAppBar().getSearchShowActive()));
-        }
-    }
+  }
 }

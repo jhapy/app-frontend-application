@@ -28,9 +28,9 @@ import java.util.Locale;
  */
 public class DefaultTitleFormatter implements TitleFormatter {
 
-    @Override
-    public String applyWithException(I18NProvider i18NProvider, Locale locale, String key)
-        throws Exception {
-        return i18NProvider.getTranslation(key, locale);
-    }
+  @Override
+  public String applyWithException(I18NProvider i18NProvider, Locale locale, String key)
+      throws Exception {
+    return i18NProvider.getTranslation(key, locale);
+  }
 }

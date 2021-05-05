@@ -41,21 +41,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface SmsTemplateService {
 
-    @PostMapping(value = "/findAnyMatching")
-    ServiceResult<Page<SmsTemplate>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+  @PostMapping(value = "/findAnyMatching")
+  ServiceResult<Page<SmsTemplate>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-    @PostMapping(value = "/countAnyMatching")
-    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+  @PostMapping(value = "/countAnyMatching")
+  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<SmsTemplate> getById(@RequestBody GetByStrIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<SmsTemplate> getById(@RequestBody GetByStrIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<SmsTemplate> save(@RequestBody SaveQuery<SmsTemplate> query);
+  @PostMapping(value = "/save")
+  ServiceResult<SmsTemplate> save(@RequestBody SaveQuery<SmsTemplate> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 
-    @PostMapping(value = "/getBySmsAction")
-    ServiceResult<SmsTemplate> getBySmsAction(@RequestBody GetByNameQuery query);
+  @PostMapping(value = "/getBySmsAction")
+  ServiceResult<SmsTemplate> getBySmsAction(@RequestBody GetByNameQuery query);
 }

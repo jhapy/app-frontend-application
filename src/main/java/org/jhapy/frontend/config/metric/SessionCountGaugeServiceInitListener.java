@@ -35,32 +35,34 @@ import org.jhapy.commons.utils.HasLogger;
 public class SessionCountGaugeServiceInitListener implements VaadinServiceInitListener, HasLogger {
 
 
-    private final MeterRegistry meterRegistry;
+  private final MeterRegistry meterRegistry;
 
-    public SessionCountGaugeServiceInitListener(MeterRegistry meterRegistry) {
-        this.meterRegistry = meterRegistry;
-    }
+  public SessionCountGaugeServiceInitListener(MeterRegistry meterRegistry) {
+    this.meterRegistry = meterRegistry;
+  }
 
-    @Override
-    public void serviceInit(ServiceInitEvent event) {
+  @Override
+  public void serviceInit(ServiceInitEvent event) {
 
-        final AtomicInteger sessionsCount = meterRegistry
-            .gauge("vaadin.sessions", new AtomicInteger(0));
+    final AtomicInteger sessionsCount = meterRegistry
+        .gauge("vaadin.sessions", new AtomicInteger(0));
 
-        final VaadinService vaadinService = event.getSource();
-
-        vaadinService.addSessionInitListener(e -> {
-            String loggerPrefix = getLoggerPrefix("sessionInit");
-            logger().info(
-                loggerPrefix + "New Vaadin session created. Current count is: " + sessionsCount
-                    .incrementAndGet());
-        });
-        vaadinService.addSessionDestroyListener(e -> {
-            String loggerPrefix = getLoggerPrefix("sessionDestroy");
-            logger()
-                .info(loggerPrefix + "Vaadin session destroyed. Current count is: " + sessionsCount
-                    .decrementAndGet());
-        });
-    }
+    final VaadinService vaadinService = event.getSource();
+    vaadinService.addSessionInitListener(e -> {
+      var loggerPrefix = getLoggerPrefix("sessionInit");
+      if (!e.getRequest().getPathInfo().startsWith("/management") && !e.getRequest().getPathInfo()
+          .startsWith("/sw.js")) {
+        info(
+            loggerPrefix, "New Vaadin session created, path {0}, current count is: {1}",
+            e.getRequest().getPathInfo(), sessionsCount
+                .incrementAndGet());
+      }
+    });
+    vaadinService.addSessionDestroyListener(e -> {
+      var loggerPrefix = getLoggerPrefix("sessionDestroy");
+      info(loggerPrefix, "Vaadin session destroyed. Current count is: {1}", sessionsCount
+          .decrementAndGet());
+    });
+  }
 }
 

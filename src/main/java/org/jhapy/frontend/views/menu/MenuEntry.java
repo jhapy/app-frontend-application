@@ -15,27 +15,27 @@ import org.jhapy.commons.utils.HasLogger;
 @Data
 public class MenuEntry implements Serializable, HasLogger {
 
-    public MenuEntry(String id) {
-        this.id = id;
-    }
+  public MenuEntry(String id) {
+    this.id = id;
+  }
 
-    private String id;
-    private VaadinIcon vaadinIcon;
-    private String title;
-    private Class targetClass;
-    private Object targetParams;
-    private String targetId;
-    private Object relatedObject;
-    private MenuEntry parentMenuEntry;
-    private Boolean canCreateSubEntries = Boolean.FALSE;
-    private List<MenuAction> contextMenu;
-    private Boolean hasChildNodes = Boolean.TRUE;
+  private String id;
+  private VaadinIcon vaadinIcon;
+  private String title;
+  private Class targetClass;
+  private Object targetParams;
+  private String targetId;
+  private Object relatedObject;
+  private MenuEntry parentMenuEntry;
+  private Boolean canCreateSubEntries = Boolean.FALSE;
+  private List<MenuAction> contextMenu;
+  private Boolean hasChildNodes = Boolean.TRUE;
 
-    public void setTargetClass(Class targetClass, Class routerLayout) {
-        String loggerPrefix = getLoggerPrefix("setTargetClass");
-        this.targetClass = targetClass;
-        //UpNavigationHelper.registerNavigationRoute(targetClass);
-        RouteConfiguration configuration = RouteConfiguration.forSessionScope();
+  public void setTargetClass(Class targetClass, Class routerLayout) {
+    var loggerPrefix = getLoggerPrefix("setTargetClass");
+    this.targetClass = targetClass;
+    //UpNavigationHelper.registerNavigationRoute(targetClass);
+    RouteConfiguration configuration = RouteConfiguration.forSessionScope();
 /*
     String route = id;
     if ( ! configuration.isPathRegistered(route) )  {
@@ -45,5 +45,5 @@ public class MenuEntry implements Serializable, HasLogger {
       //logger().warn(loggerPrefix+"Route already registered : Path = " + route + ", Target = " + targetClass.getSimpleName());
     }
  */
-    }
+  }
 }

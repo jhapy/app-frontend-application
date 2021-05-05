@@ -38,45 +38,45 @@ import org.springframework.stereotype.Component;
 @Component
 public class CountryServiceFallback implements CountryService, HasLogger {
 
-    @Override
-    public ServiceResult<Page<Country>> findAnyMatching(FindAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Page<Country>> findAnyMatching(FindAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
+  }
 
-    @Override
-    public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", 0L);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", 0L);
+  }
 
-    @Override
-    public ServiceResult<Country> getById(GetByIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Country> getById(GetByIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<Country> save(SaveQuery<Country> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Country> save(SaveQuery<Country> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<Void> delete(DeleteByIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<Country> getByIso2OrIso3(GetByIso2OrIso3Query query) {
-        logger().error(getLoggerPrefix("getByIso2OrIso3") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Country> getByIso2OrIso3(GetByIso2OrIso3Query query) {
+    logger().error(getLoggerPrefix("getByIso2OrIso3") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

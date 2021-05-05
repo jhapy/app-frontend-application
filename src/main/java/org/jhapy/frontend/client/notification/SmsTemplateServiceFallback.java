@@ -41,67 +41,67 @@ import org.springframework.stereotype.Component;
 public class SmsTemplateServiceFallback implements SmsTemplateService, HasLogger,
     FallbackFactory<SmsTemplateServiceFallback> {
 
-    final Throwable cause;
+  final Throwable cause;
 
-    public SmsTemplateServiceFallback() {
-        this(null);
+  public SmsTemplateServiceFallback() {
+    this(null);
+  }
+
+  SmsTemplateServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public SmsTemplateServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause;
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
     }
+    return new SmsTemplateServiceFallback(cause);
+  }
 
-    SmsTemplateServiceFallback(Throwable cause) {
-        this.cause = cause;
-    }
+  @Override
+  public ServiceResult<Page<SmsTemplate>> findAnyMatching(FindAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
 
-    @Override
-    public SmsTemplateServiceFallback create(Throwable cause) {
-        if (cause != null) {
-            String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-                : "Unknown error occurred : " + cause;
-            // I don't see this log statement
-            logger().debug("Client fallback called for the cause : {}", errMessage);
-        }
-        return new SmsTemplateServiceFallback(cause);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
+  }
 
-    @Override
-    public ServiceResult<Page<SmsTemplate>> findAnyMatching(FindAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", 0L);
+  }
 
-    @Override
-    public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SmsTemplate> getById(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", 0L);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SmsTemplate> getById(GetByStrIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SmsTemplate> save(SaveQuery<SmsTemplate> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SmsTemplate> save(SaveQuery<SmsTemplate> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SmsTemplate> getBySmsAction(GetByNameQuery query) {
+    logger().error(getLoggerPrefix("getBySmsAction") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
-
-    @Override
-    public ServiceResult<SmsTemplate> getBySmsAction(GetByNameQuery query) {
-        logger().error(getLoggerPrefix("getBySmsAction") + "Cannot connect to the server");
-
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
 }

@@ -48,8 +48,9 @@ import org.springframework.core.env.Profiles;
 @Configuration
 @EnableCaching
 public class CacheConfiguration implements HasLogger {
-    private GitProperties gitProperties;
-    private BuildProperties buildProperties;
+
+  private GitProperties gitProperties;
+  private BuildProperties buildProperties;
   private final Environment env;
 
   private final ServerProperties serverProperties;
@@ -60,7 +61,7 @@ public class CacheConfiguration implements HasLogger {
 
   public CacheConfiguration(Environment env, ServerProperties serverProperties,
       DiscoveryClient discoveryClient) {
-    String loggerPrefix = getLoggerPrefix("CacheConfiguration");
+    var loggerPrefix = getLoggerPrefix("CacheConfiguration");
     logger().info(loggerPrefix + "Startup");
     this.env = env;
     this.serverProperties = serverProperties;
@@ -74,21 +75,21 @@ public class CacheConfiguration implements HasLogger {
 
   @PreDestroy
   public void destroy() throws Exception {
-    String loggerPrefix = getLoggerPrefix("destroy");
+    var loggerPrefix = getLoggerPrefix("destroy");
     logger().info(loggerPrefix + "Closing Cache Manager");
     Hazelcast.shutdownAll();
   }
 
   @Bean
   public CacheManager cacheManager(HazelcastInstance hazelcastInstance) {
-    String loggerPrefix = getLoggerPrefix("cacheManager");
+    var loggerPrefix = getLoggerPrefix("cacheManager");
     logger().info(loggerPrefix + "Starting HazelcastCacheManager");
     return new com.hazelcast.spring.cache.HazelcastCacheManager(hazelcastInstance);
   }
 
   @Bean
   public HazelcastInstance hazelcastInstance(AppProperties appProperties) {
-    String loggerPrefix = getLoggerPrefix("hazelcastInstance");
+    var loggerPrefix = getLoggerPrefix("hazelcastInstance");
 
     logger().info(loggerPrefix + "Configuring Hazelcast");
     HazelcastInstance hazelCastInstance = Hazelcast
@@ -112,14 +113,16 @@ public class CacheConfiguration implements HasLogger {
       // In development, everything goes through 127.0.0.1, with a different port
       if (env
           .acceptsProfiles(Profiles.of(SpringProfileConstants.SPRING_PROFILE_K8S))) {
-          logger()
-              .debug(loggerPrefix + "Application is running with the \"k8s\" profile, Hazelcast cluster will use Kubernetes Client");
+        logger()
+            .debug(loggerPrefix
+                + "Application is running with the \"k8s\" profile, Hazelcast cluster will use Kubernetes Client");
 
-         config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getKubernetesConfig().setEnabled(true);
-        config.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("namespace", "thothee-test")
+        config.getNetworkConfig().getJoin().getKubernetesConfig()
+            .setProperty("namespace", "thothee-test")
             .setProperty("service-name", "app-i18n-server");
 
       } else if (env
@@ -127,36 +130,37 @@ public class CacheConfiguration implements HasLogger {
               SpringProfileConstants.SPRING_PROFILE_DEVELOPMENT,
               SpringProfileConstants.SPRING_PROFILE_STAGING,
               SpringProfileConstants.SPRING_PROFILE_PRODUCTION))) {
-          logger()
-              .debug(loggerPrefix + "Application is running with the \"docker swarm\" profile, Hazelcast cluster will use Eureka Client");
+        logger()
+            .debug(loggerPrefix
+                + "Application is running with the \"docker swarm\" profile, Hazelcast cluster will use Eureka Client");
 
-          config.getNetworkConfig().setPort(5701);
-          config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
-          for (ServiceInstance instance : discoveryClient.getInstances(serviceId)) {
-              String clusterMember = instance.getHost() + ":5701";
-              logger()
-                  .debug(loggerPrefix + "Adding Hazelcast (deploy) cluster member {}", clusterMember);
-              config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(clusterMember);
-          }
+        config.getNetworkConfig().setPort(5701);
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+        for (ServiceInstance instance : discoveryClient.getInstances(serviceId)) {
+          String clusterMember = instance.getHost() + ":5701";
+          logger()
+              .debug(loggerPrefix + "Adding Hazelcast (deploy) cluster member {}", clusterMember);
+          config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(clusterMember);
+        }
       } else {
         logger()
             .debug(loggerPrefix + "Application is running with the \"local\" profile, Hazelcast " +
                 "cluster will only work with localhost instances");
 
-          config.getNetworkConfig().setPort(serverProperties.getPort() + 5701);
-          config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
-          for (ServiceInstance instance : discoveryClient.getInstances(serviceId)) {
-              String clusterMember = "127.0.0.1:" + (instance.getPort() + 5701);
-              logger()
-                  .debug(loggerPrefix + "Adding Hazelcast (dev) cluster member {}", clusterMember);
-              config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(clusterMember);
-          }
+        config.getNetworkConfig().setPort(serverProperties.getPort() + 5701);
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
+        for (ServiceInstance instance : discoveryClient.getInstances(serviceId)) {
+          String clusterMember = "127.0.0.1:" + (instance.getPort() + 5701);
+          logger()
+              .debug(loggerPrefix + "Adding Hazelcast (dev) cluster member {}", clusterMember);
+          config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(clusterMember);
+        }
       }
     }
-      config.setManagementCenterConfig(new ManagementCenterConfig());
-      config.addMapConfig(initializeDefaultMapConfig(appProperties));
-      config.addMapConfig(initializeDomainMapConfig(appProperties));
-      return Hazelcast.newHazelcastInstance(config);
+    config.setManagementCenterConfig(new ManagementCenterConfig());
+    config.addMapConfig(initializeDefaultMapConfig(appProperties));
+    config.addMapConfig(initializeDomainMapConfig(appProperties));
+    return Hazelcast.newHazelcastInstance(config);
   }
 
   private MapConfig initializeDefaultMapConfig(AppProperties appProperties) {
@@ -176,7 +180,7 @@ public class CacheConfiguration implements HasLogger {
         LFU (Least Frequently Used).
         NONE is the default.
         */
-        mapConfig.getEvictionConfig().setEvictionPolicy(EvictionPolicy.LRU);
+    mapConfig.getEvictionConfig().setEvictionPolicy(EvictionPolicy.LRU);
 
         /*
         Maximum size of the map. When max size is reached,
@@ -184,29 +188,29 @@ public class CacheConfiguration implements HasLogger {
         Any integer between 0 and Integer.MAX_VALUE. 0 means
         Integer.MAX_VALUE. Default is 0.
         */
-        mapConfig.getEvictionConfig().setMaxSizePolicy(MaxSizePolicy.USED_HEAP_SIZE);
+    mapConfig.getEvictionConfig().setMaxSizePolicy(MaxSizePolicy.USED_HEAP_SIZE);
 
     return mapConfig;
   }
 
-    private MapConfig initializeDomainMapConfig(AppProperties appProperties) {
-        MapConfig mapConfig = new MapConfig("org.jhapy.frontend.*");
-        mapConfig.setTimeToLiveSeconds(appProperties.getHazelcast().getTimeToLiveSeconds());
+  private MapConfig initializeDomainMapConfig(AppProperties appProperties) {
+    MapConfig mapConfig = new MapConfig("org.jhapy.frontend.*");
+    mapConfig.setTimeToLiveSeconds(appProperties.getHazelcast().getTimeToLiveSeconds());
     return mapConfig;
   }
 
-    @Autowired(required = false)
-    public void setGitProperties(GitProperties gitProperties) {
-        this.gitProperties = gitProperties;
-    }
+  @Autowired(required = false)
+  public void setGitProperties(GitProperties gitProperties) {
+    this.gitProperties = gitProperties;
+  }
 
-    @Autowired(required = false)
-    public void setBuildProperties(BuildProperties buildProperties) {
-        this.buildProperties = buildProperties;
-    }
+  @Autowired(required = false)
+  public void setBuildProperties(BuildProperties buildProperties) {
+    this.buildProperties = buildProperties;
+  }
 
-    @Bean
-    public KeyGenerator keyGenerator() {
-        return new PrefixedKeyGenerator(this.gitProperties, this.buildProperties);
-    }
+  @Bean
+  public KeyGenerator keyGenerator() {
+    return new PrefixedKeyGenerator(this.gitProperties, this.buildProperties);
+  }
 }

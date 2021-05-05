@@ -32,14 +32,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuditServiceQueue {
 
-    @Autowired
-    AmqpTemplate jmsTemplate;
+  final
+  AmqpTemplate jmsTemplate;
 
-    public void newSession(final NewSession newSession) {
-        jmsTemplate.convertAndSend("newSession", newSession);
-    }
+  public AuditServiceQueue(AmqpTemplate jmsTemplate) {
+    this.jmsTemplate = jmsTemplate;
+  }
 
-    public void endSession(final EndSession endSession) {
-        jmsTemplate.convertAndSend("endSession", endSession);
-    }
+  public void newSession(final NewSession newSession) {
+    jmsTemplate.convertAndSend("newSession", newSession);
+  }
+
+  public void endSession(final EndSession endSession) {
+    jmsTemplate.convertAndSend("endSession", endSession);
+  }
 }

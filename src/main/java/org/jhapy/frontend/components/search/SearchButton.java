@@ -8,47 +8,49 @@ import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
+import java.io.Serial;
 
 public class SearchButton extends IconButton {
 
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private final SearchView searchView;
+  private final SearchView searchView;
 
-    public SearchButton() {
-        this(VaadinIcon.SEARCH);
-    }
+  public SearchButton() {
+    this(VaadinIcon.SEARCH);
+  }
 
-    public SearchButton(VaadinIcon icon) {
-        this(icon.create());
-    }
+  public SearchButton(VaadinIcon icon) {
+    this(icon.create());
+  }
 
-    public SearchButton(Component icon) {
-        super(icon);
-        searchView = new SearchView();
-        addClickListener(event -> searchView.open());
-    }
+  public SearchButton(Component icon) {
+    super(icon);
+    searchView = new SearchView();
+    addClickListener(event -> searchView.open());
+  }
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        super.onDetach(detachEvent);
-        searchView.getElement().removeFromParent();
-    }
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    super.onDetach(detachEvent);
+    searchView.getElement().removeFromParent();
+  }
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-        attachEvent.getUI().add(searchView);
-    }
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+    attachEvent.getUI().add(searchView);
+  }
 
-    public SearchButton withValueChangeListener(
-        HasValue.ValueChangeListener<? super AbstractField.ComponentValueChangeEvent<TextField, String>> listener) {
-        addValueChangeListener(listener);
-        return this;
-    }
+  public SearchButton withValueChangeListener(
+      HasValue.ValueChangeListener<? super AbstractField.ComponentValueChangeEvent<TextField, String>> listener) {
+    addValueChangeListener(listener);
+    return this;
+  }
 
-    public void addValueChangeListener(
-        HasValue.ValueChangeListener<? super AbstractField.ComponentValueChangeEvent<TextField, String>> listener) {
-        searchView.addValueChangeListener(listener);
-    }
+  public void addValueChangeListener(
+      HasValue.ValueChangeListener<? super AbstractField.ComponentValueChangeEvent<TextField, String>> listener) {
+    searchView.addValueChangeListener(listener);
+  }
 }

@@ -28,31 +28,31 @@ import com.github.appreciated.card.label.PrimaryLabelComponent;
  */
 public class PostItemBody extends VerticalCardComponentContainer {
 
-    private final PrimaryLabelComponent primaryLabel;
-    private final SecondaryLabelHtmlComponent secondaryLabel;
+  private final PrimaryLabelComponent primaryLabel;
+  private final SecondaryLabelHtmlComponent secondaryLabel;
 
-    public PostItemBody(String title, String description) {
-        primaryLabel = new PrimaryLabelComponent(title);
-        secondaryLabel = new SecondaryLabelHtmlComponent(description);
-        add(primaryLabel, secondaryLabel);
-        setTheme();
-    }
+  public PostItemBody(String title, String description) {
+    primaryLabel = new PrimaryLabelComponent(title);
+    secondaryLabel = new SecondaryLabelHtmlComponent(description);
+    add(primaryLabel, secondaryLabel);
+    setTheme();
+  }
 
-    public PostItemBody withWhiteSpaceNoWrap() {
-        primaryLabel.setWhiteSpaceNoWrap();
-        secondaryLabel.setWhiteSpaceNoWrap();
-        return this;
-    }
+  public PostItemBody withWhiteSpaceNoWrap() {
+    primaryLabel.setWhiteSpaceNoWrap();
+    secondaryLabel.setWhiteSpaceNoWrap();
+    return this;
+  }
 
-    public void setTheme() {
-        getElement().setAttribute("theme", "spacing-xs");
-    }
+  public void setTheme() {
+    getElement().setAttribute("theme", "spacing-xs");
+  }
 
-    public PrimaryLabelComponent getPrimaryLabel() {
-        return primaryLabel;
-    }
+  public PrimaryLabelComponent getPrimaryLabel() {
+    return primaryLabel;
+  }
 
-    public SecondaryLabelHtmlComponent getSecondaryLabel() {
-        return secondaryLabel;
-    }
+  public SecondaryLabelHtmlComponent getSecondaryLabel() {
+    return secondaryLabel;
+  }
 }

@@ -24,28 +24,28 @@ import org.springframework.stereotype.Component;
 @Order(2)
 public class SessionFilter implements Filter, HasLogger {
 
-    private final HazelcastInstance hazelcastInstance;
+  private final HazelcastInstance hazelcastInstance;
 
-    public SessionFilter(HazelcastInstance hazelcastInstance) {
-        this.hazelcastInstance = hazelcastInstance;
-    }
+  public SessionFilter(HazelcastInstance hazelcastInstance) {
+    this.hazelcastInstance = hazelcastInstance;
+  }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
-        String sessionId = ((HttpServletRequest) request).getSession().getId();
-        if (sessionId != null) {
-            SessionInfo sessionInfo = retrieveMap().getOrDefault(sessionId, null);
-            if (sessionInfo != null) {
-                sessionInfo.setLastContact(LocalDateTime.now());
-                retrieveMap().replace(sessionId, sessionInfo);
-            }
-        }
-        chain.doFilter(request, response);
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
+    String sessionId = ((HttpServletRequest) request).getSession().getId();
+    if (sessionId != null) {
+      SessionInfo sessionInfo = retrieveMap().getOrDefault(sessionId, null);
+      if (sessionInfo != null) {
+        sessionInfo.setLastContact(LocalDateTime.now());
+        retrieveMap().replace(sessionId, sessionInfo);
+      }
     }
+    chain.doFilter(request, response);
+  }
 
-    private ConcurrentMap<String, SessionInfo> retrieveMap() {
-        return hazelcastInstance.getMap("userSessions");
-    }
+  private ConcurrentMap<String, SessionInfo> retrieveMap() {
+    return hazelcastInstance.getMap("userSessions");
+  }
 
 }

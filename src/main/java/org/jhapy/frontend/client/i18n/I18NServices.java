@@ -32,36 +32,36 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class I18NServices {
 
-    public static I18NService getI18NService() {
-        return getApplicationContext().getBean(I18NService.class);
-    }
+  public static I18NService getI18NService() {
+    return getApplicationContext().getBean(I18NService.class);
+  }
 
-    public static ActionService getActionService() {
-        return getApplicationContext().getBean(ActionService.class);
-    }
+  public static ActionService getActionService() {
+    return getApplicationContext().getBean(ActionService.class);
+  }
 
-    public static ActionTrlService getActionTrlService() {
-        return getApplicationContext().getBean(ActionTrlService.class);
-    }
+  public static ActionTrlService getActionTrlService() {
+    return getApplicationContext().getBean(ActionTrlService.class);
+  }
 
-    public static ElementService getElementService() {
-        return getApplicationContext().getBean(ElementService.class);
-    }
+  public static ElementService getElementService() {
+    return getApplicationContext().getBean(ElementService.class);
+  }
 
-    public static ElementTrlService getElementTrlService() {
-        return getApplicationContext().getBean(ElementTrlService.class);
-    }
+  public static ElementTrlService getElementTrlService() {
+    return getApplicationContext().getBean(ElementTrlService.class);
+  }
 
-    public static MessageService getMessageService() {
-        return getApplicationContext().getBean(MessageService.class);
-    }
+  public static MessageService getMessageService() {
+    return getApplicationContext().getBean(MessageService.class);
+  }
 
-    public static MessageTrlService getMessageTrlService() {
-        return getApplicationContext().getBean(MessageTrlService.class);
-    }
+  public static MessageTrlService getMessageTrlService() {
+    return getApplicationContext().getBean(MessageTrlService.class);
+  }
 
-    public static ApplicationContext getApplicationContext() {
-        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-    }
+  public static ApplicationContext getApplicationContext() {
+    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+  }
 }

@@ -38,59 +38,59 @@ import org.jhapy.dto.utils.Pageable;
  */
 public class SpringDataProviderBuilder<T extends Serializable, F> {
 
-    private final BiFunction<Pageable, F, Page<T>> queryFunction;
-    private final ToLongFunction<F> lengthFunction;
-    private final List<QuerySortOrder> defaultSortOrders = new ArrayList<>();
+  private final BiFunction<Pageable, F, Page<T>> queryFunction;
+  private final ToLongFunction<F> lengthFunction;
+  private final List<QuerySortOrder> defaultSortOrders = new ArrayList<>();
 
-    private F defaultFilter = null;
+  private F defaultFilter = null;
 
-    public SpringDataProviderBuilder(
-        BiFunction<Pageable, F, Page<T>> queryFunction,
-        ToLongFunction<F> lengthFunction) {
-        this.queryFunction = queryFunction;
-        this.lengthFunction = lengthFunction;
-    }
+  public SpringDataProviderBuilder(
+      BiFunction<Pageable, F, Page<T>> queryFunction,
+      ToLongFunction<F> lengthFunction) {
+    this.queryFunction = queryFunction;
+    this.lengthFunction = lengthFunction;
+  }
 
-    public static <T extends Serializable, F> SpringDataProviderBuilder<T, F> forFunctions(
-        BiFunction<Pageable, F, Page<T>> queryFunction,
-        ToLongFunction<F> lengthFunction) {
-        return new SpringDataProviderBuilder<>(queryFunction, lengthFunction);
-    }
+  public static <T extends Serializable, F> SpringDataProviderBuilder<T, F> forFunctions(
+      BiFunction<Pageable, F, Page<T>> queryFunction,
+      ToLongFunction<F> lengthFunction) {
+    return new SpringDataProviderBuilder<>(queryFunction, lengthFunction);
+  }
 
-    public SpringDataProviderBuilder<T, F> withDefaultSort(String column,
-        SortDirection direction) {
-        defaultSortOrders.add(new QuerySortOrder(column, direction));
-        return this;
-    }
+  public SpringDataProviderBuilder<T, F> withDefaultSort(String column,
+      SortDirection direction) {
+    defaultSortOrders.add(new QuerySortOrder(column, direction));
+    return this;
+  }
 
-    public SpringDataProviderBuilder<T, F> withDefaultFilter(F defaultFilter) {
-        this.defaultFilter = defaultFilter;
-        return this;
-    }
+  public SpringDataProviderBuilder<T, F> withDefaultFilter(F defaultFilter) {
+    this.defaultFilter = defaultFilter;
+    return this;
+  }
 
-    public DataProvider<T, F> build() {
-        return new PageableDataProvider<T, F>() {
-            @Override
-            protected Page<T> fetchFromBackEnd(Query<T, F> query,
-                Pageable pageable) {
-                return queryFunction.apply(pageable,
-                    query.getFilter().orElse(defaultFilter));
-            }
+  public DataProvider<T, F> build() {
+    return new PageableDataProvider<>() {
+      @Override
+      protected Page<T> fetchFromBackEnd(Query<T, F> query,
+          Pageable pageable) {
+        return queryFunction.apply(pageable,
+            query.getFilter().orElse(defaultFilter));
+      }
 
-            @Override
-            protected List<QuerySortOrder> getDefaultSortOrders() {
-                return defaultSortOrders;
-            }
+      @Override
+      protected List<QuerySortOrder> getDefaultSortOrders() {
+        return defaultSortOrders;
+      }
 
-            @Override
-            protected int sizeInBackEnd(Query<T, F> query) {
-                return (int) lengthFunction
-                    .applyAsLong(query.getFilter().orElse(defaultFilter));
-            }
-        };
-    }
+      @Override
+      protected int sizeInBackEnd(Query<T, F> query) {
+        return (int) lengthFunction
+            .applyAsLong(query.getFilter().orElse(defaultFilter));
+      }
+    };
+  }
 
-    public ConfigurableFilterDataProvider<T, Void, F> buildFilterable() {
-        return build().withConfigurableFilter();
-    }
+  public ConfigurableFilterDataProvider<T, Void, F> buildFilterable() {
+    return build().withConfigurableFilter();
+  }
 }

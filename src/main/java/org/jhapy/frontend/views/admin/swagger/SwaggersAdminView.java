@@ -46,66 +46,66 @@ import org.springframework.security.access.annotation.Secured;
 @Secured(SecurityConst.ROLE_SWAGGER)
 public class SwaggersAdminView extends ViewFrame {
 
-    private static final String I18N_PREFIX = "swagger.";
-    protected Grid<EurekaApplication> grid;
-    private EurekaInfo eurekaInfo;
+  private static final String I18N_PREFIX = "swagger.";
+  protected Grid<EurekaApplication> grid;
+  private EurekaInfo eurekaInfo;
 
-    public SwaggersAdminView() {
+  public SwaggersAdminView() {
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+
+    initHeader();
+    setViewContent(createContent());
+
+    ServiceResult<EurekaInfo> applicationServiceResult = RegistryServices.getEurekaService()
+        .getApplications(new BaseRemoteQuery());
+
+    if (applicationServiceResult.getIsSuccess() && applicationServiceResult.getData() != null) {
+      eurekaInfo = applicationServiceResult.getData();
+      grid.setItems(eurekaInfo.getApplicationList());
     }
+  }
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-
-        initHeader();
-        setViewContent(createContent());
-
-        ServiceResult<EurekaInfo> applicationServiceResult = RegistryServices.getEurekaService()
-            .getApplications(new BaseRemoteQuery());
-
-        if (applicationServiceResult.getIsSuccess() && applicationServiceResult.getData() != null) {
-            eurekaInfo = applicationServiceResult.getData();
-            grid.setItems(eurekaInfo.getApplicationList());
-        }
-    }
-
-    protected void initHeader() {
-        AppBar appBar = JHapyMainView3.get().getAppBar();
-        appBar.setNaviMode(NaviMode.MENU);
-        appBar.setTitle(getTranslation(AppConst.TITLE_SWAGGERS_ADMIN));
-    }
+  protected void initHeader() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.setNaviMode(NaviMode.MENU);
+    appBar.setTitle(getTranslation(AppConst.TITLE_SWAGGERS_ADMIN));
+  }
 
 
-    private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout(createGrid());
-        content.setBoxSizing(BoxSizing.BORDER_BOX);
-        content.setHeightFull();
-        content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
-        return content;
-    }
+  private Component createContent() {
+    FlexBoxLayout content = new FlexBoxLayout(createGrid());
+    content.setBoxSizing(BoxSizing.BORDER_BOX);
+    content.setHeightFull();
+    content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
+    return content;
+  }
 
-    protected void showDetails(EurekaApplication app) {
-        UI.getCurrent().navigate(SwaggerAdminView.class, app.getName().toLowerCase());
-    }
+  protected void showDetails(EurekaApplication app) {
+    UI.getCurrent().navigate(SwaggerAdminView.class, app.getName().toLowerCase());
+  }
 
-    protected Grid createGrid() {
-        grid = new Grid<>();
-        grid.setSelectionMode(SelectionMode.SINGLE);
+  protected Grid createGrid() {
+    grid = new Grid<>();
+    grid.setSelectionMode(SelectionMode.SINGLE);
 
-        grid.addSelectionListener(event -> event.getFirstSelectedItem()
-            .ifPresent(this::showDetails));
+    grid.addSelectionListener(event -> event.getFirstSelectedItem()
+        .ifPresent(this::showDetails));
 
-        grid.setHeight("100%");
+    grid.setHeight("100%");
 
-        grid.addColumn(EurekaApplication::getName).setKey("name");
+    grid.addColumn(EurekaApplication::getName).setKey("name");
 
-        grid.getColumns().forEach(column -> {
-            if (column.getKey() != null) {
-                column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-                column.setResizable(true);
-                column.setSortable(true);
-            }
-        });
-        return grid;
-    }
+    grid.getColumns().forEach(column -> {
+      if (column.getKey() != null) {
+        column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+        column.setResizable(true);
+        column.setSortable(true);
+      }
+    });
+    return grid;
+  }
 }

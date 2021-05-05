@@ -25,7 +25,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.exceptions.AccessDeniedException;
-import org.jhapy.frontend.views.login.LoginView;
 
 /**
  * Adds before enter listener to check access to views. Adds the Offline banner.
@@ -38,31 +37,31 @@ import org.jhapy.frontend.views.login.LoginView;
 @CssImport(value = "./styles/loading-indicator.css")
 public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitListener, HasLogger {
 
-    @Override
-    public void serviceInit(ServiceInitEvent event) {
-        String loggerPrefix = getLoggerPrefix("serviceInit");
-        event.getSource().addUIInitListener(uiEvent -> {
-            final UI ui = uiEvent.getUI();
-            ui.getLoadingIndicatorConfiguration().setApplyDefaultTheme(false);
-            //ui.add(new OfflineBanner());
-            ui.addBeforeEnterListener(this::beforeEnter);
-        });
-    }
+  @Override
+  public void serviceInit(ServiceInitEvent event) {
+    var loggerPrefix = getLoggerPrefix("serviceInit");
+    event.getSource().addUIInitListener(uiEvent -> {
+      final UI ui = uiEvent.getUI();
+      ui.getLoadingIndicatorConfiguration().setApplyDefaultTheme(false);
+      //ui.add(new OfflineBanner());
+      ui.addBeforeEnterListener(this::beforeEnter);
+    });
+  }
 
-    /**
-     * Reroutes the user if she is not authorized to access the view.
-     *
-     * @param event before navigation event with event details
-     */
-    private void beforeEnter(BeforeEnterEvent event) {
-        final boolean accessGranted = org.jhapy.frontend.security.SecurityUtils
-            .isAccessGranted(event.getNavigationTarget());
-        if (!accessGranted) {
-            if (SecurityUtils.isUserLoggedIn()) {
-                event.rerouteToError(AccessDeniedException.class);
-            } else {
-                event.rerouteTo(LoginView.class);
-            }
-        }
+  /**
+   * Reroutes the user if she is not authorized to access the view.
+   *
+   * @param event before navigation event with event details
+   */
+  private void beforeEnter(BeforeEnterEvent event) {
+    final boolean accessGranted = org.jhapy.frontend.security.SecurityUtils
+        .isAccessGranted(event.getNavigationTarget());
+    if (!accessGranted) {
+      if (SecurityUtils.isUserLoggedIn()) {
+        event.rerouteToError(AccessDeniedException.class);
+      } else {
+        event.rerouteTo("/");
+      }
     }
+  }
 }

@@ -41,68 +41,68 @@ import org.springframework.stereotype.Component;
 public class SecurityUserServiceFallback implements SecurityUserService, HasLogger,
     FallbackFactory<SecurityUserServiceFallback> {
 
-    final Throwable cause;
+  final Throwable cause;
 
-    public SecurityUserServiceFallback() {
-        this(null);
+  public SecurityUserServiceFallback() {
+    this(null);
+  }
+
+  SecurityUserServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public SecurityUserServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause;
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
     }
+    return new SecurityUserServiceFallback(cause);
+  }
 
-    SecurityUserServiceFallback(Throwable cause) {
-        this.cause = cause;
-    }
+  @Override
+  public ServiceResult<SecurityUser> getSecurityUserByUsername(
+      GetSecurityUserByUsernameQuery query) {
+    logger()
+        .error(getLoggerPrefix("getSecurityUserByUsername") + "Cannot connect to the server");
 
-    @Override
-    public SecurityUserServiceFallback create(Throwable cause) {
-        if (cause != null) {
-            String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-                : "Unknown error occurred : " + cause;
-            // I don't see this log statement
-            logger().debug("Client fallback called for the cause : {}", errMessage);
-        }
-        return new SecurityUserServiceFallback(cause);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SecurityUser> getSecurityUserByUsername(
-        GetSecurityUserByUsernameQuery query) {
-        logger()
-            .error(getLoggerPrefix("getSecurityUserByUsername") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Page<SecurityUser>> findAnyMatching(FindAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
+  }
 
-    @Override
-    public ServiceResult<Page<SecurityUser>> findAnyMatching(FindAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("findAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
+    logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", new Page<>());
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", 0L);
+  }
 
-    @Override
-    public ServiceResult<Long> countAnyMatching(CountAnyMatchingQuery query) {
-        logger().error(getLoggerPrefix("countAnyMatching") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SecurityUser> getById(GetByStrIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", 0L);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SecurityUser> getById(GetByStrIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SecurityUser> save(SaveQuery<SecurityUser> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SecurityUser> save(SaveQuery<SecurityUser> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
-
-    @Override
-    public ServiceResult<Void> delete(DeleteByStrIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
-
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

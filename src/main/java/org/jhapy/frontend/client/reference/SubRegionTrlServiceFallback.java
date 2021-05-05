@@ -35,31 +35,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubRegionTrlServiceFallback implements SubRegionTrlService, HasLogger {
 
-    @Override
-    public ServiceResult<SubRegionTrl> getSubRegionTrl(GetSubRegionTrlQuery query) {
-        logger().error(getLoggerPrefix("getSubRegionTrl") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SubRegionTrl> getSubRegionTrl(GetSubRegionTrlQuery query) {
+    logger().error(getLoggerPrefix("getSubRegionTrl") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SubRegionTrl> getById(GetByIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SubRegionTrl> getById(GetByIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<SubRegionTrl> save(SaveQuery<SubRegionTrl> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<SubRegionTrl> save(SaveQuery<SubRegionTrl> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<Void> delete(DeleteByIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

@@ -8,17 +8,17 @@ import java.util.Optional;
 
 public class AppLayoutNotification {
 
-    public static <T extends Notification> void show(T notification) {
-        getNotificationHolder().ifPresent(holder ->
-            UI.getCurrent().access(() -> holder.add(notification))
-        );
-    }
+  public static <T extends Notification> void show(T notification) {
+    getNotificationHolder().ifPresent(holder ->
+        UI.getCurrent().access(() -> holder.add(notification))
+    );
+  }
 
-    public static <T extends Notification> Optional<NotificationHolder<T>> getNotificationHolder() {
-        return Optional.ofNullable(UIAttributes.get(NotificationHolder.class));
-    }
+  public static <T extends Notification> Optional<NotificationHolder<T>> getNotificationHolder() {
+    return Optional.ofNullable(UIAttributes.get(NotificationHolder.class));
+  }
 
-    public static void setNotificationHolder(NotificationHolder holder) {
-        UIAttributes.set(NotificationHolder.class, holder);
-    }
+  public static void setNotificationHolder(NotificationHolder holder) {
+    UIAttributes.set(NotificationHolder.class, holder);
+  }
 }

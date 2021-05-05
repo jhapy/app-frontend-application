@@ -38,15 +38,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface EurekaService {
 
-    @PostMapping(value = "/applications")
-    ServiceResult<EurekaInfo> getApplications(@RequestBody BaseRemoteQuery query);
+  @PostMapping(value = "/applications")
+  ServiceResult<EurekaInfo> getApplications(@RequestBody BaseRemoteQuery query);
 
-    @PostMapping(value = "/lastn")
-    ServiceResult<Map<String, List<String[]>>> lastn(@RequestBody BaseRemoteQuery query);
+  @PostMapping(value = "/lastn")
+  ServiceResult<Map<String, List<String[]>>> lastn(@RequestBody BaseRemoteQuery query);
 
-    @PostMapping(value = "/replicas")
-    ServiceResult<List<String>> replicas(@RequestBody BaseRemoteQuery query);
+  @PostMapping(value = "/replicas")
+  ServiceResult<List<String>> replicas(@RequestBody BaseRemoteQuery query);
 
-    @PostMapping(value = "/status")
-    ServiceResult<EurekaStatus> status(@RequestBody BaseRemoteQuery query);
+  @PostMapping(value = "/status")
+  ServiceResult<EurekaStatus> status(@RequestBody BaseRemoteQuery query);
 }

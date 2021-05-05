@@ -43,51 +43,51 @@ public class SecurityUserKeycloakDataProvider extends
     DefaultDataProvider<SecurityKeycloakUser, DefaultFilter> implements
     Serializable {
 
-    protected boolean allowEmptyFilter = false;
+  protected boolean allowEmptyFilter = false;
 
-    @Autowired
-    public SecurityUserKeycloakDataProvider() {
-        super(AppConst.DEFAULT_SORT_DIRECTION,
-            AppConst.DEFAULT_SORT_FIELDS);
+  @Autowired
+  public SecurityUserKeycloakDataProvider() {
+    super(AppConst.DEFAULT_SORT_DIRECTION,
+        AppConst.DEFAULT_SORT_FIELDS);
+  }
+
+  @Override
+  protected Page<SecurityKeycloakUser> fetchFromBackEnd(
+      Query<SecurityKeycloakUser, DefaultFilter> query,
+      Pageable pageable) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    String filterStr =
+        filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+
+    Page<SecurityKeycloakUser> page = SecurityServices.getKeycloakClient().findUsers(
+        new FindAnyMatchingQuery(filterStr, filter.isShowInactive(), pageable)).getData();
+    if (getPageObserver() != null) {
+      getPageObserver().accept(page);
+    }
+    return page;
+  }
+
+
+  @Override
+  protected int sizeInBackEnd(Query<SecurityKeycloakUser, DefaultFilter> query) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    String filterStr =
+        filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+
+    if (!isAllowEmptyFilter() && (StringUtils.isBlank(filterStr) || filterStr.length() < 3)) {
+      return 0;
     }
 
-    @Override
-    protected Page<SecurityKeycloakUser> fetchFromBackEnd(
-        Query<SecurityKeycloakUser, DefaultFilter> query,
-        Pageable pageable) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        String filterStr =
-            filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
+    return SecurityServices.getKeycloakClient()
+        .countUsers(new CountAnyMatchingQuery(filterStr, true))
+        .getData().intValue();
+  }
 
-        Page<SecurityKeycloakUser> page = SecurityServices.getKeycloakClient().findUsers(
-            new FindAnyMatchingQuery(filterStr, filter.isShowInactive(), pageable)).getData();
-        if (getPageObserver() != null) {
-            getPageObserver().accept(page);
-        }
-        return page;
-    }
+  public boolean isAllowEmptyFilter() {
+    return allowEmptyFilter;
+  }
 
-
-    @Override
-    protected int sizeInBackEnd(Query<SecurityKeycloakUser, DefaultFilter> query) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        String filterStr =
-            filter.getFilter() != null ? filter.getFilter().replaceAll("\\*", "") : null;
-
-        if (!isAllowEmptyFilter() && (StringUtils.isBlank(filterStr) || filterStr.length() < 3)) {
-            return 0;
-        }
-
-        return SecurityServices.getKeycloakClient()
-            .countUsers(new CountAnyMatchingQuery(filterStr, true))
-            .getData().intValue();
-    }
-
-    public boolean isAllowEmptyFilter() {
-        return allowEmptyFilter;
-    }
-
-    public void setAllowEmptyFilter(boolean allowEmptyFilter) {
-        this.allowEmptyFilter = allowEmptyFilter;
-    }
+  public void setAllowEmptyFilter(boolean allowEmptyFilter) {
+    this.allowEmptyFilter = allowEmptyFilter;
+  }
 }

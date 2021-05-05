@@ -42,78 +42,78 @@ import org.jhapy.frontend.utils.Pair;
 public abstract class SliceDataProvider<T extends Serializable, F>
     extends AbstractBackEndDataProvider<T, F> {
 
-    private static Order queryOrderToSpringOrder(QuerySortOrder queryOrder) {
-        return new Order(queryOrder.getDirection() == SortDirection.ASCENDING
-            ? Direction.ASC
-            : Direction.DESC, queryOrder.getSorted());
+  private static Order queryOrderToSpringOrder(QuerySortOrder queryOrder) {
+    return new Order(queryOrder.getDirection() == SortDirection.ASCENDING
+        ? Direction.ASC
+        : Direction.DESC, queryOrder.getSorted());
+  }
+
+  public static Pair<Integer, Integer> limitAndOffsetToPageSizeAndNumber(
+      int offset, int limit) {
+    int lastIndex = offset + limit - 1;
+    int maxPageSize = lastIndex + 1;
+
+    for (double pageSize = limit; pageSize <= maxPageSize; pageSize++) {
+      int startPage = (int) (offset / pageSize);
+      int endPage = (int) (lastIndex / pageSize);
+      if (startPage == endPage) {
+        // It fits on one page, let's go with that
+        return Pair.of((int) pageSize, startPage);
+      }
     }
 
-    public static Pair<Integer, Integer> limitAndOffsetToPageSizeAndNumber(
-        int offset, int limit) {
-        int lastIndex = offset + limit - 1;
-        int maxPageSize = lastIndex + 1;
+    // Should not really get here
+    return Pair.of(maxPageSize, 0);
+  }
 
-        for (double pageSize = limit; pageSize <= maxPageSize; pageSize++) {
-            int startPage = (int) (offset / pageSize);
-            int endPage = (int) (lastIndex / pageSize);
-            if (startPage == endPage) {
-                // It fits on one page, let's go with that
-                return Pair.of((int) pageSize, startPage);
-            }
-        }
+  @Override
+  protected Stream<T> fetchFromBackEnd(Query<T, F> query) {
+    Pageable pageable = getPageable(query);
+    Slice<T> result = fetchFromBackEnd(query, pageable);
+    return fromPageable(result, pageable, query);
+  }
 
-        // Should not really get here
-        return Pair.of(maxPageSize, 0);
+  protected abstract Slice<T> fetchFromBackEnd(Query<T, F> query, Pageable pageable);
+
+  private Pageable getPageable(Query<T, F> q) {
+    Pair<Integer, Integer> pageSizeAndNumber = limitAndOffsetToPageSizeAndNumber(
+        q.getOffset(), q.getLimit());
+    return new Pageable(pageSizeAndNumber.getSecond(),
+        pageSizeAndNumber.getFirst(), q.getOffset(), createSpringSort(q));
+  }
+
+  private <T, F> Collection<Order> createSpringSort(Query<T, F> q) {
+    List<QuerySortOrder> sortOrders;
+    if (q.getSortOrders().isEmpty()) {
+      sortOrders = getDefaultSortOrders();
+    } else {
+      sortOrders = q.getSortOrders();
     }
-
-    @Override
-    protected Stream<T> fetchFromBackEnd(Query<T, F> query) {
-        Pageable pageable = getPageable(query);
-        Slice<T> result = fetchFromBackEnd(query, pageable);
-        return fromPageable(result, pageable, query);
+    List<Order> orders = sortOrders.stream()
+        .map(SliceDataProvider::queryOrderToSpringOrder)
+        .collect(Collectors.toList());
+    if (orders.isEmpty()) {
+      return null;
+    } else {
+      return new ArrayList<>(orders);
     }
+  }
 
-    protected abstract Slice<T> fetchFromBackEnd(Query<T, F> query, Pageable pageable);
+  protected abstract List<QuerySortOrder> getDefaultSortOrders();
 
-    private Pageable getPageable(Query<T, F> q) {
-        Pair<Integer, Integer> pageSizeAndNumber = limitAndOffsetToPageSizeAndNumber(
-            q.getOffset(), q.getLimit());
-        return new Pageable(pageSizeAndNumber.getSecond(),
-            pageSizeAndNumber.getFirst(), q.getOffset(), createSpringSort(q));
+  private <T extends Serializable> Stream<T> fromPageable(Slice<T> result, Pageable pageable,
+      Query<T, ?> query) {
+    List<T> items = result.getContent();
+
+    int firstRequested = query.getOffset();
+    int nrRequested = query.getLimit();
+    int firstReturned = pageable.getOffset();
+    int firstReal = firstRequested - firstReturned;
+    int afterLastReal = firstReal + nrRequested;
+    if (afterLastReal > items.size()) {
+      afterLastReal = items.size();
     }
-
-    private <T, F> Collection<Order> createSpringSort(Query<T, F> q) {
-        List<QuerySortOrder> sortOrders;
-        if (q.getSortOrders().isEmpty()) {
-            sortOrders = getDefaultSortOrders();
-        } else {
-            sortOrders = q.getSortOrders();
-        }
-        List<Order> orders = sortOrders.stream()
-            .map(SliceDataProvider::queryOrderToSpringOrder)
-            .collect(Collectors.toList());
-        if (orders.isEmpty()) {
-            return null;
-        } else {
-            return new ArrayList<>(orders);
-        }
-    }
-
-    protected abstract List<QuerySortOrder> getDefaultSortOrders();
-
-    private <T extends Serializable> Stream<T> fromPageable(Slice<T> result, Pageable pageable,
-        Query<T, ?> query) {
-        List<T> items = result.getContent();
-
-        int firstRequested = query.getOffset();
-        int nrRequested = query.getLimit();
-        int firstReturned = pageable.getOffset();
-        int firstReal = firstRequested - firstReturned;
-        int afterLastReal = firstReal + nrRequested;
-        if (afterLastReal > items.size()) {
-            afterLastReal = items.size();
-        }
-        return items.subList(firstReal, afterLastReal).stream();
-    }
+    return items.subList(firstReal, afterLastReal).stream();
+  }
 
 }

@@ -33,59 +33,59 @@ import org.springframework.core.annotation.AliasFor;
 @FeignClient
 public @interface AuthorizedFeignClient {
 
-    @AliasFor(annotation = FeignClient.class, attribute = "name")
-    String name() default "";
+  @AliasFor(annotation = FeignClient.class, attribute = "name")
+  String name() default "";
 
-    /**
-     * A custom {@code @Configuration} for the feign client.
-     *
-     * Can contain override {@code @Bean} definition for the pieces that make up the client, for
-     * instance {@link feign.codec.Decoder}, {@link feign.codec.Encoder}, {@link feign.Contract}.
-     *
-     * @return the custom {@code @Configuration} for the feign client.
-     * @see FeignClientsConfiguration for the defaults.
-     */
-    @AliasFor(annotation = FeignClient.class, attribute = "configuration")
-    Class<?>[] configuration() default OAuth2InterceptedFeignConfiguration.class;
+  /**
+   * A custom {@code @Configuration} for the feign client.
+   *
+   * Can contain override {@code @Bean} definition for the pieces that make up the client, for
+   * instance {@link feign.codec.Decoder}, {@link feign.codec.Encoder}, {@link feign.Contract}.
+   *
+   * @return the custom {@code @Configuration} for the feign client.
+   * @see FeignClientsConfiguration for the defaults.
+   */
+  @AliasFor(annotation = FeignClient.class, attribute = "configuration")
+  Class<?>[] configuration() default OAuth2InterceptedFeignConfiguration.class;
 
-    /**
-     * An absolute URL or resolvable hostname (the protocol is optional).
-     *
-     * @return the URL.
-     */
-    String url() default "";
+  /**
+   * An absolute URL or resolvable hostname (the protocol is optional).
+   *
+   * @return the URL.
+   */
+  String url() default "";
 
-    /**
-     * Whether 404s should be decoded instead of throwing FeignExceptions.
-     *
-     * @return true if 404s will be decoded; false otherwise.
-     */
-    boolean decode404() default false;
+  /**
+   * Whether 404s should be decoded instead of throwing FeignExceptions.
+   *
+   * @return true if 404s will be decoded; false otherwise.
+   */
+  boolean decode404() default false;
 
-    /**
-     * Fallback class for the specified Feign client interface. The fallback class must implement
-     * the interface annotated by this annotation and be a valid Spring bean.
-     *
-     * @return the fallback class for the specified Feign client interface.
-     */
-    Class<?> fallback() default void.class;
+  /**
+   * Fallback class for the specified Feign client interface. The fallback class must implement the
+   * interface annotated by this annotation and be a valid Spring bean.
+   *
+   * @return the fallback class for the specified Feign client interface.
+   */
+  Class<?> fallback() default void.class;
 
-    /**
-     * Define a fallback factory for the specified Feign client interface. The fallback factory must
-     * produce instances of fallback classes that implement the interface annotated by {@link
-     * FeignClient}. The fallback factory must be a valid spring bean.
-     *
-     * @return fallback factory for the specified Feign client interface
-     * @see feign.hystrix.FallbackFactory for details.
-     */
-    Class<?> fallbackFactory() default void.class;
+  /**
+   * Define a fallback factory for the specified Feign client interface. The fallback factory must
+   * produce instances of fallback classes that implement the interface annotated by {@link
+   * FeignClient}. The fallback factory must be a valid spring bean.
+   *
+   * @return fallback factory for the specified Feign client interface
+   * @see feign.hystrix.FallbackFactory for details.
+   */
+  Class<?> fallbackFactory() default void.class;
 
 
-    /**
-     * Path prefix to be used by all method-level mappings. Can be used with or without {@code
-     *
-     * @return the path prefix to be used by all method-level mappings.
-     * @RibbonClient}.
-     */
-    String path() default "";
+  /**
+   * Path prefix to be used by all method-level mappings. Can be used with or without {@code
+   *
+   * @return the path prefix to be used by all method-level mappings.
+   * @RibbonClient}.
+   */
+  String path() default "";
 }

@@ -30,21 +30,21 @@ import com.vaadin.flow.component.Component;
 public class PostItem extends
     HorizontalCardComponentContainer<com.github.appreciated.card.content.Item> {
 
-    private final Component component;
+  private final Component component;
 
-    public PostItem(String title, String description) {
-        component = new PostItemBody(title, description);
-        ((PostItemBody) component).setPadding(false);
-        add(component);
-    }
+  public PostItem(String title, String description) {
+    component = new PostItemBody(title, description);
+    ((PostItemBody) component).setPadding(false);
+    add(component);
+  }
 
-    public PostItem withWhiteSpaceNoWrap() {
-        if (component instanceof PrimaryLabelComponent) {
-            ((PrimaryLabelComponent) component).setWhiteSpaceNoWrap();
-        } else if (component instanceof PostItemBody) {
-            ((PostItemBody) component).withWhiteSpaceNoWrap();
-        }
-        return this;
+  public PostItem withWhiteSpaceNoWrap() {
+    if (component instanceof PrimaryLabelComponent) {
+      ((PrimaryLabelComponent) component).setWhiteSpaceNoWrap();
+    } else if (component instanceof PostItemBody) {
+      ((PostItemBody) component).withWhiteSpaceNoWrap();
     }
+    return this;
+  }
 
 }

@@ -51,90 +51,88 @@ import org.jhapy.frontend.utils.css.lumo.BadgeColor;
 @Tag("eurekaInstancesTabContent")
 public class EurekaInstancesTabContent extends ActuatorBaseView {
 
-    protected FlexBoxLayout content;
-    protected Component component;
+  protected FlexBoxLayout content;
+  protected Component component;
 
-    protected EurekaInfo eurekaInfo;
+  protected EurekaInfo eurekaInfo;
 
-    public EurekaInstancesTabContent(UI ui, String I18N_PREFIX,
-        AuthorizationHeaderUtil authorizationHeaderUtil) {
-        super(ui, I18N_PREFIX + "eurekaInstances.", authorizationHeaderUtil);
+  public EurekaInstancesTabContent(UI ui, String I18N_PREFIX,
+      AuthorizationHeaderUtil authorizationHeaderUtil) {
+    super(ui, I18N_PREFIX + "eurekaInstances.", authorizationHeaderUtil);
+  }
+
+  public Component getContent(EurekaInfo eurekaInfo) {
+    this.eurekaInfo = eurekaInfo;
+    content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
+        getTranslation("element." + I18N_PREFIX + "title"),
+        getEurekaInstancesList(false, eurekaInfo.getApplicationList(),
+            this::getDetails)));
+    content.setAlignItems(FlexComponent.Alignment.CENTER);
+    content.setFlexDirection(FlexDirection.COLUMN);
+    content.setSizeFull();
+
+    getDetails(null, null);
+    return content;
+  }
+
+  @Override
+  public void refresh() {
+    getDetails(null, null);
+  }
+
+  protected void getDetails(EurekaApplication _eurekaApplication,
+      EurekaApplicationInstance _eurekaApplicationInstance) {
+    Grid<EurekaApplicationInstance> eurekaApplicationInstanceGrid = new Grid();
+    eurekaApplicationInstanceGrid.setWidthFull();
+
+    int idx = 0;
+    Div items = new Div();
+    items.addClassNames(BoxShadowBorders.BOTTOM, LumoStyles.Padding.Bottom.L);
+    for (EurekaApplication eurekaApplication : eurekaInfo.getApplicationList()) {
+      ListItem eurekaApplicationItem = new ListItem(
+          eurekaApplication.getName(),
+          new Badge(String.valueOf(eurekaApplication.getInstances().size()),
+              BadgeColor.SUCCESS)
+      );
+      eurekaApplicationItem.addClickListener(flexLayoutClickEvent -> eurekaApplicationInstanceGrid.setItems(eurekaApplication.getInstances()));
+      eurekaApplicationItem
+          .setDividerVisible(++idx < eurekaApplication.getInstances().size());
+      items.add(eurekaApplicationItem);
+    }
+    content.add(items);
+
+    eurekaApplicationInstanceGrid.addColumn(EurekaApplicationInstance::getInstanceId);
+    eurekaApplicationInstanceGrid.addComponentColumn(this::getInstanceStatus);
+
+    eurekaApplicationInstanceGrid.setItems(Collections.EMPTY_LIST);
+
+    content.add(eurekaApplicationInstanceGrid);
+
+    if (content.getChildren().count() > 1) {
+      if (component != null) {
+        content.remove(component);
+      }
     }
 
-    public Component getContent(EurekaInfo eurekaInfo) {
-        this.eurekaInfo = eurekaInfo;
-        content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
-            getTranslation("element." + I18N_PREFIX + "title"),
-            getEurekaInstancesList(false, eurekaInfo.getApplicationList(),
-                this::getDetails)));
-        content.setAlignItems(FlexComponent.Alignment.CENTER);
-        content.setFlexDirection(FlexDirection.COLUMN);
-        content.setSizeFull();
+    component = eurekaApplicationInstanceGrid;
+    content.add(component);
+    content.setFlex("1", component);
+  }
 
-        getDetails(null, null);
-        return content;
-    }
+  protected Component getInstanceStatus(EurekaApplicationInstance eurekaApplicationInstance) {
+    FlexBoxLayout content = new FlexBoxLayout();
+    content.setFlexDirection(FlexDirection.ROW);
+    content.setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
+    content.setSpacing(Right.S);
+    content.setAlignItems(Alignment.BASELINE);
+    content.add(new Badge(eurekaApplicationInstance.getStatus(),
+        eurekaApplicationInstance.getStatus().equalsIgnoreCase("UP") ? BadgeColor.SUCCESS
+            : BadgeColor.ERROR));
+    eurekaApplicationInstance.getMetadata().keySet().forEach(s -> {
+      content.add(new Badge(s, BadgeColor.NORMAL));
+      content.add(UIUtils.createH6Label(eurekaApplicationInstance.getMetadata().get(s)));
+    });
 
-    @Override
-    public void refresh() {
-        getDetails(null, null);
-    }
-
-    protected void getDetails(EurekaApplication _eurekaApplication,
-        EurekaApplicationInstance _eurekaApplicationInstance) {
-        Grid<EurekaApplicationInstance> eurekaApplicationInstanceGrid = new Grid();
-        eurekaApplicationInstanceGrid.setWidthFull();
-
-        int idx = 0;
-        Div items = new Div();
-        items.addClassNames(BoxShadowBorders.BOTTOM, LumoStyles.Padding.Bottom.L);
-        for (EurekaApplication eurekaApplication : eurekaInfo.getApplicationList()) {
-            ListItem eurekaApplicationItem = new ListItem(
-                eurekaApplication.getName(),
-                new Badge(String.valueOf(eurekaApplication.getInstances().size()),
-                    BadgeColor.SUCCESS)
-            );
-            eurekaApplicationItem.addClickListener(flexLayoutClickEvent -> {
-                eurekaApplicationInstanceGrid.setItems(eurekaApplication.getInstances());
-            });
-            eurekaApplicationItem
-                .setDividerVisible(++idx < eurekaApplication.getInstances().size());
-            items.add(eurekaApplicationItem);
-        }
-        content.add(items);
-
-        eurekaApplicationInstanceGrid.addColumn(EurekaApplicationInstance::getInstanceId);
-        eurekaApplicationInstanceGrid.addComponentColumn(this::getInstanceStatus);
-
-        eurekaApplicationInstanceGrid.setItems(Collections.EMPTY_LIST);
-
-        content.add(eurekaApplicationInstanceGrid);
-
-        if (content.getChildren().count() > 1) {
-            if (component != null) {
-                content.remove(component);
-            }
-        }
-
-        component = eurekaApplicationInstanceGrid;
-        content.add(component);
-        content.setFlex("1", component);
-    }
-
-    protected Component getInstanceStatus(EurekaApplicationInstance eurekaApplicationInstance) {
-        FlexBoxLayout content = new FlexBoxLayout();
-        content.setFlexDirection(FlexDirection.ROW);
-        content.setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
-        content.setSpacing(Right.S);
-        content.setAlignItems(Alignment.BASELINE);
-        content.add(new Badge(eurekaApplicationInstance.getStatus(),
-            eurekaApplicationInstance.getStatus().equalsIgnoreCase("UP") ? BadgeColor.SUCCESS
-                : BadgeColor.ERROR));
-        eurekaApplicationInstance.getMetadata().keySet().forEach(s -> {
-            content.add(new Badge(s, BadgeColor.NORMAL));
-            content.add(UIUtils.createH6Label(eurekaApplicationInstance.getMetadata().get(s)));
-        });
-
-        return content;
-    }
+    return content;
+  }
 }

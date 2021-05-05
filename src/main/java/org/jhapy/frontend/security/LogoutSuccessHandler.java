@@ -34,17 +34,17 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
  */
 public class LogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler implements HasLogger {
 
-    private final SessionService sessionService;
+  private final SessionService sessionService;
 
-    public LogoutSuccessHandler(SessionService sessionService) {
-        this.sessionService = sessionService;
-    }
+  public LogoutSuccessHandler(SessionService sessionService) {
+    this.sessionService = sessionService;
+  }
 
-    @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
-        Authentication authentication) throws IOException, ServletException {
-        String loggerPrefix = getLoggerPrefix("onLogoutSuccess");
-        logger().debug(loggerPrefix + "Logout !");
-        super.onLogoutSuccess(request, response, authentication);
-    }
+  @Override
+  public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
+      Authentication authentication) throws IOException, ServletException {
+    var loggerPrefix = getLoggerPrefix("onLogoutSuccess");
+    logger().debug(loggerPrefix + "Logout !");
+    super.onLogoutSuccess(request, response, authentication);
+  }
 }

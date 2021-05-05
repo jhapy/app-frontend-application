@@ -44,138 +44,138 @@ import org.jhapy.frontend.dataproviders.DefaultBackendFree;
 public abstract class DefaultCustomListFieldFree<C extends BaseInnerEntity> extends FlexBoxLayout
     implements HasValue<CustomListFieldFreeValueChangeEvent<C>, List<C>>, HasLogger, Serializable {
 
-    protected final String i18nPrefix;
-    protected Crud<C> gridCrud;
-    protected Button newButton;
-    protected DefaultBackendFree<C> dataProvider;
-    protected Grid.Column editColumn;
-    private final List<ValueChangeListener<? super CustomListFieldFreeValueChangeEvent<C>>> changeListeners = new ArrayList<>();
+  protected final String i18nPrefix;
+  protected Crud<C> gridCrud;
+  protected Button newButton;
+  protected DefaultBackendFree<C> dataProvider;
+  protected Grid.Column editColumn;
+  private final List<ValueChangeListener<? super CustomListFieldFreeValueChangeEvent<C>>> changeListeners = new ArrayList<>();
 
-    protected DefaultCustomListFieldFree(String i18nPrefix) {
-        this.i18nPrefix = i18nPrefix;
-    }
+  protected DefaultCustomListFieldFree(String i18nPrefix) {
+    this.i18nPrefix = i18nPrefix;
+  }
 
-    protected static String createEditColumnTemplate(String crudI18n) {
-        return "<vaadin-crud-edit aria-label=\"" + crudI18n + "\"></vaadin-crud-edit>";
-    }
+  protected static String createEditColumnTemplate(String crudI18n) {
+    return "<vaadin-crud-edit aria-label=\"" + crudI18n + "\"></vaadin-crud-edit>";
+  }
 
-    public DefaultBackendFree<C> getDataProvider() {
-        return dataProvider;
+  public DefaultBackendFree<C> getDataProvider() {
+    return dataProvider;
+  }
+
+  @Override
+  public List<C> getValue() {
+    var loggerPrefix = getLoggerPrefix("generateModelValue");
+    logger().debug(loggerPrefix + "Result =  " + dataProvider.getValues());
+    return new ArrayList<>(dataProvider.getValues());
+  }
+
+  @Override
+  public void setValue(List<C> values) {
+    var loggerPrefix = getLoggerPrefix("setPresentationValue");
+    logger().debug(loggerPrefix + "Param =  " + values);
+    if (values != null) {
+      dataProvider.setValues(values);
     }
+  }
+
+  @Override
+  public Registration addValueChangeListener(
+      ValueChangeListener<? super CustomListFieldFreeValueChangeEvent<C>> valueChangeListener) {
+    changeListeners.add(valueChangeListener);
+    return () -> changeListeners.remove(valueChangeListener);
+  }
+
+  protected CrudI18n createI18n() {
+    Locale currentLocal = UI.getCurrent().getLocale();
+    CrudI18n i18nGrid = CrudI18n.createDefault();
+
+    i18nGrid.setNewItem(getTranslation("action.global.addButton", currentLocal));
+    i18nGrid.setEditItem(getTranslation("action.global.editButton", currentLocal));
+    i18nGrid.setSaveItem(getTranslation("action.global.saveButton", currentLocal));
+    i18nGrid.setDeleteItem(getTranslation("action.global.deleteButton", currentLocal));
+    i18nGrid.setCancel(getTranslation("action.global.cancel", currentLocal));
+    i18nGrid.setEditLabel(getTranslation("action.global.editButton", currentLocal));
+
+    i18nGrid.getConfirm().getCancel()
+        .setTitle(getTranslation("element.global.cancel.title", currentLocal));
+    i18nGrid.getConfirm().getCancel()
+        .setContent(getTranslation("element.global.cancel.content", currentLocal));
+    i18nGrid.getConfirm().getCancel().getButton()
+        .setDismiss(getTranslation("action.global.cancel.dismissButton", currentLocal));
+    i18nGrid.getConfirm().getCancel().getButton()
+        .setConfirm(getTranslation("action.global.cancel.confirmButton", currentLocal));
+
+    i18nGrid.getConfirm().getDelete()
+        .setTitle(getTranslation("element.global.delete.title", currentLocal));
+    i18nGrid.getConfirm().getDelete()
+        .setContent(getTranslation("element.global.delete.content", currentLocal));
+    i18nGrid.getConfirm().getDelete().getButton()
+        .setDismiss(getTranslation("action.global.delete.dismissButton", currentLocal));
+    i18nGrid.getConfirm().getDelete().getButton()
+        .setConfirm(getTranslation("action.global.delete.confirmButton", currentLocal));
+
+    return i18nGrid;
+  }
+
+  @Override
+  public boolean isReadOnly() {
+    return false;
+  }
+
+  @Override
+  public void setReadOnly(boolean b) {
+  }
+
+  @Override
+  public boolean isRequiredIndicatorVisible() {
+    return false;
+  }
+
+  @Override
+  public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
+  }
+
+  public void updateValue(List<C> oldValues, List<C> newValues) {
+    changeListeners.forEach(valueChangeListener -> valueChangeListener
+        .valueChanged(new CustomListFieldFreeValueChangeEvent<>(oldValues, newValues, this)));
+  }
+
+  public class Backend extends DefaultBackendFree<C> {
 
     @Override
-    public List<C> getValue() {
-        String loggerPrefix = getLoggerPrefix("generateModelValue");
-        logger().debug(loggerPrefix + "Result =  " + dataProvider.getValues());
-        return new ArrayList<>(dataProvider.getValues());
+    public Object getId(C item) {
+      return item.getTemporaryId();
     }
 
-    @Override
-    public void setValue(List<C> values) {
-        String loggerPrefix = getLoggerPrefix("setPresentationValue");
-        logger().debug(loggerPrefix + "Param =  " + values);
-        if (values != null) {
-            dataProvider.setValues(values);
+    public void setValues(Collection<C> values) {
+      fieldsMap.clear();
+      values.forEach(value -> {
+        if (value.getTemporaryId() == null) {
+          value.setTemporaryId(uniqueLong.incrementAndGet());
         }
+      });
+      fieldsMap.addAll(values);
     }
 
-    @Override
-    public Registration addValueChangeListener(
-        ValueChangeListener<? super CustomListFieldFreeValueChangeEvent<C>> valueChangeListener) {
-        changeListeners.add(valueChangeListener);
-        return () -> changeListeners.remove(valueChangeListener);
+    public void persist(C value) {
+      List<C> previousValues = new ArrayList<>(fieldsMap);
+
+      if (value.getTemporaryId() == null) {
+        value.setTemporaryId(uniqueLong.incrementAndGet());
+      }
+      if (!fieldsMap.contains(value)) {
+        fieldsMap.add(value);
+      }
+      updateValue(previousValues, fieldsMap);
     }
 
-    protected CrudI18n createI18n() {
-        Locale currentLocal = UI.getCurrent().getLocale();
-        CrudI18n i18nGrid = CrudI18n.createDefault();
+    public void delete(C value) {
+      List<C> previousValues = new ArrayList<>(fieldsMap);
 
-        i18nGrid.setNewItem(getTranslation("action.global.addButton", currentLocal));
-        i18nGrid.setEditItem(getTranslation("action.global.editButton", currentLocal));
-        i18nGrid.setSaveItem(getTranslation("action.global.saveButton", currentLocal));
-        i18nGrid.setDeleteItem(getTranslation("action.global.deleteButton", currentLocal));
-        i18nGrid.setCancel(getTranslation("action.global.cancel", currentLocal));
-        i18nGrid.setEditLabel(getTranslation("action.global.editButton", currentLocal));
+      fieldsMap.remove(value);
 
-        i18nGrid.getConfirm().getCancel()
-            .setTitle(getTranslation("element.global.cancel.title", currentLocal));
-        i18nGrid.getConfirm().getCancel()
-            .setContent(getTranslation("element.global.cancel.content", currentLocal));
-        i18nGrid.getConfirm().getCancel().getButton()
-            .setDismiss(getTranslation("action.global.cancel.dismissButton", currentLocal));
-        i18nGrid.getConfirm().getCancel().getButton()
-            .setConfirm(getTranslation("action.global.cancel.confirmButton", currentLocal));
-
-        i18nGrid.getConfirm().getDelete()
-            .setTitle(getTranslation("element.global.delete.title", currentLocal));
-        i18nGrid.getConfirm().getDelete()
-            .setContent(getTranslation("element.global.delete.content", currentLocal));
-        i18nGrid.getConfirm().getDelete().getButton()
-            .setDismiss(getTranslation("action.global.delete.dismissButton", currentLocal));
-        i18nGrid.getConfirm().getDelete().getButton()
-            .setConfirm(getTranslation("action.global.delete.confirmButton", currentLocal));
-
-        return i18nGrid;
+      updateValue(previousValues, fieldsMap);
     }
-
-    @Override
-    public boolean isReadOnly() {
-        return false;
-    }
-
-    @Override
-    public void setReadOnly(boolean b) {
-    }
-
-    @Override
-    public boolean isRequiredIndicatorVisible() {
-        return false;
-    }
-
-    @Override
-    public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
-    }
-
-    public void updateValue(List<C> oldValues, List<C> newValues) {
-        changeListeners.forEach(valueChangeListener -> valueChangeListener
-            .valueChanged(new CustomListFieldFreeValueChangeEvent<>(oldValues, newValues, this)));
-    }
-
-    public class Backend extends DefaultBackendFree<C> {
-
-        @Override
-        public Object getId(C item) {
-            return item.getTemporaryId();
-        }
-
-        public void setValues(Collection<C> values) {
-            fieldsMap.clear();
-            values.forEach(value -> {
-                if (value.getTemporaryId() == null) {
-                    value.setTemporaryId(uniqueLong.incrementAndGet());
-                }
-            });
-            fieldsMap.addAll(values);
-        }
-
-        public void persist(C value) {
-            List<C> previousValues = new ArrayList<>(fieldsMap);
-
-            if (value.getTemporaryId() == null) {
-                value.setTemporaryId(uniqueLong.incrementAndGet());
-            }
-            if (!fieldsMap.contains(value)) {
-                fieldsMap.add(value);
-            }
-            updateValue(previousValues, fieldsMap);
-        }
-
-        public void delete(C value) {
-            List<C> previousValues = new ArrayList<>(fieldsMap);
-
-            fieldsMap.remove(value);
-
-            updateValue(previousValues, fieldsMap);
-        }
-    }
+  }
 }

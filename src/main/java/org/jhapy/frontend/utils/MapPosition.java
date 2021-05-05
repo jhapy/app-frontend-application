@@ -26,8 +26,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class MapPosition implements Serializable {
 
-    private Double latitude;
-    private Double longitude;
+  private Double latitude;
+  private Double longitude;
 
-    private String placeId;
+  private String placeId;
 }

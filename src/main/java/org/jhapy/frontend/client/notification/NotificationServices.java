@@ -32,24 +32,24 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class NotificationServices {
 
-    public static MailService getMailService() {
-        return getApplicationContext().getBean(MailService.class);
-    }
+  public static MailService getMailService() {
+    return getApplicationContext().getBean(MailService.class);
+  }
 
-    public static SmsService getSmsService() {
-        return getApplicationContext().getBean(SmsService.class);
-    }
+  public static SmsService getSmsService() {
+    return getApplicationContext().getBean(SmsService.class);
+  }
 
-    public static MailTemplateService getMailTemplateService() {
-        return getApplicationContext().getBean(MailTemplateService.class);
-    }
+  public static MailTemplateService getMailTemplateService() {
+    return getApplicationContext().getBean(MailTemplateService.class);
+  }
 
-    public static SmsTemplateService getSmsTemplateService() {
-        return getApplicationContext().getBean(SmsTemplateService.class);
-    }
+  public static SmsTemplateService getSmsTemplateService() {
+    return getApplicationContext().getBean(SmsTemplateService.class);
+  }
 
-    public static ApplicationContext getApplicationContext() {
-        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-    }
+  public static ApplicationContext getApplicationContext() {
+    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+  }
 }

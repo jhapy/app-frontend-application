@@ -20,16 +20,16 @@ package org.jhapy.frontend.utils;
 
 public enum IconSize {
 
-    S("size-s"), M("size-m"), L("size-l");
+  S("size-s"), M("size-m"), L("size-l");
 
-    private final String style;
+  private final String style;
 
-    IconSize(String style) {
-        this.style = style;
-    }
+  IconSize(String style) {
+    this.style = style;
+  }
 
-    public String getClassName() {
-        return style;
-    }
+  public String getClassName() {
+    return style;
+  }
 
 }

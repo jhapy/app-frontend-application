@@ -20,15 +20,15 @@ package org.jhapy.frontend.utils.css;
 
 public enum FlexWrap {
 
-    NO_WRAP("nowrap"), WRAP("wrap"), WRAP_REVERSE("wrap-reverse");
+  NO_WRAP("nowrap"), WRAP("wrap"), WRAP_REVERSE("wrap-reverse");
 
-    private final String value;
+  private final String value;
 
-    FlexWrap(String value) {
-        this.value = value;
-    }
+  FlexWrap(String value) {
+    this.value = value;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  public String getValue() {
+    return value;
+  }
 }

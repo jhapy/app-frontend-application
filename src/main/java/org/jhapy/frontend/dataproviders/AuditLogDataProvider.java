@@ -46,53 +46,53 @@ public class AuditLogDataProvider extends
     DefaultDataProvider<AuditLog, AuditLogFilter> implements
     Serializable {
 
-    private final Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler;
-    private final Function<CountAuditLogQuery, ServiceResult<Long>> countHandler;
+  private final Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler;
+  private final Function<CountAuditLogQuery, ServiceResult<Long>> countHandler;
 
-    public AuditLogDataProvider(
-        Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler,
-        Function<CountAuditLogQuery, ServiceResult<Long>> countHandler) {
-        super(AppConst.DEFAULT_SORT_DIRECTION,
-            AppConst.DEFAULT_SORT_FIELDS);
-        this.findHandler = findHandler;
-        this.countHandler = countHandler;
+  public AuditLogDataProvider(
+      Function<FindAuditLogQuery, ServiceResult<Page<AuditLog>>> findHandler,
+      Function<CountAuditLogQuery, ServiceResult<Long>> countHandler) {
+    super(AppConst.DEFAULT_SORT_DIRECTION,
+        AppConst.DEFAULT_SORT_FIELDS);
+    this.findHandler = findHandler;
+    this.countHandler = countHandler;
+  }
+
+  @Override
+  protected Page<AuditLog> fetchFromBackEnd(
+      Query<AuditLog, AuditLogFilter> query,
+      Pageable pageable) {
+    AuditLogFilter filter = query.getFilter().orElse(null);
+    Page<AuditLog> page = findHandler
+        .apply(new FindAuditLogQuery(filter.getClassName(), filter.getRecordId(), pageable))
+        .getData();
+    if (getPageObserver() != null) {
+      getPageObserver().accept(page);
     }
+    return page;
+  }
 
-    @Override
-    protected Page<AuditLog> fetchFromBackEnd(
-        Query<AuditLog, AuditLogFilter> query,
-        Pageable pageable) {
-        AuditLogFilter filter = query.getFilter().orElse(null);
-        Page<AuditLog> page = findHandler
-            .apply(new FindAuditLogQuery(filter.getClassName(), filter.getRecordId(), pageable))
-            .getData();
-        if (getPageObserver() != null) {
-            getPageObserver().accept(page);
-        }
-        return page;
+
+  @Override
+  protected int sizeInBackEnd(Query<AuditLog, AuditLogFilter> query) {
+    AuditLogFilter filter = query.getFilter().orElse(null);
+
+    ServiceResult<Long> _count = countHandler
+        .apply(new CountAuditLogQuery(filter.getClassName(), filter.getRecordId()));
+
+    if (_count.getIsSuccess() && _count.getData() != null) {
+      return _count.getData().intValue();
+    } else {
+      return 0;
     }
+  }
 
+  @Data
+  @EqualsAndHashCode(callSuper = true)
+  @AllArgsConstructor
+  public static class AuditLogFilter extends DefaultFilter {
 
-    @Override
-    protected int sizeInBackEnd(Query<AuditLog, AuditLogFilter> query) {
-        AuditLogFilter filter = query.getFilter().orElse(null);
-
-        ServiceResult<Long> _count = countHandler
-            .apply(new CountAuditLogQuery(filter.getClassName(), filter.getRecordId()));
-
-        if (_count.getIsSuccess() && _count.getData() != null) {
-            return _count.getData().intValue();
-        } else {
-            return 0;
-        }
-    }
-
-    @Data
-    @EqualsAndHashCode(callSuper=true)
-    @AllArgsConstructor
-    public static class AuditLogFilter extends DefaultFilter {
-
-        private String className = null;
-        private String recordId = null;
-    }
+    private String className = null;
+    private String recordId = null;
+  }
 }

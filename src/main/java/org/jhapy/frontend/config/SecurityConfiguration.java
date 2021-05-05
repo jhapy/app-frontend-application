@@ -76,268 +76,192 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter implements HasLogger {
 
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
+  @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
+  private String issuerUri;
 
-    private final AppProperties appProperties;
-    private final SecurityProblemSupport problemSupport;
-    private final SecurityRoleService securityRoleService;
-    private final String realm;
-    private final boolean forceHttpsForRealm;
-    private final ClientRegistrationRepository clientRegistrationRepository;
+  private final AppProperties appProperties;
+  private final SecurityProblemSupport problemSupport;
+  private final SecurityRoleService securityRoleService;
+  private final String realm;
+  private final boolean forceHttpsForRealm;
+  private final ClientRegistrationRepository clientRegistrationRepository;
 
-    @Autowired
-    private KeycloakOauth2UserService keycloakOidcUserService;
+  @Autowired
+  private KeycloakOauth2UserService keycloakOidcUserService;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate = new RestTemplate();
 
-    public SecurityConfiguration(AppProperties appProperties,
-        SecurityProblemSupport problemSupport,
-        SecurityRoleService securityRoleService,
-        ClientRegistrationRepository clientRegistrationRepository,
+  public SecurityConfiguration(AppProperties appProperties,
+      SecurityProblemSupport problemSupport,
+      SecurityRoleService securityRoleService,
+      ClientRegistrationRepository clientRegistrationRepository,
         @Value("${kc.realm}") String realm) {
-        this.problemSupport = problemSupport;
-        this.appProperties = appProperties;
-        this.securityRoleService = securityRoleService;
-        this.clientRegistrationRepository = clientRegistrationRepository;
-        this.realm = realm;
-        this.forceHttpsForRealm = appProperties.getAuthorization().getForceRealmToHttps();
-    }
+    this.problemSupport = problemSupport;
+    this.appProperties = appProperties;
+    this.securityRoleService = securityRoleService;
+    this.clientRegistrationRepository = clientRegistrationRepository;
+    this.realm = realm;
+    this.forceHttpsForRealm = appProperties.getAuthorization().getForceRealmToHttps();
+  }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(
-            // Vaadin Flow static resources
-            "/VAADIN/**",
-            // the standard favicon URI
-            "/favicon.ico",
+  @Override
+  public void configure(WebSecurity web) {
+    web.ignoring().antMatchers(
+        // Vaadin Flow static resources
+        "/VAADIN/**",
+        // the standard favicon URI
+        "/favicon.ico",
 
-            // the robots exclusion standard
-            "/robots.txt",
+        // the robots exclusion standard
+        "/robots.txt",
 
-            // web application manifest
-            "/manifest.webmanifest",
-            "/sw.js",
-            "/offline-page.html",
+        // web application manifest
+        "/manifest.webmanifest",
+        "/sw.js",
+        "/offline-page.html",
 
-            // icons and images
-            "/icons/**",
-            "/images/**",
+        // icons and images
+        "/icons/**",
+        "/images/**",
 
-            // (development mode) static resources
-            "/frontend/**",
+        // (development mode) static resources
+        "/frontend/**",
 
-            // (development mode) webjars
-            "/webjars/**",
+        // (development mode) webjars
+        "/webjars/**",
 
-            // (development mode) H2 debugging console
-            "/h2-console/**",
+        // (development mode) H2 debugging console
+        "/h2-console/**",
 
-            // (production mode) static resources
-            "/frontend-es5/**", "/frontend-es6/**");
-    }
+        // (production mode) static resources
+        "/frontend-es5/**", "/frontend-es6/**");
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        String loggerPrefix = getLoggerPrefix("configure");
-        http
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
-            .headers()
-            .frameOptions()
-            .disable()
-            .and()
-            .csrf()
-            .disable()
-            .authorizeRequests()
-            .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-            .antMatchers("/places").permitAll()
-            .antMatchers("/api/auth-info").permitAll()
-            .antMatchers("/api/**").authenticated()
-            .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/health/**").permitAll()
-            .antMatchers("/management/info").permitAll()
-            .antMatchers("/management/prometheus").permitAll()
-            .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
-            .anyRequest().fullyAuthenticated()
-            .and()
-            .logout().addLogoutHandler(new LogoutHandler() {
-                                           @Override
-                                           public void logout(HttpServletRequest request, HttpServletResponse response,
-                                               Authentication authentication) {
-                                               if (authentication != null
-                                                   && authentication.getPrincipal() != null
-                                                   && authentication.getPrincipal() instanceof OidcUser) {
-                                                   propagateLogoutToKeycloak(
-                                                       (OidcUser) authentication.getPrincipal());
-                                               }
-                                           }
-
-                                           private void propagateLogoutToKeycloak(OidcUser user) {
-                                               String loggerPrefix = getLoggerPrefix(
-                                                   "propagateLogoutToKeycloak");
-                                               String endSessionEndpoint =
-                                                   user.getIssuer() + "/protocol/openid-connect/logout";
-
-                                               UriComponentsBuilder builder = UriComponentsBuilder //
-                                                   .fromUriString(endSessionEndpoint) //
-                                                   .queryParam("id_token_hint",
-                                                       user.getIdToken().getTokenValue());
-
-                                               logger().info(
-                                                   loggerPrefix + "Call Keycloak logout endpoint");
-                                               ResponseEntity<String> logoutResponse = restTemplate
-                                                   .getForEntity(builder.toUriString(), String.class);
-                                               if (logoutResponse.getStatusCode().is2xxSuccessful()) {
-                                                   logger().info(
-                                                       loggerPrefix + "Successfully logged out in Keycloak");
-                                               } else {
-                                                   logger().info(loggerPrefix
-                                                       + "Could not propagate logout to Keycloak");
-                                               }
-                                           }
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    var loggerPrefix = getLoggerPrefix("configure");
+    http
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
+        .headers()
+        .frameOptions()
+        .disable()
+        .and()
+        .csrf()
+        .disable()
+        .authorizeRequests()
+        .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+        .antMatchers("/places").permitAll()
+        .antMatchers("/api/auth-info").permitAll()
+        .antMatchers("/api/**").authenticated()
+        .antMatchers("/management/health").permitAll()
+        .antMatchers("/management/health/**").permitAll()
+        .antMatchers("/management/info").permitAll()
+        .antMatchers("/management/prometheus").permitAll()
+        .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
+        .anyRequest().fullyAuthenticated()
+        .and()
+        .logout().addLogoutHandler(new LogoutHandler() {
+                                     @Override
+                                     public void logout(HttpServletRequest request, HttpServletResponse response,
+                                         Authentication authentication) {
+                                       if (authentication != null
+                                           && authentication.getPrincipal() != null
+                                           && authentication.getPrincipal() instanceof OidcUser) {
+                                         propagateLogoutToKeycloak(
+                                             (OidcUser) authentication.getPrincipal());
                                        }
-        ).and()
-            .oauth2ResourceServer()
-            .jwt()
-            .jwtAuthenticationConverter(authenticationConverter())
-            .and().and()
-            .oauth2Login().authorizationEndpoint()
-            .authorizationRequestResolver(
-                new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
-                    "/oauth2/authorization", forceHttpsForRealm)).and().userInfoEndpoint()
-            .oidcUserService(keycloakOidcUserService).and()
-            // I don't want a page with different clients as login options
-            // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
-            // plus the configured realm as immediate redirect to Keycloak
-            //.loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
-            .loginPage(appProperties.getAuthorization().getLoginRootUrl()
-                + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
-        logger().debug(loggerPrefix + "Using login root url : " + (
-            appProperties.getAuthorization().getLoginRootUrl()
-                + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm));
-    }
+                                     }
 
-    Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter
-            .setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
-        return jwtAuthenticationConverter;
-    }
+                                     private void propagateLogoutToKeycloak(OidcUser user) {
+                                       var loggerPrefix = getLoggerPrefix(
+                                           "propagateLogoutToKeycloak");
+                                       String endSessionEndpoint =
+                                           user.getIssuer() + "/protocol/openid-connect/logout";
 
-    @Bean
-    public KeycloakOauth2UserService keycloakOidcUserService(
-        OAuth2ClientProperties oauth2ClientProperties) {
+                                       UriComponentsBuilder builder = UriComponentsBuilder //
+                                           .fromUriString(endSessionEndpoint) //
+                                           .queryParam("id_token_hint",
+                                               user.getIdToken().getTokenValue());
 
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders
-            .fromIssuerLocation(oauth2ClientProperties.getProvider().get("oidc").getIssuerUri());
-        //NimbusJwtDecoderJwkSupport jwtDecoder = new NimbusJwtDecoderJwkSupport(oauth2ClientProperties.getProvider().get("keycloak").getJwkSetUri());
+                                       info(loggerPrefix, "Call Keycloak logout endpoint");
+                                       ResponseEntity<String> logoutResponse = restTemplate
+                                           .getForEntity(builder.toUriString(), String.class);
+                                       if (logoutResponse.getStatusCode().is2xxSuccessful()) {
+                                         info(loggerPrefix, "Successfully logged out in Keycloak");
+                                       } else {
+                                         info(loggerPrefix,"Could not propagate logout to Keycloak");
+                                       }
+                                     }
+                                   }
+    ).and()
+        .oauth2ResourceServer()
+        .jwt()
+        .jwtAuthenticationConverter(authenticationConverter())
+        .and().and()
+        .oauth2Login().authorizationEndpoint()
+        .authorizationRequestResolver(
+            new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
+                "/oauth2/authorization", forceHttpsForRealm)).and().userInfoEndpoint()
+        .oidcUserService(keycloakOidcUserService).and()
+        // I don't want a page with different clients as login options
+        // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
+        // plus the configured realm as immediate redirect to Keycloak
+        //.loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
+        .loginPage(appProperties.getAuthorization().getLoginRootUrl()
+            + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
+    debug(loggerPrefix, "Using login root url : {0}{1}/{2}", appProperties.getAuthorization().getLoginRootUrl(), DEFAULT_AUTHORIZATION_REQUEST_BASE_URI, realm);
+  }
 
-        SimpleAuthorityMapper authoritiesMapper = new SimpleAuthorityMapper();
-        authoritiesMapper.setConvertToUpperCase(true);
+  Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
+    var jwtAuthenticationConverter = new JwtAuthenticationConverter();
+    jwtAuthenticationConverter
+        .setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
+    return jwtAuthenticationConverter;
+  }
 
-        return new KeycloakOauth2UserService(jwtDecoder, authoritiesMapper);
-    }
+  @Bean
+  public KeycloakOauth2UserService keycloakOidcUserService(
+      OAuth2ClientProperties oauth2ClientProperties) {
 
-    @Bean
-    JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders
-            .fromOidcIssuerLocation(issuerUri);
+    var jwtDecoder = (NimbusJwtDecoder) JwtDecoders
+        .fromIssuerLocation(oauth2ClientProperties.getProvider().get("oidc").getIssuerUri());
+    //NimbusJwtDecoderJwkSupport jwtDecoder = new NimbusJwtDecoderJwkSupport(oauth2ClientProperties.getProvider().get("keycloak").getJwkSetUri());
 
-        OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(
-            appProperties.getSecurity().getOauth2().getAudience());
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer,
-            audienceValidator);
+    var authoritiesMapper = new SimpleAuthorityMapper();
+    authoritiesMapper.setConvertToUpperCase(true);
 
-        jwtDecoder.setJwtValidator(withAudience);
+    return new KeycloakOauth2UserService(jwtDecoder, authoritiesMapper);
+  }
 
-        return jwtDecoder;
-    }
+  @Bean
+  JwtDecoder jwtDecoder() {
+    var jwtDecoder = (NimbusJwtDecoder) JwtDecoders
+        .fromOidcIssuerLocation(issuerUri);
 
-    @Bean
-    public KeycloakLogoutHandler keycloakLogoutHandler() {
-        return new KeycloakLogoutHandler(new RestTemplate());
-    }
+    var audienceValidator = new AudienceValidator(
+        appProperties.getSecurity().getOauth2().getAudience());
+    var withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+    var withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer,
+        audienceValidator);
 
-    /*
-      @Override
-      public void configure(HttpSecurity http) throws Exception {
-          // @formatter:off
-          http
-              .csrf()
-              .disable()
-              .exceptionHandling()
-                  .authenticationEntryPoint(problemSupport)
-                  .accessDeniedHandler(problemSupport)
-          .and()
-              .headers()
-              .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
-          .and()
-              .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-          .and()
-              .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
-          .and()
-              .frameOptions()
-              .deny()
-          .and()
-              .requestCache().requestCache(new CustomRequestCache())
-          .and()
-              .sessionManagement()
-              .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-          .and()
-              .authorizeRequests()
-              .accessDecisionManager(accessDecisionManager())
-              .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-              .antMatchers("/VAADIN/**").permitAll()
-              .antMatchers(        "/manifest.webmanifest").permitAll()
-              .antMatchers("/sw.js").permitAll()
-              .antMatchers("/icons/**").permitAll()
-              .antMatchers("/images/**").permitAll()
-              .antMatchers("/frontend/**").permitAll()
-              .antMatchers("/webjars/**").permitAll()
-              .antMatchers("/frontend-es5/**", "/frontend-es6/**").permitAll()
-              .antMatchers("/offline-page.html").permitAll()
-              .antMatchers("/api/auth-info").permitAll()
-              .antMatchers("/api/**").authenticated()
-              .antMatchers("/management/health").permitAll()
-              .antMatchers("/management/info").permitAll()
-              .antMatchers("/management/prometheus").permitAll()
-              .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-              .anyRequest().authenticated()
-          .and()
-              .oauth2Login();
-          // @formatter:on
-      }
+    jwtDecoder.setJwtValidator(withAudience);
 
+    return jwtDecoder;
+  }
 
-      Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {
-          JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-          jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
-          return jwtAuthenticationConverter;
-      }
+  @Bean
+  public KeycloakLogoutHandler keycloakLogoutHandler() {
+    return new KeycloakLogoutHandler(new RestTemplate());
+  }
 
-      //@Bean
-      JwtDecoder jwtDecoder() {
-          NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
-
-          OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(appProperties.getSecurity().getOauth2().getAudience());
-          OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-          OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
-
-          jwtDecoder.setJwtValidator(withAudience);
-
-          return jwtDecoder;
-      }
-
-    */
-    @Bean
-    public AccessDecisionManager accessDecisionManager() {
-        List<AccessDecisionVoter<?>> decisionVoters
-            = Arrays.asList(
-            new WebExpressionVoter(),
-            new RoleVoter(),
-            new AuthenticatedVoter(),
-            new JHapyAccessDecisionVoter(securityRoleService));
-        return new UnanimousBased(decisionVoters);
-    }
+  @Bean
+  public AccessDecisionManager accessDecisionManager() {
+    List<AccessDecisionVoter<?>> decisionVoters
+        = Arrays.asList(
+        new WebExpressionVoter(),
+        new RoleVoter(),
+        new AuthenticatedVoter(),
+        new JHapyAccessDecisionVoter(securityRoleService));
+    return new UnanimousBased(decisionVoters);
+  }
 }

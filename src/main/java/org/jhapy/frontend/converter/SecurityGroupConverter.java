@@ -34,25 +34,25 @@ import org.springframework.stereotype.Component;
 public class SecurityGroupConverter extends
     BidirectionalConverter<SecurityKeycloakGroup, GroupRepresentation> {
 
-    @Override
-    public GroupRepresentation convertTo(SecurityKeycloakGroup source,
-        Type<GroupRepresentation> destinationType,
-        MappingContext mappingContext) {
-        GroupRepresentation result = new GroupRepresentation();
-        result.setId(source.getId());
-        result.setName(source.getName());
+  @Override
+  public GroupRepresentation convertTo(SecurityKeycloakGroup source,
+      Type<GroupRepresentation> destinationType,
+      MappingContext mappingContext) {
+    GroupRepresentation result = new GroupRepresentation();
+    result.setId(source.getId());
+    result.setName(source.getName());
 
-        return result;
-    }
+    return result;
+  }
 
-    @Override
-    public SecurityKeycloakGroup convertFrom(GroupRepresentation source,
-        Type<SecurityKeycloakGroup> destinationType,
-        MappingContext mappingContext) {
-        SecurityKeycloakGroup result = new SecurityKeycloakGroup();
-        result.setId(source.getId());
-        result.setName(source.getName());
+  @Override
+  public SecurityKeycloakGroup convertFrom(GroupRepresentation source,
+      Type<SecurityKeycloakGroup> destinationType,
+      MappingContext mappingContext) {
+    SecurityKeycloakGroup result = new SecurityKeycloakGroup();
+    result.setId(source.getId());
+    result.setName(source.getName());
 
-        return result;
-    }
+    return result;
+  }
 }

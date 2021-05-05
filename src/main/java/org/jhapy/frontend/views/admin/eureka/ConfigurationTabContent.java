@@ -40,6 +40,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,282 +79,282 @@ import org.vaadin.tabs.PagedTabs;
 @Tag("apiTabContent")
 public class ConfigurationTabContent extends ActuatorBaseView {
 
-    protected FlexBoxLayout content;
-    protected Component component;
+  protected FlexBoxLayout content;
+  protected Component component;
 
-    protected Grid<Bean> beansGrid;
-    protected ListDataProvider<Bean> beanListDataProvider;
-    protected Map<String, Grid<PropertySource>> envGrid;
-    protected FlexBoxLayout envRows;
+  protected Grid<Bean> beansGrid;
+  protected ListDataProvider<Bean> beanListDataProvider;
+  protected Map<String, Grid<PropertySource>> envGrid;
+  protected FlexBoxLayout envRows;
 
-    public ConfigurationTabContent(UI ui, String I18N_PREFIX,
-        AuthorizationHeaderUtil authorizationHeaderUtil) {
-        super(ui, I18N_PREFIX + "configurations.", authorizationHeaderUtil);
-    }
+  public ConfigurationTabContent(UI ui, String I18N_PREFIX,
+      AuthorizationHeaderUtil authorizationHeaderUtil) {
+    super(ui, I18N_PREFIX + "configurations.", authorizationHeaderUtil);
+  }
 
-    public Component getContent(EurekaInfo eurekaInfo) {
-        content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
-            getTranslation("element." + I18N_PREFIX + "title"),
-            getEurekaInstancesList(true, eurekaInfo.getApplicationList(), this::getDetails)));
-        content.setAlignItems(FlexComponent.Alignment.CENTER);
-        content.setFlexDirection(FlexDirection.COLUMN);
-        content.setSizeFull();
+  public Component getContent(EurekaInfo eurekaInfo) {
+    content = new FlexBoxLayout(createHeader(VaadinIcon.SEARCH,
+        getTranslation("element." + I18N_PREFIX + "title"),
+        getEurekaInstancesList(true, eurekaInfo.getApplicationList(), this::getDetails)));
+    content.setAlignItems(FlexComponent.Alignment.CENTER);
+    content.setFlexDirection(FlexDirection.COLUMN);
+    content.setSizeFull();
 
-        PagedTabs tabs = new PagedTabs(content);
-        content.add(tabs);
+    PagedTabs tabs = new PagedTabs(content);
+    content.add(tabs);
 
-        tabs.add(getTranslation("element." + I18N_PREFIX + "tab.beans"), getBeans(), false);
-        tabs.add(getTranslation("element." + I18N_PREFIX + "tab.env"), getEnv(), false);
+    tabs.add(getTranslation("element." + I18N_PREFIX + "tab.beans"), getBeans(), false);
+    tabs.add(getTranslation("element." + I18N_PREFIX + "tab.env"), getEnv(), false);
 
-        //getDetails( null, null);
+    //getDetails( null, null);
 
-        return content;
-    }
+    return content;
+  }
 
-    protected void getDetails(EurekaApplication eurekaApplication,
-        EurekaApplicationInstance eurekaApplicationInstance) {
-        titleLabel.setText(
-            getTranslation("element." + I18N_PREFIX + "title") + " - " + eurekaApplicationInstance
-                .getInstanceId());
+  protected void getDetails(EurekaApplication eurekaApplication,
+      EurekaApplicationInstance eurekaApplicationInstance) {
+    titleLabel.setText(
+        getTranslation("element." + I18N_PREFIX + "title") + " - " + eurekaApplicationInstance
+            .getInstanceId());
 
-        try {
-            final HttpHeaders httpHeaders = new HttpHeaders() {{
-                set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
-                setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            }};
+    try {
+      final HttpHeaders httpHeaders = new HttpHeaders() {{
+        set("Authorization", authorizationHeaderUtil.getAuthorizationHeader().get());
+        setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      }};
 
-            logger().debug(
-                "Application : " + eurekaApplication.getName() + ", Config Props Url = "
-                    + eurekaApplicationInstance.getMetadata().get("management.url")
-                    + "/configprops");
-            ResponseEntity<String> configprops = restTemplate.exchange(URI.create(
-                eurekaApplicationInstance.getMetadata().get("management.url") + "/configprops"),
-                HttpMethod.GET,
-                new HttpEntity<>(httpHeaders), String.class);
-            String configpropsBody = configprops.getBody();
+      logger().debug(
+          "Application : " + eurekaApplication.getName() + ", Config Props Url = "
+              + eurekaApplicationInstance.getMetadata().get("management.url")
+              + "/configprops");
+      ResponseEntity<String> configprops = restTemplate.exchange(URI.create(
+          eurekaApplicationInstance.getMetadata().get("management.url") + "/configprops"),
+          HttpMethod.GET,
+          new HttpEntity<>(httpHeaders), String.class);
+      String configpropsBody = configprops.getBody();
 
-            logger().debug("Config Props = " + configpropsBody);
+      logger().debug("Config Props = " + configpropsBody);
 
-            JSONParser jsonParser = new JSONParser();
+      JSONParser jsonParser = new JSONParser();
 
-            ObjectMapper objectMapper = new ObjectMapper();
+      ObjectMapper objectMapper = new ObjectMapper();
 
-            ConfigProps configPropsObj = new ConfigProps();
-            Contexts contextsObj = new Contexts();
-            contextsObj.setContexts(new HashMap<>());
-            configPropsObj.setContexts(contextsObj);
+      ConfigProps configPropsObj = new ConfigProps();
+      Contexts contextsObj = new Contexts();
+      contextsObj.setContexts(new HashMap<>());
+      configPropsObj.setContexts(contextsObj);
 
-            JSONObject configpropsJsonObject = (JSONObject) jsonParser.parse(configpropsBody);
+      JSONObject configpropsJsonObject = (JSONObject) jsonParser.parse(configpropsBody);
 
-            JSONObject contextsJsonObject = (JSONObject) configpropsJsonObject.get("contexts");
-            contextsJsonObject.forEach((key, contexts) -> {
-                ConfigProps.Contexts.Context contextObj = new Context();
-                contextObj.setBeans(new HashMap<>());
-                JSONObject beansJsonObject = (JSONObject) ((JSONObject) contexts).get("beans");
+      JSONObject contextsJsonObject = (JSONObject) configpropsJsonObject.get("contexts");
+      contextsJsonObject.forEach((key, contexts) -> {
+        ConfigProps.Contexts.Context contextObj = new Context();
+        contextObj.setBeans(new HashMap<>());
+        JSONObject beansJsonObject = (JSONObject) ((JSONObject) contexts).get("beans");
 
-                beansJsonObject.forEach((o, o2) -> {
-                    Bean beanObj = new Bean();
-                    beanObj.setPrefix(((JSONObject) o2).get("prefix").toString());
-                    try {
-                        beanObj.setProperties(objectMapper
-                            .readValue(((JSONObject) o2).get("properties").toString(),
-                                new TypeReference<Map<String, Object>>() {
-                                }));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                    contextObj.getBeans().put(o.toString(), beanObj);
-                });
-                contextsObj.getContexts().put(key.toString(), contextObj);
-            });
-
-            //logger().debug("Config Props Converted = " + configPropsObj);
-            beanListDataProvider = new ListDataProvider<>(configPropsObj.getBeans());
-            beansGrid.setDataProvider(beanListDataProvider);
-
-            logger().debug(
-                "Application : " + eurekaApplication.getName() + ", Env Url = "
-                    + eurekaApplicationInstance.getMetadata().get("management.url") + "/env");
-            ResponseEntity<String> env = restTemplate.exchange(URI.create(
-                eurekaApplicationInstance.getMetadata().get("management.url") + "/env"),
-                HttpMethod.GET,
-                new HttpEntity<>(httpHeaders), String.class);
-            String envBody = env.getBody();
-
-            //logger().debug("Env = " + envBody);
-
-            Env env1 = new Env();
-
-            JSONObject envJsonObject = (JSONObject) jsonParser.parse(envBody);
-            JSONArray activeProfilesJsonObject = (JSONArray) envJsonObject.get("activeProfiles");
-            env1.setActiveProfiles(
-                (String[]) activeProfilesJsonObject.stream().map(Object::toString)
-                    .toArray(String[]::new));
-            JSONArray propertySourcesJsonObject = (JSONArray) envJsonObject.get("propertySources");
-            env1.setPropertySources((PropertySource[]) propertySourcesJsonObject.stream().map(o -> {
-                PropertySource propertySource = new PropertySource();
-                JSONObject propertySourceJsonObject = (JSONObject) o;
-                propertySource.setName(propertySourceJsonObject.get("name").toString());
-                propertySource.setProperties(new HashMap<>());
-                JSONObject properties = (JSONObject) propertySourceJsonObject.get("properties");
-                properties.forEach((o1, o2) -> {
-                    Property property = new Property();
-                    JSONObject propertyJsonObject = (JSONObject) o2;
-                    if (propertyJsonObject.get("value") != null) {
-                        property.setValue(propertyJsonObject.get("value").toString());
-                    }
-                    if (propertyJsonObject.get("origin") != null) {
-                        property.setOrigin(propertyJsonObject.get("origin").toString());
-                    }
-                    propertySource.getProperties().put(o1.toString(), property);
-                });
-                return propertySource;
-            }).toArray(PropertySource[]::new));
-
-            envRows.removeAll();
-
-            List<ListDataProvider<Property>> dataProviders = new ArrayList<>();
-
-            TextField filterTextField = new TextField();
-            filterTextField.setLabel(getTranslation("element." + I18N_PREFIX + "filter"));
-            filterTextField.addValueChangeListener(
-                event -> dataProviders.forEach(dataProvider -> dataProvider.addFilter(
-                    data ->
-                        StringUtils.containsIgnoreCase(data.getName(), filterTextField.getValue())
-                            || StringUtils
-                            .containsIgnoreCase(data.getValue(), filterTextField.getValue()))));
-            filterTextField.setValueChangeMode(ValueChangeMode.EAGER);
-
-            envRows.add(filterTextField);
-
-            for (PropertySource propertySource : env1.getPropertySources()) {
-                envRows.add(UIUtils.createH5Label(propertySource.getName()));
-
-                Grid<Property> gridProperty = new Grid();
-                ListDataProvider<Property> listDataProvider = new ListDataProvider<>(
-                    propertySource.getPropertyList());
-                dataProviders.add(listDataProvider);
-
-                gridProperty.setDataProvider(listDataProvider);
-
-                Column propertyColumn = gridProperty.addColumn(Property::getName).setWidth("150px")
-                    .setKey("property");
-                Column valueColumn = gridProperty.addColumn(Property::getValue).setAutoWidth(true)
-                    .setKey("value");
-
-                gridProperty.getColumns().forEach(column -> {
-                    if (column.getKey() != null) {
-                        column
-                            .setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-                        column.setResizable(true);
-                    }
-                });
-
-                beansGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-
-                envRows.add(gridProperty);
-            }
-            //ogger().debug("Env Converted = " + env1);
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    protected Component getBeans() {
-        beansGrid = new Grid<>();
-        beansGrid.setWidthFull();
-        beanListDataProvider = new ListDataProvider<>(Collections.emptyList());
-        beansGrid.setDataProvider(beanListDataProvider);
-
-        Column prefixColumn = beansGrid.addColumn(Bean::getPrefix).setWidth("150px")
-            .setKey("prefix");
-        Column propertiesColumn = beansGrid.addComponentColumn(BeanComponent::new)
-            .setAutoWidth(true)
-            .setKey("properties");
-
-        beansGrid.getColumns().forEach(column -> {
-            if (column.getKey() != null) {
-                column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-                column.setResizable(true);
-            }
+        beansJsonObject.forEach((o, o2) -> {
+          Bean beanObj = new Bean();
+          beanObj.setPrefix(((JSONObject) o2).get("prefix").toString());
+          try {
+            beanObj.setProperties(objectMapper
+                .readValue(((JSONObject) o2).get("properties").toString(),
+                    new TypeReference<>() {
+                    }));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          contextObj.getBeans().put(o.toString(), beanObj);
         });
+        contextsObj.getContexts().put(key.toString(), contextObj);
+      });
 
-        HeaderRow filterRow = beansGrid.appendHeaderRow();
+      //logger().debug("Config Props Converted = " + configPropsObj);
+      beanListDataProvider = new ListDataProvider<>(configPropsObj.getBeans());
+      beansGrid.setDataProvider(beanListDataProvider);
 
-        TextField prefixFilter = new TextField();
-        prefixFilter.addValueChangeListener(event -> beanListDataProvider.addFilter(
-            data -> StringUtils.containsIgnoreCase(data.getPrefix(),
-                prefixFilter.getValue())));
+      logger().debug(
+          "Application : " + eurekaApplication.getName() + ", Env Url = "
+              + eurekaApplicationInstance.getMetadata().get("management.url") + "/env");
+      ResponseEntity<String> env = restTemplate.exchange(URI.create(
+          eurekaApplicationInstance.getMetadata().get("management.url") + "/env"),
+          HttpMethod.GET,
+          new HttpEntity<>(httpHeaders), String.class);
+      String envBody = env.getBody();
 
-        prefixFilter.setValueChangeMode(ValueChangeMode.EAGER);
+      //logger().debug("Env = " + envBody);
 
-        filterRow.getCell(prefixColumn).setComponent(prefixFilter);
-        prefixFilter.setSizeFull();
-        prefixFilter.setPlaceholder("Filter");
+      Env env1 = new Env();
 
-        TextField propertiesFilter = new TextField();
-        propertiesFilter.addValueChangeListener(event -> beanListDataProvider
-            .addFilter(data -> StringUtils.containsIgnoreCase(
-                StringUtils.join(data.getProperties()), propertiesFilter.getValue())));
+      JSONObject envJsonObject = (JSONObject) jsonParser.parse(envBody);
+      JSONArray activeProfilesJsonObject = (JSONArray) envJsonObject.get("activeProfiles");
+      env1.setActiveProfiles(
+          (String[]) activeProfilesJsonObject.stream().map(Object::toString)
+              .toArray(String[]::new));
+      JSONArray propertySourcesJsonObject = (JSONArray) envJsonObject.get("propertySources");
+      env1.setPropertySources((PropertySource[]) propertySourcesJsonObject.stream().map(o -> {
+        PropertySource propertySource = new PropertySource();
+        JSONObject propertySourceJsonObject = (JSONObject) o;
+        propertySource.setName(propertySourceJsonObject.get("name").toString());
+        propertySource.setProperties(new HashMap<>());
+        JSONObject properties = (JSONObject) propertySourceJsonObject.get("properties");
+        properties.forEach((o1, o2) -> {
+          Property property = new Property();
+          JSONObject propertyJsonObject = (JSONObject) o2;
+          if (propertyJsonObject.get("value") != null) {
+            property.setValue(propertyJsonObject.get("value").toString());
+          }
+          if (propertyJsonObject.get("origin") != null) {
+            property.setOrigin(propertyJsonObject.get("origin").toString());
+          }
+          propertySource.getProperties().put(o1.toString(), property);
+        });
+        return propertySource;
+      }).toArray(PropertySource[]::new));
 
-        propertiesFilter.setValueChangeMode(ValueChangeMode.EAGER);
+      envRows.removeAll();
 
-        filterRow.getCell(propertiesColumn).setComponent(propertiesFilter);
-        propertiesFilter.setSizeFull();
-        propertiesFilter.setPlaceholder("Filter");
+      List<ListDataProvider<Property>> dataProviders = new ArrayList<>();
+
+      TextField filterTextField = new TextField();
+      filterTextField.setLabel(getTranslation("element." + I18N_PREFIX + "filter"));
+      filterTextField.addValueChangeListener(
+          event -> dataProviders.forEach(dataProvider -> dataProvider.addFilter(
+              data ->
+                  StringUtils.containsIgnoreCase(data.getName(), filterTextField.getValue())
+                      || StringUtils
+                      .containsIgnoreCase(data.getValue(), filterTextField.getValue()))));
+      filterTextField.setValueChangeMode(ValueChangeMode.EAGER);
+
+      envRows.add(filterTextField);
+
+      for (PropertySource propertySource : env1.getPropertySources()) {
+        envRows.add(UIUtils.createH5Label(propertySource.getName()));
+
+        Grid<Property> gridProperty = new Grid();
+        ListDataProvider<Property> listDataProvider = new ListDataProvider<>(
+            propertySource.getPropertyList());
+        dataProviders.add(listDataProvider);
+
+        gridProperty.setDataProvider(listDataProvider);
+
+        Column propertyColumn = gridProperty.addColumn(Property::getName).setWidth("150px")
+            .setKey("property");
+        Column valueColumn = gridProperty.addColumn(Property::getValue).setAutoWidth(true)
+            .setKey("value");
+
+        gridProperty.getColumns().forEach(column -> {
+          if (column.getKey() != null) {
+            column
+                .setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+            column.setResizable(true);
+          }
+        });
 
         beansGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
 
-        return beansGrid;
+        envRows.add(gridProperty);
+      }
+      //ogger().debug("Env Converted = " + env1);
+
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
+  }
 
-    protected Component getEnv() {
-        envRows = new FlexBoxLayout();
-        envRows.setFlexDirection(FlexDirection.COLUMN);
-        envRows.setWidthFull();
+  protected Component getBeans() {
+    beansGrid = new Grid<>();
+    beansGrid.setWidthFull();
+    beanListDataProvider = new ListDataProvider<>(Collections.emptyList());
+    beansGrid.setDataProvider(beanListDataProvider);
 
-        return envRows;
-    }
+    Column prefixColumn = beansGrid.addColumn(Bean::getPrefix).setWidth("150px")
+        .setKey("prefix");
+    Column propertiesColumn = beansGrid.addComponentColumn(BeanComponent::new)
+        .setAutoWidth(true)
+        .setKey("properties");
 
-    public static class BeanComponent extends Div {
+    beansGrid.getColumns().forEach(column -> {
+      if (column.getKey() != null) {
+        column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+        column.setResizable(true);
+      }
+    });
 
-        public BeanComponent(Bean bean) {
-            FlexBoxLayout rows = new FlexBoxLayout();
-            rows.setFlexDirection(FlexDirection.COLUMN);
-            rows.setWidthFull();
+    HeaderRow filterRow = beansGrid.appendHeaderRow();
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            bean.getProperties().keySet().forEach(s -> {
-                FlexBoxLayout row = new FlexBoxLayout();
-                row.setFlexDirection(FlexDirection.ROW);
-                row.setJustifyContentMode(JustifyContentMode.BETWEEN);
-                Label label = UIUtils.createH5Label(s);
-                label.setWidth("33%");
-                row.add(label);
+    TextField prefixFilter = new TextField();
+    prefixFilter.addValueChangeListener(event -> beanListDataProvider.addFilter(
+        data -> StringUtils.containsIgnoreCase(data.getPrefix(),
+            prefixFilter.getValue())));
 
-                String v = gson.toJson(bean.getProperties().get(s));
-                if (v.split("\n").length > 1) {
-                    TextArea val = new TextArea();
-                    val.setReadOnly(true);
-                    val.setWidth("66%");
-                    val.setValue(v);
-                    row.add(val);
+    prefixFilter.setValueChangeMode(ValueChangeMode.EAGER);
 
-                    row.setFlex("1", val);
-                } else {
-                    TextField val = new TextField();
-                    val.setReadOnly(true);
-                    val.setWidth("66%");
-                    val.setValue(v);
-                    row.add(val);
+    filterRow.getCell(prefixColumn).setComponent(prefixFilter);
+    prefixFilter.setSizeFull();
+    prefixFilter.setPlaceholder("Filter");
 
-                    row.setFlex("1", val);
-                }
-                rows.add(row);
-            });
+    TextField propertiesFilter = new TextField();
+    propertiesFilter.addValueChangeListener(event -> beanListDataProvider
+        .addFilter(data -> StringUtils.containsIgnoreCase(
+            StringUtils.join(data.getProperties()), propertiesFilter.getValue())));
 
-            add(rows);
+    propertiesFilter.setValueChangeMode(ValueChangeMode.EAGER);
+
+    filterRow.getCell(propertiesColumn).setComponent(propertiesFilter);
+    propertiesFilter.setSizeFull();
+    propertiesFilter.setPlaceholder("Filter");
+
+    beansGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+    return beansGrid;
+  }
+
+  protected Component getEnv() {
+    envRows = new FlexBoxLayout();
+    envRows.setFlexDirection(FlexDirection.COLUMN);
+    envRows.setWidthFull();
+
+    return envRows;
+  }
+
+  public static class BeanComponent extends Div {
+
+    public BeanComponent(Bean bean) {
+      FlexBoxLayout rows = new FlexBoxLayout();
+      rows.setFlexDirection(FlexDirection.COLUMN);
+      rows.setWidthFull();
+
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      bean.getProperties().keySet().forEach(s -> {
+        FlexBoxLayout row = new FlexBoxLayout();
+        row.setFlexDirection(FlexDirection.ROW);
+        row.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        Label label = UIUtils.createH5Label(s);
+        label.setWidth("33%");
+        row.add(label);
+
+        String v = gson.toJson(bean.getProperties().get(s));
+        if (v.split("\n").length > 1) {
+          TextArea val = new TextArea();
+          val.setReadOnly(true);
+          val.setWidth("66%");
+          val.setValue(v);
+          row.add(val);
+
+          row.setFlex("1", val);
+        } else {
+          TextField val = new TextField();
+          val.setReadOnly(true);
+          val.setWidth("66%");
+          val.setValue(v);
+          row.add(val);
+
+          row.setFlex("1", val);
         }
+        rows.add(row);
+      });
+
+      add(rows);
     }
+  }
 }

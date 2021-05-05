@@ -24,15 +24,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper=false)
 public class CropEvent extends ComponentEvent<Croppie> {
 
-    private CropPoints points;
-    private float zoom;
+  private CropPoints points;
+  private float zoom;
 
-    public CropEvent(Croppie source, boolean fromClient, CropPoints points, float zoom) {
-        super(source, fromClient);
-        this.points = points;
-        this.zoom = zoom;
-    }
+  public CropEvent(Croppie source, boolean fromClient, CropPoints points, float zoom) {
+    super(source, fromClient);
+    this.points = points;
+    this.zoom = zoom;
+  }
 }

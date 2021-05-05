@@ -32,20 +32,20 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class BaseServices {
 
-    public static GooglePlaceSearchService getGooglePlaceSearchService() {
-        return getApplicationContext().getBean(GooglePlaceSearchService.class);
-    }
+  public static GooglePlaceSearchService getGooglePlaceSearchService() {
+    return getApplicationContext().getBean(GooglePlaceSearchService.class);
+  }
 
-    public static ResourceService getResourceService() {
-        return getApplicationContext().getBean(ResourceService.class);
-    }
+  public static ResourceService getResourceService() {
+    return getApplicationContext().getBean(ResourceService.class);
+  }
 
-    public static AuthService getAuthService() {
-        return getApplicationContext().getBean(AuthService.class);
-    }
+  public static AuthService getAuthService() {
+    return getApplicationContext().getBean(AuthService.class);
+  }
 
-    public static ApplicationContext getApplicationContext() {
-        ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
-        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-    }
+  public static ApplicationContext getApplicationContext() {
+    ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
+    return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+  }
 }

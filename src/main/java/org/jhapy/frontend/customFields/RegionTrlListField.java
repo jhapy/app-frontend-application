@@ -48,99 +48,99 @@ public abstract class RegionTrlListField extends
     DefaultCustomListField<RegionTrl> implements
     Serializable {
 
-    public RegionTrlListField() {
-        super("regionTrl.");
+  public RegionTrlListField() {
+    super("regionTrl.");
 
-        dataProvider = new MyBackend();
+    dataProvider = new MyBackend();
 
-        add(initContent());
+    add(initContent());
 
-        getElement().setAttribute("colspan", "2");
+    getElement().setAttribute("colspan", "2");
+  }
+
+  public void setReadOnly(boolean readOnly) {
+    super.setReadOnly(readOnly);
+    if (gridCrud != null) {
+      gridCrud.getGrid().setEnabled(!readOnly);
+      newButton.setEnabled(!readOnly);
+      editColumn.setVisible(!readOnly);
     }
+  }
 
-    public void setReadOnly(boolean readOnly) {
-        super.setReadOnly(readOnly);
-        if (gridCrud != null) {
-            gridCrud.getGrid().setEnabled(!readOnly);
-            newButton.setEnabled(!readOnly);
-            editColumn.setVisible(!readOnly);
-        }
+  protected Component initContent() {
+    Grid<RegionTrl> grid = new Grid<>();
+
+    gridCrud = new Crud<>(RegionTrl.class, grid, createInterfaceTrlEditor());
+    gridCrud.setMinHeight("300px");
+    gridCrud.setWidth("100%");
+    gridCrud.setI18n(createI18n());
+    gridCrud.getGrid().setEnabled(false);
+    gridCrud.setDataProvider(dataProvider);
+    gridCrud.addSaveListener(e -> {
+      if (e.getItem().getId() == null) {
+        dataProvider.getValues().add(e.getItem());
+      }
+    });
+    gridCrud.addDeleteListener(e -> dataProvider.getValues().remove(e.getItem()));
+
+    editColumn = grid.addColumn(TemplateRenderer.of(createEditColumnTemplate("Edit")))
+        .setKey("vaadin-crud-edit-column").setWidth("4em").setFlexGrow(0);
+
+    grid.addColumn(RegionTrl::getName)
+        .setHeader(getTranslation("element." + i18nPrefix + "name"));
+    grid.addColumn(new TextRenderer<>(
+        row -> row.getIso3Language() == null ? "" : row.getIso3Language()))
+        .setHeader(getTranslation("element." + i18nPrefix + "language"));
+
+    newButton = new Button(getTranslation("action.global.addButton"));
+    newButton.getElement().setAttribute("theme", "primary");
+    newButton
+        .addClickListener(
+            event -> gridCrud.getElement().executeJs("$0.__openEditor($1)", gridCrud, "'new'"));
+    gridCrud.setToolbar(newButton);
+
+    newButton.setEnabled(false);
+    editColumn.setVisible(false);
+
+    return gridCrud;
+  }
+
+  protected CrudEditor<RegionTrl> createInterfaceTrlEditor() {
+    TextField value = new TextField(getTranslation("element." + i18nPrefix + "value"));
+
+    ComboBox<Locale> language = new ComboBox<>(
+        getTranslation("element." + i18nPrefix + "language"),
+        MyI18NProvider.getAvailableLanguages(getLocale()));
+    language.setItemLabelGenerator(Locale::getDisplayLanguage);
+
+    FormLayout form = new FormLayout(value, language);
+
+    Binder<RegionTrl> binder = new BeanValidationBinder<>(RegionTrl.class);
+    binder.forField(value).asRequired()
+        .bind(RegionTrl::getName, RegionTrl::setName);
+    binder.forField(language).asRequired()
+        .bind((regionTrl) -> regionTrl.getIso3Language() == null ? null
+                : new Locale(regionTrl.getIso3Language()),
+            (regionTrl, locale) -> regionTrl.setIso3Language(locale.getLanguage()));
+
+    return new BinderCrudEditor<>(binder, form);
+  }
+
+  class MyBackend extends Backend {
+
+    public void setValues(Collection<RegionTrl> regionTrls) {
+      if (regionTrls != null) {
+        regionTrls.forEach(
+            regionTrl -> {
+              RegionTrl _regionTrl = ReferenceServices.getRegionTrlService()
+                  .getById(new GetByIdQuery(regionTrl.getId())).getData();
+              if (_regionTrl != null) {
+                fieldsMap.add(_regionTrl);
+              }
+            });
+      }
     }
-
-    protected Component initContent() {
-        Grid<RegionTrl> grid = new Grid<>();
-
-        gridCrud = new Crud<>(RegionTrl.class, grid, createInterfaceTrlEditor());
-        gridCrud.setMinHeight("300px");
-        gridCrud.setWidth("100%");
-        gridCrud.setI18n(createI18n());
-        gridCrud.getGrid().setEnabled(false);
-        gridCrud.setDataProvider(dataProvider);
-        gridCrud.addSaveListener(e -> {
-            if (e.getItem().getId() == null) {
-                dataProvider.getValues().add(e.getItem());
-            }
-        });
-        gridCrud.addDeleteListener(e -> dataProvider.getValues().remove(e.getItem()));
-
-        editColumn = grid.addColumn(TemplateRenderer.of(createEditColumnTemplate("Edit")))
-            .setKey("vaadin-crud-edit-column").setWidth("4em").setFlexGrow(0);
-
-        grid.addColumn(RegionTrl::getName)
-            .setHeader(getTranslation("element." + i18nPrefix + "name"));
-        grid.addColumn(new TextRenderer<>(
-            row -> row.getIso3Language() == null ? "" : row.getIso3Language()))
-            .setHeader(getTranslation("element." + i18nPrefix + "language"));
-
-        newButton = new Button(getTranslation("action.global.addButton"));
-        newButton.getElement().setAttribute("theme", "primary");
-        newButton
-            .addClickListener(
-                event -> gridCrud.getElement().executeJs("$0.__openEditor($1)", gridCrud, "'new'"));
-        gridCrud.setToolbar(newButton);
-
-        newButton.setEnabled(false);
-        editColumn.setVisible(false);
-
-        return gridCrud;
-    }
-
-    protected CrudEditor<RegionTrl> createInterfaceTrlEditor() {
-        TextField value = new TextField(getTranslation("element." + i18nPrefix + "value"));
-
-        ComboBox<Locale> language = new ComboBox<>(
-            getTranslation("element." + i18nPrefix + "language"),
-            MyI18NProvider.getAvailableLanguages(getLocale()));
-        language.setItemLabelGenerator(Locale::getDisplayLanguage);
-
-        FormLayout form = new FormLayout(value, language);
-
-        Binder<RegionTrl> binder = new BeanValidationBinder<>(RegionTrl.class);
-        binder.forField(value).asRequired()
-            .bind(RegionTrl::getName, RegionTrl::setName);
-        binder.forField(language).asRequired()
-            .bind((regionTrl) -> regionTrl.getIso3Language() == null ? null
-                    : new Locale(regionTrl.getIso3Language()),
-                (regionTrl, locale) -> regionTrl.setIso3Language(locale.getLanguage()));
-
-        return new BinderCrudEditor<>(binder, form);
-    }
-
-    class MyBackend extends Backend {
-
-        public void setValues(Collection<RegionTrl> regionTrls) {
-            if (regionTrls != null) {
-                regionTrls.forEach(
-                    regionTrl -> {
-                        RegionTrl _regionTrl = ReferenceServices.getRegionTrlService()
-                            .getById(new GetByIdQuery(regionTrl.getId())).getData();
-                        if (_regionTrl != null) {
-                            fieldsMap.add(_regionTrl);
-                        }
-                    });
-            }
-        }
-    }
+  }
 }
 
 

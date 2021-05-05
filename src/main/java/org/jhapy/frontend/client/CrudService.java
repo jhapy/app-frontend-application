@@ -28,15 +28,15 @@ import org.jhapy.dto.domain.BaseEntity;
  */
 public interface CrudService<T extends BaseEntity> {
 
-    T save(T entity);
+  T save(T entity);
 
-    void delete(T entity);
+  void delete(T entity);
 
-    void delete(long id);
+  void delete(long id);
 
-    long count();
+  long count();
 
-    T load(long id);
+  T load(long id);
 
-    Iterable<T> findAll();
+  Iterable<T> findAll();
 }

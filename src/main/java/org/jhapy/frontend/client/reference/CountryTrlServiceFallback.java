@@ -35,31 +35,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class CountryTrlServiceFallback implements CountryTrlService, HasLogger {
 
-    @Override
-    public ServiceResult<CountryTrl> getCountryTrl(GetCountryTrlQuery query) {
-        logger().error(getLoggerPrefix("getCountryTrl") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<CountryTrl> getCountryTrl(GetCountryTrlQuery query) {
+    logger().error(getLoggerPrefix("getCountryTrl") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<CountryTrl> getById(GetByIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<CountryTrl> getById(GetByIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<CountryTrl> save(SaveQuery<CountryTrl> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<CountryTrl> save(SaveQuery<CountryTrl> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<Void> delete(DeleteByIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

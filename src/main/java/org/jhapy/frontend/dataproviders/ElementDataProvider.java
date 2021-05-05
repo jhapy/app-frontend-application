@@ -41,32 +41,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ElementDataProvider extends DefaultDataProvider<Element, DefaultFilter> implements
     Serializable {
 
-    @Autowired
-    public ElementDataProvider() {
-        super(AppConst.DEFAULT_SORT_DIRECTION,
-            AppConst.DEFAULT_SORT_FIELDS);
-    }
+  @Autowired
+  public ElementDataProvider() {
+    super(AppConst.DEFAULT_SORT_DIRECTION,
+        AppConst.DEFAULT_SORT_FIELDS);
+  }
 
-    @Override
-    protected Page<Element> fetchFromBackEnd(Query<Element, DefaultFilter> query,
-        Pageable pageable) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        Page<Element> page = I18NServices.getElementService()
-            .findAnyMatching(
-                new FindAnyMatchingQuery(filter.getFilter(), filter.isShowInactive(), pageable))
-            .getData();
-        if (getPageObserver() != null) {
-            getPageObserver().accept(page);
-        }
-        return page;
+  @Override
+  protected Page<Element> fetchFromBackEnd(Query<Element, DefaultFilter> query,
+      Pageable pageable) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    Page<Element> page = I18NServices.getElementService()
+        .findAnyMatching(
+            new FindAnyMatchingQuery(filter.getFilter(), filter.isShowInactive(), pageable))
+        .getData();
+    if (getPageObserver() != null) {
+      getPageObserver().accept(page);
     }
+    return page;
+  }
 
 
-    @Override
-    protected int sizeInBackEnd(Query<Element, DefaultFilter> query) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        return I18NServices.getElementService()
-            .countAnyMatching(new CountAnyMatchingQuery(filter.getFilter(),
-                filter.isShowInactive())).getData().intValue();
-    }
+  @Override
+  protected int sizeInBackEnd(Query<Element, DefaultFilter> query) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    return I18NServices.getElementService()
+        .countAnyMatching(new CountAnyMatchingQuery(filter.getFilter(),
+            filter.isShowInactive())).getData().intValue();
+  }
 }

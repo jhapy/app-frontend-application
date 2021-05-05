@@ -48,86 +48,86 @@ import org.springframework.security.access.annotation.Secured;
 public class SecurityRolesView extends
     DefaultMasterDetailsView<SecurityRole, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-    public SecurityRolesView(MyI18NProvider myI18NProvider) {
-        super("securityRole.", SecurityRole.class, new SecurityRoleDataProvider(),
-            (e) -> SecurityServices.getSecurityRoleService().save(new SaveQuery<>(e)),
-            e -> SecurityServices.getSecurityRoleService()
-                .delete(new DeleteByStrIdQuery(e.getId())),
-            myI18NProvider);
-    }
+  public SecurityRolesView(MyI18NProvider myI18NProvider) {
+    super("securityRole.", SecurityRole.class, new SecurityRoleDataProvider(),
+        (e) -> SecurityServices.getSecurityRoleService().save(new SaveQuery<>(e)),
+        e -> SecurityServices.getSecurityRoleService()
+            .delete(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
+  }
 
-    protected Grid createGrid() {
-        grid = new Grid<>();
-        grid.setSelectionMode(SelectionMode.SINGLE);
+  protected Grid createGrid() {
+    grid = new Grid<>();
+    grid.setSelectionMode(SelectionMode.SINGLE);
 
-        grid.addSelectionListener(event -> event.getFirstSelectedItem()
-            .ifPresent(this::showDetails));
+    grid.addSelectionListener(event -> event.getFirstSelectedItem()
+        .ifPresent(this::showDetails));
 
-        grid.setDataProvider(dataProvider);
-        grid.setHeight("100%");
+    grid.setDataProvider(dataProvider);
+    grid.setHeight("100%");
 
-        grid.addColumn(SecurityRole::getName).setKey("name");
-        grid.addColumn(new BooleanOkRenderer<>(SecurityRole::getCanLogin)).setKey("canLogin");
+    grid.addColumn(SecurityRole::getName).setKey("name");
+    grid.addColumn(new BooleanOkRenderer<>(SecurityRole::getCanLogin)).setKey("canLogin");
 
-        grid.getColumns().forEach(column -> {
-            if (column.getKey() != null) {
-                column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-                column.setResizable(true);
-            }
-        });
-        return grid;
-    }
+    grid.getColumns().forEach(column -> {
+      if (column.getKey() != null) {
+        column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+        column.setResizable(true);
+      }
+    });
+    return grid;
+  }
 
-    protected Component createDetails(SecurityRole securityRole) {
-        boolean isNew = securityRole.getId() == null;
-        detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
-            : getTranslation("element.global.update") + " : " + securityRole.getName());
+  protected Component createDetails(SecurityRole securityRole) {
+    boolean isNew = securityRole.getId() == null;
+    detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
+        : getTranslation("element.global.update") + " : " + securityRole.getName());
 
-        detailsDrawerFooter.setDeleteButtonVisible(!isNew);
+    detailsDrawerFooter.setDeleteButtonVisible(!isNew);
 
-        TextField name = new TextField();
-        name.setWidth("100%");
+    TextField name = new TextField();
+    name.setWidth("100%");
 
-        TextField description = new TextField();
-        description.setWidth("100%");
+    TextField description = new TextField();
+    description.setWidth("100%");
 
-        Checkbox canLogin = new Checkbox();
+    Checkbox canLogin = new Checkbox();
 
-        Checkbox isActive = new Checkbox();
+    Checkbox isActive = new Checkbox();
 
-        // Form layout
-        FormLayout editingForm = new FormLayout();
-        editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
-            LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
-        editingForm.setResponsiveSteps(
-            new FormLayout.ResponsiveStep("0", 1,
-                FormLayout.ResponsiveStep.LabelsPosition.TOP),
-            new FormLayout.ResponsiveStep("26em", 2,
-                FormLayout.ResponsiveStep.LabelsPosition.TOP));
-        FormLayout.FormItem nameItem = editingForm
-            .addFormItem(name, getTranslation("element." + I18N_PREFIX + "name"));
-        editingForm
-            .addFormItem(description, getTranslation("element." + I18N_PREFIX + "description"));
-        editingForm.addFormItem(canLogin, getTranslation("element." + I18N_PREFIX + "canLogin"));
-        FormLayout.FormItem isActiveItem = editingForm
-            .addFormItem(isActive, getTranslation("element." + I18N_PREFIX + "isActive"));
+    // Form layout
+    FormLayout editingForm = new FormLayout();
+    editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
+        LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+    editingForm.setResponsiveSteps(
+        new FormLayout.ResponsiveStep("0", 1,
+            FormLayout.ResponsiveStep.LabelsPosition.TOP),
+        new FormLayout.ResponsiveStep("26em", 2,
+            FormLayout.ResponsiveStep.LabelsPosition.TOP));
+    FormLayout.FormItem nameItem = editingForm
+        .addFormItem(name, getTranslation("element." + I18N_PREFIX + "name"));
+    editingForm
+        .addFormItem(description, getTranslation("element." + I18N_PREFIX + "description"));
+    editingForm.addFormItem(canLogin, getTranslation("element." + I18N_PREFIX + "canLogin"));
+    FormLayout.FormItem isActiveItem = editingForm
+        .addFormItem(isActive, getTranslation("element." + I18N_PREFIX + "isActive"));
 
-        UIUtils.setColSpan(2, nameItem);
+    UIUtils.setColSpan(2, nameItem);
 
-        binder.setBean(securityRole);
+    binder.setBean(securityRole);
 
-        binder.bind(name, SecurityRole::getName, SecurityRole::setName);
-        binder.bind(description, SecurityRole::getDescription, SecurityRole::setDescription);
-        binder.bind(canLogin, SecurityRole::getCanLogin, SecurityRole::setCanLogin);
-        binder.bind(isActive, SecurityRole::getIsActive, SecurityRole::setIsActive);
+    binder.bind(name, SecurityRole::getName, SecurityRole::setName);
+    binder.bind(description, SecurityRole::getDescription, SecurityRole::setDescription);
+    binder.bind(canLogin, SecurityRole::getCanLogin, SecurityRole::setCanLogin);
+    binder.bind(isActive, SecurityRole::getIsActive, SecurityRole::setIsActive);
 
-        return editingForm;
-    }
+    return editingForm;
+  }
 
-    protected void filter(String filter) {
-        dataProvider
-            .setFilter(new DefaultFilter(
-                StringUtils.isBlank(filter) ? null : "*" + filter + "*",
-                Boolean.TRUE));
-    }
+  protected void filter(String filter) {
+    dataProvider
+        .setFilter(new DefaultFilter(
+            StringUtils.isBlank(filter) ? null : "*" + filter + "*",
+            Boolean.TRUE));
+  }
 }

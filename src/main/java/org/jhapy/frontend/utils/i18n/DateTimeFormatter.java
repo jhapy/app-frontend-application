@@ -34,49 +34,49 @@ import java.util.Locale;
  */
 public class DateTimeFormatter {
 
-    public static String formatNoYear(LocalDate localDate, Locale currentLocal) {
-        if (localDate == null) {
-            return "";
-        } else {
-            return localDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM"));
-        }
+  public static String formatNoYear(LocalDate localDate, Locale currentLocal) {
+    if (localDate == null) {
+      return "";
+    } else {
+      return localDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM"));
     }
+  }
 
-    public static String format(LocalDate localDate, Locale currentLocal) {
-        if (localDate == null) {
-            return "";
-        } else {
-            return java.time.format.DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-                .withLocale(currentLocal).format(localDate);
-        }
+  public static String format(LocalDate localDate, Locale currentLocal) {
+    if (localDate == null) {
+      return "";
+    } else {
+      return java.time.format.DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+          .withLocale(currentLocal).format(localDate);
     }
+  }
 
-    public static String format(LocalDateTime localDateTime, Locale currentLocal) {
-        if (localDateTime == null) {
-            return "";
-        } else {
-            return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,
-                FormatStyle.MEDIUM).withLocale(currentLocal).format(localDateTime);
-        }
+  public static String format(LocalDateTime localDateTime, Locale currentLocal) {
+    if (localDateTime == null) {
+      return "";
+    } else {
+      return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,
+          FormatStyle.MEDIUM).withLocale(currentLocal).format(localDateTime);
     }
+  }
 
-    public static String format(Instant instant, Locale currentLocal) {
-        if (instant == null) {
-            return "";
-        } else {
-            return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,
-                FormatStyle.MEDIUM).withLocale(currentLocal).format(LocalDateTime
-                .ofInstant(instant, ZoneOffset.systemDefault()));
-        }
+  public static String format(Instant instant, Locale currentLocal) {
+    if (instant == null) {
+      return "";
+    } else {
+      return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,
+          FormatStyle.MEDIUM).withLocale(currentLocal).format(LocalDateTime
+          .ofInstant(instant, ZoneOffset.systemDefault()));
     }
+  }
 
-    public static String format(Date date, Locale currentLocal) {
-        if (date == null) {
-            return "";
-        } else {
-            return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-                .withLocale(currentLocal)
-                .withZone(ZoneId.systemDefault()).format(date.toInstant());
-        }
+  public static String format(Date date, Locale currentLocal) {
+    if (date == null) {
+      return "";
+    } else {
+      return java.time.format.DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+          .withLocale(currentLocal)
+          .withZone(ZoneId.systemDefault()).format(date.toInstant());
     }
+  }
 }

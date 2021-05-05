@@ -57,7 +57,6 @@ import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
-import org.jhapy.frontend.views.JHapyMainView;
 import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 
@@ -72,179 +71,179 @@ import org.springframework.security.access.annotation.Secured;
 public class MailTemplateAdminView extends ViewFrame implements RouterLayout, HasLogger,
     HasUrlParameter<String> {
 
-    private final Binder<MailTemplate> binder = new Binder<>();
-    private MailTemplate mailTemplate;
-    private DefaultDataProvider<MailTemplate, DefaultFilter> securityUserDataProvider;
-    private Registration contextIconRegistration = null;
+  private final Binder<MailTemplate> binder = new Binder<>();
+  private MailTemplate mailTemplate;
+  private DefaultDataProvider<MailTemplate, DefaultFilter> securityUserDataProvider;
+  private Registration contextIconRegistration = null;
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
 
-        AppBar appBar = initAppBar();
-        String title = mailTemplate == null ? "" : mailTemplate.getName();
-        appBar.setTitle(title);
+    AppBar appBar = initAppBar();
+    String title = mailTemplate == null ? "" : mailTemplate.getName();
+    appBar.setTitle(title);
 
-        setViewContent(createContent());
-        setViewFooter(getFooter());
+    setViewContent(createContent());
+    setViewFooter(getFooter());
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    if (contextIconRegistration != null) {
+      contextIconRegistration.remove();
     }
+  }
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        if (contextIconRegistration != null) {
-            contextIconRegistration.remove();
-        }
+  private AppBar initAppBar() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
+    if (contextIconRegistration == null) {
+      contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
     }
+    return appBar;
+  }
 
-    private AppBar initAppBar() {
-        AppBar appBar = JHapyMainView3.get().getAppBar();
-        appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-        if (contextIconRegistration == null) {
-            contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
-        }
-        return appBar;
-    }
+  protected Component getFooter() {
+    Button saveButton = new Button(getTranslation("action.global.saveButton"));
+    saveButton.addClickListener(event -> save());
 
-    protected Component getFooter() {
-        Button saveButton = new Button(getTranslation("action.global.saveButton"));
-        saveButton.addClickListener(event -> save());
+    Button cancelButton = new Button(getTranslation("action.global.cancelButton"));
+    cancelButton.addClickListener(event -> cancel());
 
-        Button cancelButton = new Button(getTranslation("action.global.cancelButton"));
-        cancelButton.addClickListener(event -> cancel());
+    HorizontalLayout footer = new HorizontalLayout(saveButton, cancelButton);
+    footer.setPadding(true);
+    footer.setSpacing(true);
 
-        HorizontalLayout footer = new HorizontalLayout(saveButton, cancelButton);
-        footer.setPadding(true);
-        footer.setSpacing(true);
+    return footer;
+  }
 
-        return footer;
-    }
+  private Component createContent() {
+    FlexBoxLayout content = new FlexBoxLayout(getSettingsForm());
+    content.setBoxSizing(BoxSizing.BORDER_BOX);
+    content.setHeightFull();
+    content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
+    return content;
+  }
 
-    private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout(getSettingsForm());
-        content.setBoxSizing(BoxSizing.BORDER_BOX);
-        content.setHeightFull();
-        content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
-        return content;
-    }
+  public Component getSettingsForm() {
+    FormLayout formLayout = new FormLayout();
+    formLayout.addClassNames(LumoStyles.Padding.Bottom.L,
+        LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+    formLayout.setResponsiveSteps(
+        new ResponsiveStep("26em", 1,
+            ResponsiveStep.LabelsPosition.TOP),
+        new ResponsiveStep("32em", 2,
+            ResponsiveStep.LabelsPosition.TOP));
 
-    public Component getSettingsForm() {
-        FormLayout formLayout = new FormLayout();
-        formLayout.addClassNames(LumoStyles.Padding.Bottom.L,
-            LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
-        formLayout.setResponsiveSteps(
-            new ResponsiveStep("26em", 1,
-                ResponsiveStep.LabelsPosition.TOP),
-            new ResponsiveStep("32em", 2,
-                ResponsiveStep.LabelsPosition.TOP));
+    TextField nameField = new TextField();
+    nameField.setWidthFull();
 
-        TextField nameField = new TextField();
-        nameField.setWidthFull();
+    TextField subjectField = new TextField();
+    subjectField.setWidthFull();
 
-        TextField subjectField = new TextField();
-        subjectField.setWidthFull();
+    EmailField fromField = new EmailField();
+    fromField.setWidthFull();
 
-        EmailField fromField = new EmailField();
-        fromField.setWidthFull();
+    EmailField copyToField = new EmailField();
+    copyToField.setWidthFull();
 
-        EmailField copyToField = new EmailField();
-        copyToField.setWidthFull();
+    RichTextEditor bodyField = new RichTextEditor();
+    bodyField.setWidthFull();
 
-        RichTextEditor bodyField = new RichTextEditor();
-        bodyField.setWidthFull();
+    TextField bodyAsHtml = new TextField();
+    bodyAsHtml.setVisible(false);
+    bodyField.addValueChangeListener(value -> {
+      try {
+        bodyAsHtml.setValue(bodyField.getHtmlValue());
+      } catch (Exception ignored) {
+      }
+    });
 
-        TextField bodyAsHtml = new TextField();
-        bodyAsHtml.setVisible(false);
-        bodyField.addValueChangeListener(value -> {
-            try {
-                bodyAsHtml.setValue(bodyField.getHtmlValue());
-            } catch (Exception ignored) {
-            }
-        });
+    TextField mailActionField = new TextField();
+    mailActionField.setWidthFull();
 
-        TextField mailActionField = new TextField();
-        mailActionField.setWidthFull();
+    formLayout.addFormItem(nameField, getTranslation("element.mailTemplate.name"));
+    formLayout.addFormItem(mailActionField, getTranslation("element.mailTemplate.action"));
+    formLayout.addFormItem(subjectField, getTranslation("element.mailTemplate.subject"));
+    formLayout.addFormItem(fromField, getTranslation("element.mailTemplate.from"));
+    formLayout.addFormItem(copyToField, getTranslation("element.mailTemplate.copyTo"));
 
-        formLayout.addFormItem(nameField, getTranslation("element.mailTemplate.name"));
-        formLayout.addFormItem(mailActionField, getTranslation("element.mailTemplate.action"));
-        formLayout.addFormItem(subjectField, getTranslation("element.mailTemplate.subject"));
-        formLayout.addFormItem(fromField, getTranslation("element.mailTemplate.from"));
-        formLayout.addFormItem(copyToField, getTranslation("element.mailTemplate.copyTo"));
+    FormItem bodyFieldItem = formLayout
+        .addFormItem(bodyField, getTranslation("element.mailTemplate.body"));
 
-        FormItem bodyFieldItem = formLayout
-            .addFormItem(bodyField, getTranslation("element.mailTemplate.body"));
+    UIUtils.setColSpan(2, bodyFieldItem);
 
-        UIUtils.setColSpan(2, bodyFieldItem);
+    binder.forField(nameField).asRequired(getTranslation("message.error.nameRequired"))
+        .bind(MailTemplate::getName, MailTemplate::setName);
+    binder.forField(subjectField).asRequired(getTranslation("message.error.subjectRequired"))
+        .bind(MailTemplate::getSubject, MailTemplate::setSubject);
+    binder.forField(fromField).asRequired(getTranslation("message.error.fromRequired"))
+        .bind(MailTemplate::getFrom, MailTemplate::setFrom);
+    binder.bind(copyToField, MailTemplate::getCopyTo, MailTemplate::setCopyTo);
+    binder.forField(bodyField.asHtml()).asRequired(getTranslation("message.error.bodyRequired"))
+        .bind(MailTemplate::getBody, MailTemplate::setBody);
+    binder.forField(bodyAsHtml).bind(MailTemplate::getBodyHtml, MailTemplate::setBodyHtml);
+    binder.forField(mailActionField).asRequired(getTranslation("message.error.mailAction"))
+        .bind(MailTemplate::getMailAction, MailTemplate::setMailAction);
 
-        binder.forField(nameField).asRequired(getTranslation("message.error.nameRequired"))
-            .bind(MailTemplate::getName, MailTemplate::setName);
-        binder.forField(subjectField).asRequired(getTranslation("message.error.subjectRequired"))
-            .bind(MailTemplate::getSubject, MailTemplate::setSubject);
-        binder.forField(fromField).asRequired(getTranslation("message.error.fromRequired"))
-            .bind(MailTemplate::getFrom, MailTemplate::setFrom);
-        binder.bind(copyToField, MailTemplate::getCopyTo, MailTemplate::setCopyTo);
-        binder.forField(bodyField.asHtml()).asRequired(getTranslation("message.error.bodyRequired"))
-            .bind(MailTemplate::getBody, MailTemplate::setBody);
-        binder.forField(bodyAsHtml).bind(MailTemplate::getBodyHtml, MailTemplate::setBodyHtml);
-        binder.forField(mailActionField).asRequired(getTranslation("message.error.mailAction"))
-            .bind(MailTemplate::getMailAction, MailTemplate::setMailAction);
+    Div content = new Div(formLayout);
+    content.addClassName("grid-view");
+    return content;
+  }
 
-        Div content = new Div(formLayout);
-        content.addClassName("grid-view");
-        return content;
-    }
+  protected void save() {
+    String id = binder.getBean().getId();
 
-    protected void save() {
-        String id = binder.getBean().getId();
+    boolean isNew = id == null;
 
-        boolean isNew = id == null;
-
-        if (binder.writeBeanIfValid(mailTemplate)) {
-            ServiceResult<MailTemplate> _mailTemplate = NotificationServices
-                .getMailTemplateService()
-                .save(new SaveQuery<>(mailTemplate));
-            if (_mailTemplate.getIsSuccess() && _mailTemplate.getData() != null) {
-                JHapyMainView.get()
-                    .displayInfoMessage(getTranslation("message.global.recordSavedMessage"));
-                mailTemplate = _mailTemplate.getData();
-                if (isNew) {
-                    UI.getCurrent().navigate(MailTemplateAdminView.class, mailTemplate.getId());
-                } else {
-                    binder.readBean(mailTemplate);
-                }
-            } else {
-                JHapyMainView.get()
-                    .displayErrorMessage(
-                        getTranslation("message.global.error", _mailTemplate.getMessage()));
-                // Notification.show(getTranslation("message.global.error", _user.getMessage()), 3000, Position.MIDDLE);
-            }
+    if (binder.writeBeanIfValid(mailTemplate)) {
+      ServiceResult<MailTemplate> _mailTemplate = NotificationServices
+          .getMailTemplateService()
+          .save(new SaveQuery<>(mailTemplate));
+      if (_mailTemplate.getIsSuccess() && _mailTemplate.getData() != null) {
+        JHapyMainView3.get()
+            .displayInfoMessage(getTranslation("message.global.recordSavedMessage"));
+        mailTemplate = _mailTemplate.getData();
+        if (isNew) {
+          UI.getCurrent().navigate(MailTemplateAdminView.class, mailTemplate.getId());
         } else {
-            JHapyMainView.get()
-                .displayErrorMessage(getTranslation("message.global.validationErrorMessage"));
-            // Notification.show(getTranslation("message.global.validationErrorMessage"), 3000, Notification.Position.BOTTOM_CENTER);
+          binder.readBean(mailTemplate);
         }
+      } else {
+        JHapyMainView3.get()
+            .displayErrorMessage(
+                getTranslation("message.global.error", _mailTemplate.getMessage()));
+        // Notification.show(getTranslation("message.global.error", _user.getMessage()), 3000, Position.MIDDLE);
+      }
+    } else {
+      JHapyMainView3.get()
+          .displayErrorMessage(getTranslation("message.global.validationErrorMessage"));
+      // Notification.show(getTranslation("message.global.validationErrorMessage"), 3000, Notification.Position.BOTTOM_CENTER);
+    }
+  }
+
+  protected void cancel() {
+    binder.readBean(mailTemplate);
+  }
+
+  @Override
+  public void setParameter(BeforeEvent beforeEvent, String id) {
+    if (StringUtils.isBlank(id) || "-1".equals(id)) {
+      mailTemplate = new MailTemplate();
+    } else {
+      mailTemplate = NotificationServices.getMailTemplateService()
+          .getById(new GetByStrIdQuery(id))
+          .getData();
+      if (mailTemplate == null) {
+        mailTemplate = new MailTemplate();
+      }
     }
 
-    protected void cancel() {
-        binder.readBean(mailTemplate);
-    }
+    binder.setBean(mailTemplate);
+  }
 
-    @Override
-    public void setParameter(BeforeEvent beforeEvent, String id) {
-        if (StringUtils.isBlank(id) || "-1".equals(id)) {
-            mailTemplate = new MailTemplate();
-        } else {
-            mailTemplate = NotificationServices.getMailTemplateService()
-                .getById(new GetByStrIdQuery(id))
-                .getData();
-            if (mailTemplate == null) {
-                mailTemplate = new MailTemplate();
-            }
-        }
-
-        binder.setBean(mailTemplate);
-    }
-
-    private void goBack() {
-        UI.getCurrent().navigate(MailTemplatesAdminView.class);
-    }
+  private void goBack() {
+    UI.getCurrent().navigate(MailTemplatesAdminView.class);
+  }
 }

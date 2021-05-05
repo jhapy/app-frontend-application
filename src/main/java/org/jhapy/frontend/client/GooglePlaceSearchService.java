@@ -43,20 +43,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface GooglePlaceSearchService {
 
-    @PostMapping(value = "/searchPlaces")
-    ServiceResult searchPlaces(@RequestBody SearchPlacesQuery query);
+  @PostMapping(value = "/searchPlaces")
+  ServiceResult searchPlaces(@RequestBody SearchPlacesQuery query);
 
-    @PostMapping(value = "/searchAroundByKeyword")
-    ServiceResult<List<PlacesSearchResult>> searchAroundByKeyword(
-        @RequestBody SearchAroundByKeywordQuery query);
+  @PostMapping(value = "/searchAroundByKeyword")
+  ServiceResult<List<PlacesSearchResult>> searchAroundByKeyword(
+      @RequestBody SearchAroundByKeywordQuery query);
 
-    @PostMapping(value = "/autocompleteSearchRequest")
-    ServiceResult<List<AutocompletePrediction>> autocompleteSearchRequest(
-        @RequestBody AutocompleteSearchRequestQuery query);
+  @PostMapping(value = "/autocompleteSearchRequest")
+  ServiceResult<List<AutocompletePrediction>> autocompleteSearchRequest(
+      @RequestBody AutocompleteSearchRequestQuery query);
 
-    @PostMapping(value = "/getGooglePhoto")
-    ServiceResult<StoredFile> getGooglePhoto(@RequestBody GetGooglePhotoQuery query);
+  @PostMapping(value = "/getGooglePhoto")
+  ServiceResult<StoredFile> getGooglePhoto(@RequestBody GetGooglePhotoQuery query);
 
-    @PostMapping(value = "/getPlaceDetails")
-    ServiceResult<PlaceDetails> getPlaceDetails(@RequestBody GetPlaceDetailsQuery query);
+  @PostMapping(value = "/getPlaceDetails")
+  ServiceResult<PlaceDetails> getPlaceDetails(@RequestBody GetPlaceDetailsQuery query);
 }

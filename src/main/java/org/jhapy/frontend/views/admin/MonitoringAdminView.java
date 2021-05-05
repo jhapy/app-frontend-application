@@ -33,45 +33,45 @@ import org.springframework.security.access.annotation.Secured;
 @Secured(SecurityConst.ROLE_ADMIN)
 public class MonitoringAdminView extends ViewFrame implements RouterLayout, HasLogger {
 
-    private final HazelcastInstance hazelcastInstance;
+  private final HazelcastInstance hazelcastInstance;
 
-    public MonitoringAdminView(HazelcastInstance hazelcastInstance) {
-        this.hazelcastInstance = hazelcastInstance;
-    }
+  public MonitoringAdminView(HazelcastInstance hazelcastInstance) {
+    this.hazelcastInstance = hazelcastInstance;
+  }
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-        JHapyMainView3.get().getAppBar().setTitle(getTranslation("element.dashboard.title"));
-        setViewContent(createContent());
-    }
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
+    JHapyMainView3.get().getAppBar().setTitle(getTranslation("element.dashboard.title"));
+    setViewContent(createContent());
+  }
 
-    private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout();
-        content.setFlexDirection(FlexDirection.COLUMN);
-        content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
-        content.setWidthFull();
+  private Component createContent() {
+    FlexBoxLayout content = new FlexBoxLayout();
+    content.setFlexDirection(FlexDirection.COLUMN);
+    content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
+    content.setWidthFull();
 
-        content.add(UIUtils.createLabel(FontSize.L, "Current sessions :"));
+    content.add(UIUtils.createLabel(FontSize.L, "Current sessions :"));
 
-        ConcurrentMap<String, SessionInfo> userSession = retrieveMap();
-        List<SessionInfo> data = new ArrayList<>(userSession.values());
-        data.sort((o1, o2) -> -1 * o1.getLastContact().compareTo(o2.getLastContact()));
-        data.forEach(sessionInfo -> {
-            ListItem item = new ListItem(
-                sessionInfo.getUsername() + " " + sessionInfo.getSourceIp(),
-                "Login : " + DateTimeFormatter.format(sessionInfo.getLoginDateTime(), getLocale())
-                    + ", last contact : " + (sessionInfo.getLastContact() != null ?
-                    DateTimeFormatter.format(sessionInfo.getLastContact(), getLocale()) : "N/A")
-                    + " ("
-                    + sessionInfo.getJSessionId() + ")");
-            content.add(item);
-        });
+    ConcurrentMap<String, SessionInfo> userSession = retrieveMap();
+    List<SessionInfo> data = new ArrayList<>(userSession.values());
+    data.sort((o1, o2) -> -1 * o1.getLastContact().compareTo(o2.getLastContact()));
+    data.forEach(sessionInfo -> {
+      ListItem item = new ListItem(
+          sessionInfo.getUsername() + " " + sessionInfo.getSourceIp(),
+          "Login : " + DateTimeFormatter.format(sessionInfo.getLoginDateTime(), getLocale())
+              + ", last contact : " + (sessionInfo.getLastContact() != null ?
+              DateTimeFormatter.format(sessionInfo.getLastContact(), getLocale()) : "N/A")
+              + " ("
+              + sessionInfo.getJSessionId() + ")");
+      content.add(item);
+    });
 
-        return content;
-    }
+    return content;
+  }
 
-    private ConcurrentMap<String, SessionInfo> retrieveMap() {
-        return hazelcastInstance.getMap("userSessions");
-    }
+  private ConcurrentMap<String, SessionInfo> retrieveMap() {
+    return hazelcastInstance.getMap("userSessions");
+  }
 }

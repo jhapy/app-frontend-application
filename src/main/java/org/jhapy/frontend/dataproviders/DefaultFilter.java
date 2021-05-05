@@ -9,38 +9,38 @@ import java.io.Serializable;
  */
 public class DefaultFilter implements Serializable {
 
-    private String filter;
-    private Boolean showInactive;
+  private String filter;
+  private Boolean showInactive;
 
-    public DefaultFilter() {
-    }
+  public DefaultFilter() {
+  }
 
-    public DefaultFilter(String filter) {
-        this(filter, null);
-    }
+  public DefaultFilter(String filter) {
+    this(filter, null);
+  }
 
-    public DefaultFilter(String filter, Boolean showInactive) {
-        this.filter = filter;
-        this.showInactive = showInactive;
-    }
+  public DefaultFilter(String filter, Boolean showInactive) {
+    this.filter = filter;
+    this.showInactive = showInactive;
+  }
 
-    public static DefaultFilter getEmptyFilter() {
-        return new DefaultFilter(null, null);
-    }
+  public static DefaultFilter getEmptyFilter() {
+    return new DefaultFilter(null, null);
+  }
 
-    public String getFilter() {
-        return filter;
-    }
+  public String getFilter() {
+    return filter;
+  }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
+  public void setFilter(String filter) {
+    this.filter = filter;
+  }
 
-    public Boolean isShowInactive() {
-        return showInactive;
-    }
+  public Boolean isShowInactive() {
+    return showInactive;
+  }
 
-    public void setShowInactive(Boolean showInactive) {
-        this.showInactive = showInactive;
-    }
+  public void setShowInactive(Boolean showInactive) {
+    this.showInactive = showInactive;
+  }
 }

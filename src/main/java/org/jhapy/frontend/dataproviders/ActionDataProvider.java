@@ -41,31 +41,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ActionDataProvider extends DefaultDataProvider<Action, DefaultFilter> implements
     Serializable {
 
-    @Autowired
-    public ActionDataProvider() {
-        super(AppConst.DEFAULT_SORT_DIRECTION,
-            AppConst.DEFAULT_SORT_FIELDS);
-    }
+  @Autowired
+  public ActionDataProvider() {
+    super(AppConst.DEFAULT_SORT_DIRECTION,
+        AppConst.DEFAULT_SORT_FIELDS);
+  }
 
-    @Override
-    protected Page<Action> fetchFromBackEnd(Query<Action, DefaultFilter> query,
-        Pageable pageable) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        Page<Action> page = I18NServices.getActionService()
-            .findAnyMatching(new FindAnyMatchingQuery(filter.getFilter(),
-                filter.isShowInactive(), pageable)).getData();
-        if (getPageObserver() != null) {
-            getPageObserver().accept(page);
-        }
-        return page;
+  @Override
+  protected Page<Action> fetchFromBackEnd(Query<Action, DefaultFilter> query,
+      Pageable pageable) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    Page<Action> page = I18NServices.getActionService()
+        .findAnyMatching(new FindAnyMatchingQuery(filter.getFilter(),
+            filter.isShowInactive(), pageable)).getData();
+    if (getPageObserver() != null) {
+      getPageObserver().accept(page);
     }
+    return page;
+  }
 
 
-    @Override
-    protected int sizeInBackEnd(Query<Action, DefaultFilter> query) {
-        DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
-        return I18NServices.getActionService()
-            .countAnyMatching(new CountAnyMatchingQuery(filter.getFilter(),
-                filter.isShowInactive())).getData().intValue();
-    }
+  @Override
+  protected int sizeInBackEnd(Query<Action, DefaultFilter> query) {
+    DefaultFilter filter = query.getFilter().orElse(DefaultFilter.getEmptyFilter());
+    return I18NServices.getActionService()
+        .countAnyMatching(new CountAnyMatchingQuery(filter.getFilter(),
+            filter.isShowInactive())).getData().intValue();
+  }
 }

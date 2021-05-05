@@ -35,62 +35,62 @@ import org.springframework.security.access.annotation.Secured;
 public class SwaggerAdminView extends ViewFrame implements RouterLayout, HasLogger,
     HasUrlParameter<String> {
 
-    private IFrame swaggerView;
-    private String appName;
-    private String swaggerUrl;
-    private Registration contextIconRegistration = null;
+  private IFrame swaggerView;
+  private String appName;
+  private String swaggerUrl;
+  private Registration contextIconRegistration = null;
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    super.onAttach(attachEvent);
 
-        initAppBar();
+    initAppBar();
 
-        JHapyMainView3.get().getAppBar().setTitle(appName);
-        setViewContent(createContent());
+    JHapyMainView3.get().getAppBar().setTitle(appName);
+    setViewContent(createContent());
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    if (contextIconRegistration != null) {
+      contextIconRegistration.remove();
     }
+  }
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        if (contextIconRegistration != null) {
-            contextIconRegistration.remove();
-        }
+  private AppBar initAppBar() {
+    AppBar appBar = JHapyMainView3.get().getAppBar();
+    appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
+    if (contextIconRegistration == null) {
+      contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
     }
+    return appBar;
+  }
 
-    private AppBar initAppBar() {
-        AppBar appBar = JHapyMainView3.get().getAppBar();
-        appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-        if (contextIconRegistration == null) {
-            contextIconRegistration = appBar.getContextIcon().addClickListener(event -> goBack());
-        }
-        return appBar;
+  private Component createContent() {
+    FlexBoxLayout content = new FlexBoxLayout();
+    content.setFlexDirection(FlexDirection.COLUMN);
+    content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
+    content.setSizeFull();
+
+    swaggerView = new IFrame(swaggerUrl);
+    swaggerView.setSizeFull();
+    content.add(swaggerView);
+
+    return content;
+  }
+
+  @Override
+  public void setParameter(BeforeEvent event, String parameter) {
+    if (StringUtils.isNoneBlank(parameter)) {
+      String url = ((VaadinServletRequest) VaadinService.getCurrentRequest()).getRequestURL()
+          .toString();
+
+      swaggerUrl = url + "swagger/" + parameter + "/swagger-ui.html";
+      this.appName = parameter;
     }
+  }
 
-    private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout();
-        content.setFlexDirection(FlexDirection.COLUMN);
-        content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
-        content.setSizeFull();
-
-        swaggerView = new IFrame(swaggerUrl);
-        swaggerView.setSizeFull();
-        content.add(swaggerView);
-
-        return content;
-    }
-
-    @Override
-    public void setParameter(BeforeEvent event, String parameter) {
-        if (StringUtils.isNoneBlank(parameter)) {
-            String url = ((VaadinServletRequest) VaadinService.getCurrentRequest()).getRequestURL()
-                .toString();
-
-            swaggerUrl = url + "swagger/" + parameter + "/swagger-ui.html";
-            this.appName = parameter;
-        }
-    }
-
-    private void goBack() {
-        UI.getCurrent().navigate(SwaggersAdminView.class);
-    }
+  private void goBack() {
+    UI.getCurrent().navigate(SwaggersAdminView.class);
+  }
 }

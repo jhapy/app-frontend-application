@@ -39,35 +39,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "${jhapy.remote-services.authorization-server.name:null}", url = "${jhapy.remote-services.authorization-server.url:}", path = "/uaa/auth", fallbackFactory = AuthServiceServiceFallback.class)
 public interface AuthService {
 
-    @PostMapping(value = "/login")
-    ServiceResult<AuthResponse> authenticateUser(@RequestBody LoginQuery query);
+  @PostMapping(value = "/login")
+  ServiceResult<AuthResponse> authenticateUser(@RequestBody LoginQuery query);
 
-    @PostMapping(value = "/signup")
-    ServiceResult<String> registerUser(@RequestBody SignUpQuery query);
+  @PostMapping(value = "/signup")
+  ServiceResult<String> registerUser(@RequestBody SignUpQuery query);
 
-    @PostMapping(value = "/resetVerificationToken")
-    ServiceResult<Void> resetVerificationToken(
-        @RequestBody ResetVerificationTokenQuery query);
+  @PostMapping(value = "/resetVerificationToken")
+  ServiceResult<Void> resetVerificationToken(
+      @RequestBody ResetVerificationTokenQuery query);
 
-    @PostMapping(value = "/forgetPassword")
-    ServiceResult<Void> forgetPassword(@Valid @RequestBody ForgetPasswordQuery query);
+  @PostMapping(value = "/forgetPassword")
+  ServiceResult<Void> forgetPassword(@Valid @RequestBody ForgetPasswordQuery query);
 
-    @PostMapping(value = "/validateUser")
-    ServiceResult<String> validateUser(@Valid @RequestBody ValidateUserQuery query);
+  @PostMapping(value = "/validateUser")
+  ServiceResult<String> validateUser(@Valid @RequestBody ValidateUserQuery query);
 
-    @PostMapping(value = "/passwordReset")
-    ServiceResult<Void> passwordReset(@Valid @RequestBody PasswordResetQuery query);
+  @PostMapping(value = "/passwordReset")
+  ServiceResult<Void> passwordReset(@Valid @RequestBody PasswordResetQuery query);
 
-    @PostMapping(value = "/createRememberMeToken")
-    ServiceResult<RememberMeToken> createRememberMeToken(
-        @Valid @RequestBody CreateRememberMeTokenQuery query);
+  @PostMapping(value = "/createRememberMeToken")
+  ServiceResult<RememberMeToken> createRememberMeToken(
+      @Valid @RequestBody CreateRememberMeTokenQuery query);
 
-    @PostMapping(value = "/clearRememberMeToken")
-    ServiceResult<Void> clearRememberMeToken(
-        @Valid @RequestBody ClearRememberMeTokenQuery query);
+  @PostMapping(value = "/clearRememberMeToken")
+  ServiceResult<Void> clearRememberMeToken(
+      @Valid @RequestBody ClearRememberMeTokenQuery query);
 
-    @PostMapping(value = "/getSecurityUserIdByRememberMeToken")
-    ServiceResult<SecurityUser> getSecurityUserByRememberMeToken(
-        @Valid @RequestBody GetSecurityUserByRememberMeTokenQuery query);
+  @PostMapping(value = "/getSecurityUserIdByRememberMeToken")
+  ServiceResult<SecurityUser> getSecurityUserByRememberMeToken(
+      @Valid @RequestBody GetSecurityUserByRememberMeTokenQuery query);
 
 }

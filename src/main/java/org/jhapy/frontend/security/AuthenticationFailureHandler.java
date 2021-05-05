@@ -41,41 +41,41 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
  */
 public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private final SecurityUserService securityUserService;
-    private final SessionService sessionService;
+  private final SecurityUserService securityUserService;
+  private final SessionService sessionService;
 
-    public AuthenticationFailureHandler(String failureUrl,
-        SecurityUserService securityUserService,
-        SessionService sessionService) {
-        super(failureUrl);
-        this.sessionService = sessionService;
-        setUseForward(true);
-        this.securityUserService = securityUserService;
-    }
+  public AuthenticationFailureHandler(String failureUrl,
+      SecurityUserService securityUserService,
+      SessionService sessionService) {
+    super(failureUrl);
+    this.sessionService = sessionService;
+    setUseForward(true);
+    this.securityUserService = securityUserService;
+  }
 
-    @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-        AuthenticationException exception) throws IOException, ServletException {
-        String username = request.getParameter("username");
+  @Override
+  public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException exception) throws IOException, ServletException {
+    String username = request.getParameter("username");
 
-        if (exception instanceof BadCredentialsException) {
-            SecurityUser securityUser = securityUserService
-                .getSecurityUserByUsername(new GetSecurityUserByUsernameQuery(username)).getData();
-            if (securityUser != null) {
-                securityUser.setFailedLoginAttempts(securityUser.getFailedLoginAttempts() + 1);
-                if (securityUser.getFailedLoginAttempts() > 4) {
-                    securityUser.setIsAccountLocked(true);
-                }
-                securityUserService.save(new SaveQuery<>(securityUser));
-            }
+    if (exception instanceof BadCredentialsException) {
+      SecurityUser securityUser = securityUserService
+          .getSecurityUserByUsername(new GetSecurityUserByUsernameQuery(username)).getData();
+      if (securityUser != null) {
+        securityUser.setFailedLoginAttempts(securityUser.getFailedLoginAttempts() + 1);
+        if (securityUser.getFailedLoginAttempts() > 4) {
+          securityUser.setIsAccountLocked(true);
         }
-        AuditServices.getAuditServiceQueue()
-            .newSession(new NewSession(request.getRequestedSessionId(), username, null,
-                Instant.now(), false, exception.getLocalizedMessage()));
-
-        if (request.getSession() != null) {
-            request.changeSessionId();
-        }
-        super.onAuthenticationFailure(request, response, exception);
+        securityUserService.save(new SaveQuery<>(securityUser));
+      }
     }
+    AuditServices.getAuditServiceQueue()
+        .newSession(new NewSession(request.getRequestedSessionId(), username, null,
+            Instant.now(), false, exception.getLocalizedMessage()));
+
+    if (request.getSession() != null) {
+      request.changeSessionId();
+    }
+    super.onAuthenticationFailure(request, response, exception);
+  }
 }

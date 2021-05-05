@@ -38,15 +38,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface CountryTrlService {
 
-    @PostMapping(value = "/getCountryTrl")
-    ServiceResult<CountryTrl> getCountryTrl(@RequestBody GetCountryTrlQuery query);
+  @PostMapping(value = "/getCountryTrl")
+  ServiceResult<CountryTrl> getCountryTrl(@RequestBody GetCountryTrlQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<CountryTrl> getById(@RequestBody GetByIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<CountryTrl> getById(@RequestBody GetByIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<CountryTrl> save(@RequestBody SaveQuery<CountryTrl> query);
+  @PostMapping(value = "/save")
+  ServiceResult<CountryTrl> save(@RequestBody SaveQuery<CountryTrl> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 }

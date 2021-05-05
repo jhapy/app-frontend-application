@@ -38,49 +38,49 @@ import org.springframework.stereotype.Component;
 @Component
 public class JHapyAccessDecisionVoter implements AccessDecisionVoter, HasLogger {
 
-    private final SecurityRoleService securityRoleService;
-    private List<String> allowedRoles;
+  private final SecurityRoleService securityRoleService;
+  private List<String> allowedRoles;
 
-    public JHapyAccessDecisionVoter(
-        SecurityRoleService securityRoleService) {
-        this.securityRoleService = securityRoleService;
+  public JHapyAccessDecisionVoter(
+      SecurityRoleService securityRoleService) {
+    this.securityRoleService = securityRoleService;
 
+  }
+
+  @Override
+  public boolean supports(ConfigAttribute attribute) {
+    return true;
+  }
+
+  @Override
+  public int vote(Authentication authentication, Object object, Collection collection) {
+    var loggerPrefix = getLoggerPrefix("vote");
+
+    int result = authentication.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .filter(getAllowedRoles()::contains)
+        .findAny()
+        .map(s -> ACCESS_GRANTED)
+        .orElse(ACCESS_ABSTAIN);
+
+    logger().trace(loggerPrefix + "Result = " + (result == ACCESS_GRANTED ? " Access Granted"
+        : " Abstain voting"));
+
+    return result;
+  }
+
+  protected List<String> getAllowedRoles() {
+    if (allowedRoles == null) {
+      allowedRoles = securityRoleService.getAllowedLoginRoles().getData().stream().map(
+          SecurityRole::getName).collect(
+          Collectors.toList());
     }
 
-    @Override
-    public boolean supports(ConfigAttribute attribute) {
-        return true;
-    }
+    return allowedRoles;
+  }
 
-    @Override
-    public int vote(Authentication authentication, Object object, Collection collection) {
-        String loggerPrefix = getLoggerPrefix("vote");
-
-        int result = authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .filter(getAllowedRoles()::contains)
-            .findAny()
-            .map(s -> ACCESS_GRANTED)
-            .orElse(ACCESS_ABSTAIN);
-
-        logger().trace(loggerPrefix + "Result = " + (result == ACCESS_GRANTED ? " Access Granted"
-            : " Abstain voting"));
-
-        return result;
-    }
-
-    protected List<String> getAllowedRoles() {
-        if (allowedRoles == null) {
-            allowedRoles = securityRoleService.getAllowedLoginRoles().getData().stream().map(
-                SecurityRole::getName).collect(
-                Collectors.toList());
-        }
-
-        return allowedRoles;
-    }
-
-    @Override
-    public boolean supports(Class clazz) {
-        return true;
-    }
+  @Override
+  public boolean supports(Class clazz) {
+    return true;
+  }
 }

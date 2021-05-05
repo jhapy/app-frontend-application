@@ -43,153 +43,153 @@ import org.jhapy.frontend.views.EntityView;
 public class EntityPresenter<T extends BaseEntity, V extends EntityView<T>>
     implements HasLogger {
 
-    private final CrudService<T> crudService;
+  private final CrudService<T> crudService;
 
-    private final CurrentUser currentUser;
+  private final CurrentUser currentUser;
 
-    private V view;
+  private V view;
 
-    private final EntityPresenterState<T> state = new EntityPresenterState<>();
+  private final EntityPresenterState<T> state = new EntityPresenterState<>();
 
-    public EntityPresenter(
-        CrudService<T> crudService, CurrentUser currentUser) {
-        this.crudService = crudService;
-        this.currentUser = currentUser;
+  public EntityPresenter(
+      CrudService<T> crudService, CurrentUser currentUser) {
+    this.crudService = crudService;
+    this.currentUser = currentUser;
+  }
+
+  public V getView() {
+    return view;
+  }
+
+  public void setView(V view) {
+    this.view = view;
+  }
+
+  public void delete(CrudOperationListener<T> onSuccess) {
+    Message CONFIRM_DELETE = Message.CONFIRM_DELETE.createMessage();
+    confirmIfNecessaryAndExecute(true, CONFIRM_DELETE, () -> {
+      if (executeOperation(() -> crudService.delete(state.getEntity()))) {
+        onSuccess.execute(state.getEntity());
+      }
+    }, () -> {
+    });
+  }
+
+  public void save(CrudOperationListener<T> onSuccess) {
+    if (executeOperation(this::saveEntity)) {
+      onSuccess.execute(state.getEntity());
     }
+  }
 
-    public V getView() {
-        return view;
+  public boolean executeUpdate(UnaryOperator<T> updater) {
+    return executeOperation(() -> state.updateEntity(updater.apply(getEntity()), isNew()));
+  }
+
+  private boolean executeOperation(Runnable operation) {
+    try {
+      operation.run();
+      return true;
+    } catch (UserFriendlyDataException e) {
+      // Commit failed because of application-level data constraints
+      consumeError(e, e.getMessage(), true);
+    } catch (DataIntegrityViolationException e) {
+      // Commit failed because of validation errors
+      consumeError(
+          e, CrudErrorMessage.OPERATION_PREVENTED_BY_REFERENCES, true);
+    } catch (OptimisticLockingFailureException e) {
+      consumeError(e, CrudErrorMessage.CONCURRENT_UPDATE, true);
+    } catch (EntityNotFoundException e) {
+      consumeError(e, CrudErrorMessage.ENTITY_NOT_FOUND, false);
+    } catch (ConstraintViolationException e) {
+      consumeError(e, CrudErrorMessage.REQUIRED_FIELDS_MISSING, false);
     }
+    return false;
+  }
 
-    public void setView(V view) {
-        this.view = view;
+  private void consumeError(
+      Exception e, String message, boolean isPersistent) {
+    logger().debug(message, e);
+    view.showError(message, isPersistent);
+  }
+
+  private void saveEntity() {
+    state.updateEntity(
+        crudService.save(state.getEntity()),
+        isNew());
+  }
+
+  public boolean writeEntity() {
+    try {
+      view.write(state.getEntity());
+      return true;
+    } catch (ValidationException e) {
+      view.showError(CrudErrorMessage.REQUIRED_FIELDS_MISSING, false);
+      return false;
+    } catch (NullPointerException e) {
+      return false;
     }
+  }
 
-    public void delete(CrudOperationListener<T> onSuccess) {
-        Message CONFIRM_DELETE = Message.CONFIRM_DELETE.createMessage();
-        confirmIfNecessaryAndExecute(true, CONFIRM_DELETE, () -> {
-            if (executeOperation(() -> crudService.delete(state.getEntity()))) {
-                onSuccess.execute(state.getEntity());
-            }
-        }, () -> {
-        });
+  public void close() {
+    state.clear();
+    view.clear();
+  }
+
+  public void cancel(Runnable onConfirmed, Runnable onCancelled) {
+    confirmIfNecessaryAndExecute(
+        view.isDirty(),
+        Message.UNSAVED_CHANGES.createMessage(state.getEntityName()),
+        () -> {
+          view.clear();
+          onConfirmed.run();
+        }, onCancelled);
+  }
+
+  private void confirmIfNecessaryAndExecute(
+      boolean needsConfirmation, Message message, Runnable onConfirmed,
+      Runnable onCancelled) {
+    if (needsConfirmation) {
+      showConfirmationRequest(message, onConfirmed, onCancelled);
+    } else {
+      onConfirmed.run();
     }
+  }
 
-    public void save(CrudOperationListener<T> onSuccess) {
-        if (executeOperation(this::saveEntity)) {
-            onSuccess.execute(state.getEntity());
-        }
-    }
+  private void showConfirmationRequest(
+      Message message, Runnable onOk, Runnable onCancel) {
+    view.getConfirmDialog().setText(message.getMessage());
+    view.getConfirmDialog().setHeader(message.getCaption());
+    view.getConfirmDialog().setCancelText(message.getCancelText());
+    view.getConfirmDialog().setConfirmText(message.getOkText());
+    view.getConfirmDialog().setOpened(true);
 
-    public boolean executeUpdate(UnaryOperator<T> updater) {
-        return executeOperation(() -> state.updateEntity(updater.apply(getEntity()), isNew()));
-    }
+    final Registration okRegistration =
+        view.getConfirmDialog().addConfirmListener(e -> onOk.run());
+    final Registration cancelRegistration =
+        view.getConfirmDialog().addCancelListener(e -> onCancel.run());
+    state.updateRegistration(okRegistration, cancelRegistration);
+  }
 
-    private boolean executeOperation(Runnable operation) {
-        try {
-            operation.run();
-            return true;
-        } catch (UserFriendlyDataException e) {
-            // Commit failed because of application-level data constraints
-            consumeError(e, e.getMessage(), true);
-        } catch (DataIntegrityViolationException e) {
-            // Commit failed because of validation errors
-            consumeError(
-                e, CrudErrorMessage.OPERATION_PREVENTED_BY_REFERENCES, true);
-        } catch (OptimisticLockingFailureException e) {
-            consumeError(e, CrudErrorMessage.CONCURRENT_UPDATE, true);
-        } catch (EntityNotFoundException e) {
-            consumeError(e, CrudErrorMessage.ENTITY_NOT_FOUND, false);
-        } catch (ConstraintViolationException e) {
-            consumeError(e, CrudErrorMessage.REQUIRED_FIELDS_MISSING, false);
-        }
-        return false;
-    }
+  public boolean loadEntity(Long id, CrudOperationListener<T> onSuccess) {
+    return executeOperation(() -> {
+      state.updateEntity(crudService.load(id), false);
+      onSuccess.execute(state.getEntity());
+    });
+  }
 
-    private void consumeError(
-        Exception e, String message, boolean isPersistent) {
-        logger().debug(message, e);
-        view.showError(message, isPersistent);
-    }
+  public T getEntity() {
+    return state.getEntity();
+  }
 
-    private void saveEntity() {
-        state.updateEntity(
-            crudService.save(state.getEntity()),
-            isNew());
-    }
+  public boolean isNew() {
+    return state.isNew();
+  }
 
-    public boolean writeEntity() {
-        try {
-            view.write(state.getEntity());
-            return true;
-        } catch (ValidationException e) {
-            view.showError(CrudErrorMessage.REQUIRED_FIELDS_MISSING, false);
-            return false;
-        } catch (NullPointerException e) {
-            return false;
-        }
-    }
+  @FunctionalInterface
+  public interface CrudOperationListener<T> {
 
-    public void close() {
-        state.clear();
-        view.clear();
-    }
-
-    public void cancel(Runnable onConfirmed, Runnable onCancelled) {
-        confirmIfNecessaryAndExecute(
-            view.isDirty(),
-            Message.UNSAVED_CHANGES.createMessage(state.getEntityName()),
-            () -> {
-                view.clear();
-                onConfirmed.run();
-            }, onCancelled);
-    }
-
-    private void confirmIfNecessaryAndExecute(
-        boolean needsConfirmation, Message message, Runnable onConfirmed,
-        Runnable onCancelled) {
-        if (needsConfirmation) {
-            showConfirmationRequest(message, onConfirmed, onCancelled);
-        } else {
-            onConfirmed.run();
-        }
-    }
-
-    private void showConfirmationRequest(
-        Message message, Runnable onOk, Runnable onCancel) {
-        view.getConfirmDialog().setText(message.getMessage());
-        view.getConfirmDialog().setHeader(message.getCaption());
-        view.getConfirmDialog().setCancelText(message.getCancelText());
-        view.getConfirmDialog().setConfirmText(message.getOkText());
-        view.getConfirmDialog().setOpened(true);
-
-        final Registration okRegistration =
-            view.getConfirmDialog().addConfirmListener(e -> onOk.run());
-        final Registration cancelRegistration =
-            view.getConfirmDialog().addCancelListener(e -> onCancel.run());
-        state.updateRegistration(okRegistration, cancelRegistration);
-    }
-
-    public boolean loadEntity(Long id, CrudOperationListener<T> onSuccess) {
-        return executeOperation(() -> {
-            state.updateEntity(crudService.load(id), false);
-            onSuccess.execute(state.getEntity());
-        });
-    }
-
-    public T getEntity() {
-        return state.getEntity();
-    }
-
-    public boolean isNew() {
-        return state.isNew();
-    }
-
-    @FunctionalInterface
-    public interface CrudOperationListener<T> {
-
-        void execute(T entity);
-    }
+    void execute(T entity);
+  }
 
 }
 
@@ -198,49 +198,49 @@ public class EntityPresenter<T extends BaseEntity, V extends EntityView<T>>
  */
 class EntityPresenterState<T extends BaseEntity> {
 
-    private T entity;
-    private String entityName;
-    private Registration okRegistration;
-    private Registration cancelRegistration;
-    private boolean isNew = false;
+  private T entity;
+  private String entityName;
+  private Registration okRegistration;
+  private Registration cancelRegistration;
+  private boolean isNew = false;
 
-    void updateEntity(T entity, boolean isNew) {
-        this.entity = entity;
-        this.entityName = EntityUtil.getName(this.entity.getClass());
-        this.isNew = isNew;
-    }
+  void updateEntity(T entity, boolean isNew) {
+    this.entity = entity;
+    this.entityName = EntityUtil.getName(this.entity.getClass());
+    this.isNew = isNew;
+  }
 
-    void updateRegistration(
-        Registration okRegistration, Registration cancelRegistration) {
-        clearRegistration(this.okRegistration);
-        clearRegistration(this.cancelRegistration);
-        this.okRegistration = okRegistration;
-        this.cancelRegistration = cancelRegistration;
-    }
+  void updateRegistration(
+      Registration okRegistration, Registration cancelRegistration) {
+    clearRegistration(this.okRegistration);
+    clearRegistration(this.cancelRegistration);
+    this.okRegistration = okRegistration;
+    this.cancelRegistration = cancelRegistration;
+  }
 
-    void clear() {
-        this.entity = null;
-        this.entityName = null;
-        this.isNew = false;
-        updateRegistration(null, null);
-    }
+  void clear() {
+    this.entity = null;
+    this.entityName = null;
+    this.isNew = false;
+    updateRegistration(null, null);
+  }
 
-    private void clearRegistration(Registration registration) {
-        if (registration != null) {
-            registration.remove();
-        }
+  private void clearRegistration(Registration registration) {
+    if (registration != null) {
+      registration.remove();
     }
+  }
 
-    public T getEntity() {
-        return entity;
-    }
+  public T getEntity() {
+    return entity;
+  }
 
-    public String getEntityName() {
-        return entityName;
-    }
+  public String getEntityName() {
+    return entityName;
+  }
 
-    public boolean isNew() {
-        return isNew;
-    }
+  public boolean isNew() {
+    return isNew;
+  }
 
 }

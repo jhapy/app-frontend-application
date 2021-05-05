@@ -43,73 +43,73 @@ import org.springframework.stereotype.Component;
 public class MessageTrlServiceFallback implements MessageTrlService, HasLogger,
     FallbackFactory<MessageTrlService> {
 
-    final Throwable cause;
+  final Throwable cause;
 
-    public MessageTrlServiceFallback() {
-        this(null);
+  public MessageTrlServiceFallback() {
+    this(null);
+  }
+
+  MessageTrlServiceFallback(Throwable cause) {
+    this.cause = cause;
+  }
+
+  @Override
+  public MessageTrlServiceFallback create(Throwable cause) {
+    if (cause != null) {
+      String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
+          : "Unknown error occurred : " + cause;
+      // I don't see this log statement
+      logger().debug("Client fallback called for the cause : {}", errMessage);
     }
+    return new MessageTrlServiceFallback(cause);
+  }
 
-    MessageTrlServiceFallback(Throwable cause) {
-        this.cause = cause;
-    }
+  @Override
+  public ServiceResult<List<MessageTrl>> findByMessage(FindByMessageQuery query) {
+    logger().error(getLoggerPrefix("findByMessage") + "Cannot connect to the server");
 
-    @Override
-    public MessageTrlServiceFallback create(Throwable cause) {
-        if (cause != null) {
-            String errMessage = StringUtils.isNotBlank(cause.getMessage()) ? cause.getMessage()
-                : "Unknown error occurred : " + cause;
-            // I don't see this log statement
-            logger().debug("Client fallback called for the cause : {}", errMessage);
-        }
-        return new MessageTrlServiceFallback(cause);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
+  }
 
-    @Override
-    public ServiceResult<List<MessageTrl>> findByMessage(FindByMessageQuery query) {
-        logger().error(getLoggerPrefix("findByMessage") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Long> countByMessage(CountByMessageQuery query) {
+    logger().error(getLoggerPrefix("countByMessage") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", 0L);
+  }
 
-    @Override
-    public ServiceResult<Long> countByMessage(CountByMessageQuery query) {
-        logger().error(getLoggerPrefix("countByMessage") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<List<MessageTrl>> findByIso3(FindByIso3Query query) {
+    logger().error(getLoggerPrefix("findByIso3") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", 0L);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
+  }
 
-    @Override
-    public ServiceResult<List<MessageTrl>> findByIso3(FindByIso3Query query) {
-        logger().error(getLoggerPrefix("findByIso3") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<MessageTrl> getByNameAndIso3(GetByNameAndIso3Query query) {
+    logger().error(getLoggerPrefix("getByNameAndIso3") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", Collections.emptyList());
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<MessageTrl> getByNameAndIso3(GetByNameAndIso3Query query) {
-        logger().error(getLoggerPrefix("getByNameAndIso3") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<MessageTrl> getById(GetByIdQuery query) {
+    logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<MessageTrl> getById(GetByIdQuery query) {
-        logger().error(getLoggerPrefix("getById") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<MessageTrl> save(SaveQuery<MessageTrl> query) {
+    logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 
-    @Override
-    public ServiceResult<MessageTrl> save(SaveQuery<MessageTrl> query) {
-        logger().error(getLoggerPrefix("save") + "Cannot connect to the server");
+  @Override
+  public ServiceResult<Void> delete(DeleteByIdQuery query) {
+    logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
 
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
-
-    @Override
-    public ServiceResult<Void> delete(DeleteByIdQuery query) {
-        logger().error(getLoggerPrefix("delete") + "Cannot connect to the server");
-
-        return new ServiceResult<>(false, "Cannot connect to server", null);
-    }
+    return new ServiceResult<>(false, "Cannot connect to server", null);
+  }
 }

@@ -30,8 +30,8 @@ import com.vaadin.flow.component.cookieconsent.CookieConsent;
  */
 public class AppCookieConsent extends CookieConsent {
 
-    public AppCookieConsent() {
-        setPosition(Position.BOTTOM);
-    }
+  public AppCookieConsent() {
+    setPosition(Position.BOTTOM);
+  }
 
 }

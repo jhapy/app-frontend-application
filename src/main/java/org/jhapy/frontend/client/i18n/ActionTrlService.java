@@ -42,24 +42,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface ActionTrlService {
 
-    @PostMapping(value = "/findByAction")
-    ServiceResult<List<ActionTrl>> findByAction(@RequestBody FindByActionQuery query);
+  @PostMapping(value = "/findByAction")
+  ServiceResult<List<ActionTrl>> findByAction(@RequestBody FindByActionQuery query);
 
-    @PostMapping(value = "/countByAction")
-    ServiceResult<Long> countByAction(@RequestBody CountByActionQuery query);
+  @PostMapping(value = "/countByAction")
+  ServiceResult<Long> countByAction(@RequestBody CountByActionQuery query);
 
-    @PostMapping(value = "/findByIso3")
-    ServiceResult<List<ActionTrl>> findByIso3(@RequestBody FindByIso3Query query);
+  @PostMapping(value = "/findByIso3")
+  ServiceResult<List<ActionTrl>> findByIso3(@RequestBody FindByIso3Query query);
 
-    @PostMapping(value = "/getByNameAndIso3")
-    ServiceResult<ActionTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
+  @PostMapping(value = "/getByNameAndIso3")
+  ServiceResult<ActionTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<ActionTrl> getById(@RequestBody GetByIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<ActionTrl> getById(@RequestBody GetByIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<ActionTrl> save(@RequestBody SaveQuery<ActionTrl> query);
+  @PostMapping(value = "/save")
+  ServiceResult<ActionTrl> save(@RequestBody SaveQuery<ActionTrl> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 }

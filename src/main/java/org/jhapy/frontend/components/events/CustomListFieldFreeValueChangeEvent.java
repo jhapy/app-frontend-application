@@ -26,34 +26,34 @@ import org.jhapy.frontend.customFields.DefaultCustomListFieldFree;
 public class CustomListFieldFreeValueChangeEvent<C extends BaseInnerEntity> implements
     HasValue.ValueChangeEvent<List<C>> {
 
-    private final List<C> oldValues;
-    private final List<C> newValues;
-    private final DefaultCustomListFieldFree src;
+  private final List<C> oldValues;
+  private final List<C> newValues;
+  private final DefaultCustomListFieldFree src;
 
-    public CustomListFieldFreeValueChangeEvent(List<C> oldValues, List<C> newValues,
-        DefaultCustomListFieldFree src) {
-        this.oldValues = oldValues;
-        this.newValues = newValues;
-        this.src = src;
-    }
+  public CustomListFieldFreeValueChangeEvent(List<C> oldValues, List<C> newValues,
+      DefaultCustomListFieldFree src) {
+    this.oldValues = oldValues;
+    this.newValues = newValues;
+    this.src = src;
+  }
 
-    @Override
-    public HasValue<?, List<C>> getHasValue() {
-        return src;
-    }
+  @Override
+  public HasValue<?, List<C>> getHasValue() {
+    return src;
+  }
 
-    @Override
-    public boolean isFromClient() {
-        return true;
-    }
+  @Override
+  public boolean isFromClient() {
+    return true;
+  }
 
-    @Override
-    public List<C> getOldValue() {
-        return oldValues;
-    }
+  @Override
+  public List<C> getOldValue() {
+    return oldValues;
+  }
 
-    @Override
-    public List<C> getValue() {
-        return newValues;
-    }
+  @Override
+  public List<C> getValue() {
+    return newValues;
+  }
 }

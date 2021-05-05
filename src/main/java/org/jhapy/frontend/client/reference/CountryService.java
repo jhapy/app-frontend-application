@@ -41,21 +41,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface CountryService {
 
-    @PostMapping(value = "/findAnyMatching")
-    ServiceResult<Page<Country>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+  @PostMapping(value = "/findAnyMatching")
+  ServiceResult<Page<Country>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-    @PostMapping(value = "/countAnyMatching")
-    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+  @PostMapping(value = "/countAnyMatching")
+  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<Country> getById(@RequestBody GetByIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<Country> getById(@RequestBody GetByIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<Country> save(@RequestBody SaveQuery<Country> query);
+  @PostMapping(value = "/save")
+  ServiceResult<Country> save(@RequestBody SaveQuery<Country> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 
-    @PostMapping(value = "/getByIso2OrIso3")
-    ServiceResult<Country> getByIso2OrIso3(@RequestBody GetByIso2OrIso3Query query);
+  @PostMapping(value = "/getByIso2OrIso3")
+  ServiceResult<Country> getByIso2OrIso3(@RequestBody GetByIso2OrIso3Query query);
 }

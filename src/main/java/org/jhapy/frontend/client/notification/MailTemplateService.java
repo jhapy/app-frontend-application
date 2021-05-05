@@ -41,21 +41,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Primary
 public interface MailTemplateService {
 
-    @PostMapping(value = "/findAnyMatching")
-    ServiceResult<Page<MailTemplate>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
+  @PostMapping(value = "/findAnyMatching")
+  ServiceResult<Page<MailTemplate>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-    @PostMapping(value = "/countAnyMatching")
-    ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
+  @PostMapping(value = "/countAnyMatching")
+  ServiceResult<Long> countAnyMatching(@RequestBody CountAnyMatchingQuery query);
 
-    @PostMapping(value = "/getById")
-    ServiceResult<MailTemplate> getById(@RequestBody GetByStrIdQuery query);
+  @PostMapping(value = "/getById")
+  ServiceResult<MailTemplate> getById(@RequestBody GetByStrIdQuery query);
 
-    @PostMapping(value = "/save")
-    ServiceResult<MailTemplate> save(@RequestBody SaveQuery<MailTemplate> query);
+  @PostMapping(value = "/save")
+  ServiceResult<MailTemplate> save(@RequestBody SaveQuery<MailTemplate> query);
 
-    @PostMapping(value = "/delete")
-    ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
+  @PostMapping(value = "/delete")
+  ServiceResult<Void> delete(@RequestBody DeleteByStrIdQuery query);
 
-    @PostMapping(value = "/getByMailAction")
-    ServiceResult<MailTemplate> getByMailAction(@RequestBody GetByNameQuery query);
+  @PostMapping(value = "/getByMailAction")
+  ServiceResult<MailTemplate> getByMailAction(@RequestBody GetByNameQuery query);
 }

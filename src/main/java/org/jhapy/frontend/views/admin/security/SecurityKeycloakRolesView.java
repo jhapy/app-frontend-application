@@ -42,7 +42,7 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
-import org.jhapy.frontend.views.JHapyMainView;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_ROLES)
@@ -50,100 +50,100 @@ import org.springframework.security.access.annotation.Secured;
 public class SecurityKeycloakRolesView extends
     DefaultMasterDetailsView<SecurityKeycloakRole, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-    public SecurityKeycloakRolesView(MyI18NProvider myI18NProvider) {
-        super("securityRole.", SecurityKeycloakRole.class, new SecurityRoleKeycloakDataProvider(),
-            (e) -> SecurityServices.getKeycloakClient().saveRole(new SaveQuery<>(e)),
-            e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())),
-            myI18NProvider);
-    }
+  public SecurityKeycloakRolesView(MyI18NProvider myI18NProvider) {
+    super("securityRole.", SecurityKeycloakRole.class, new SecurityRoleKeycloakDataProvider(),
+        (e) -> SecurityServices.getKeycloakClient().saveRole(new SaveQuery<>(e)),
+        e -> SecurityServices.getKeycloakClient().deleteRole(new DeleteByStrIdQuery(e.getId())),
+        myI18NProvider);
+  }
 
-    @Override
-    protected void initHeader() {
-        super.initHeader();
+  @Override
+  protected void initHeader() {
+    super.initHeader();
 
-        AppBar appBar = JHapyMainView.get().getAppBar();
+    AppBar appBar = JHapyMainView3.get().getAppBar();
 
-        Button clearCacheButton = new Button(getTranslation("action.sync.clearCache"));
-        clearCacheButton.addClickListener(buttonClickEvent -> {
-            SecurityServices.getKeycloakClient().cleanRoleCache();
-            dataProvider.refreshAll();
-        });
+    Button clearCacheButton = new Button(getTranslation("action.sync.clearCache"));
+    clearCacheButton.addClickListener(buttonClickEvent -> {
+      SecurityServices.getKeycloakClient().cleanRoleCache();
+      dataProvider.refreshAll();
+    });
 
-        appBar.addActionItem(clearCacheButton);
-    }
+    appBar.addActionItem(clearCacheButton);
+  }
 
-    protected Grid createGrid() {
-        grid = new Grid<>();
-        grid.setSelectionMode(SelectionMode.SINGLE);
+  protected Grid createGrid() {
+    grid = new Grid<>();
+    grid.setSelectionMode(SelectionMode.SINGLE);
 
-        grid.addSelectionListener(event -> event.getFirstSelectedItem()
-            .ifPresent(this::showDetails));
+    grid.addSelectionListener(event -> event.getFirstSelectedItem()
+        .ifPresent(this::showDetails));
 
-        grid.setDataProvider(dataProvider);
-        grid.setHeight("100%");
+    grid.setDataProvider(dataProvider);
+    grid.setHeight("100%");
 
-        grid.addColumn(SecurityKeycloakRole::getName).setKey("name");
+    grid.addColumn(SecurityKeycloakRole::getName).setKey("name");
 
-        grid.getColumns().forEach(column -> {
-            if (column.getKey() != null) {
-                column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
-                column.setResizable(true);
-            }
-        });
-        return grid;
-    }
+    grid.getColumns().forEach(column -> {
+      if (column.getKey() != null) {
+        column.setHeader(getTranslation("element." + I18N_PREFIX + column.getKey()));
+        column.setResizable(true);
+      }
+    });
+    return grid;
+  }
 
-    protected Component createDetails(SecurityKeycloakRole securityRole) {
-        boolean isNew = securityRole.getId() == null;
-        detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
-            : getTranslation("element.global.update") + " : " + securityRole.getName());
+  protected Component createDetails(SecurityKeycloakRole securityRole) {
+    boolean isNew = securityRole.getId() == null;
+    detailsDrawerHeader.setTitle(isNew ? getTranslation("element.global.new") + " : "
+        : getTranslation("element.global.update") + " : " + securityRole.getName());
 
-        detailsDrawerFooter.setDeleteButtonVisible(!isNew);
+    detailsDrawerFooter.setDeleteButtonVisible(!isNew);
 
-        TextField name = new TextField();
-        name.setWidth("100%");
+    TextField name = new TextField();
+    name.setWidth("100%");
 
-        TextField description = new TextField();
-        description.setWidth("100%");
+    TextField description = new TextField();
+    description.setWidth("100%");
 
-        Checkbox canLogin = new Checkbox();
+    Checkbox canLogin = new Checkbox();
 
-        Checkbox isActive = new Checkbox();
+    Checkbox isActive = new Checkbox();
 
-        // Form layout
-        FormLayout editingForm = new FormLayout();
-        editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
-            LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
-        editingForm.setResponsiveSteps(
-            new FormLayout.ResponsiveStep("0", 1,
-                FormLayout.ResponsiveStep.LabelsPosition.TOP),
-            new FormLayout.ResponsiveStep("26em", 2,
-                FormLayout.ResponsiveStep.LabelsPosition.TOP));
-        FormLayout.FormItem nameItem = editingForm
-            .addFormItem(name, getTranslation("element." + I18N_PREFIX + "name"));
-        editingForm
-            .addFormItem(description, getTranslation("element." + I18N_PREFIX + "description"));
-        editingForm.addFormItem(canLogin, getTranslation("element." + I18N_PREFIX + "canLogin"));
-        FormLayout.FormItem isActiveItem = editingForm
-            .addFormItem(isActive, getTranslation("element." + I18N_PREFIX + "isActive"));
+    // Form layout
+    FormLayout editingForm = new FormLayout();
+    editingForm.addClassNames(LumoStyles.Padding.Bottom.L,
+        LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+    editingForm.setResponsiveSteps(
+        new FormLayout.ResponsiveStep("0", 1,
+            FormLayout.ResponsiveStep.LabelsPosition.TOP),
+        new FormLayout.ResponsiveStep("26em", 2,
+            FormLayout.ResponsiveStep.LabelsPosition.TOP));
+    FormLayout.FormItem nameItem = editingForm
+        .addFormItem(name, getTranslation("element." + I18N_PREFIX + "name"));
+    editingForm
+        .addFormItem(description, getTranslation("element." + I18N_PREFIX + "description"));
+    editingForm.addFormItem(canLogin, getTranslation("element." + I18N_PREFIX + "canLogin"));
+    FormLayout.FormItem isActiveItem = editingForm
+        .addFormItem(isActive, getTranslation("element." + I18N_PREFIX + "isActive"));
 
-        UIUtils.setColSpan(2, nameItem);
+    UIUtils.setColSpan(2, nameItem);
 
-        binder.setBean(securityRole);
+    binder.setBean(securityRole);
 
-        binder.bind(name, SecurityKeycloakRole::getName, SecurityKeycloakRole::setName);
-        binder.bind(description, SecurityKeycloakRole::getDescription,
-            SecurityKeycloakRole::setDescription);
-        binder.bind(canLogin, SecurityKeycloakRole::getCanLogin, SecurityKeycloakRole::setCanLogin);
-        binder.bind(isActive, SecurityKeycloakRole::getIsActive, SecurityKeycloakRole::setIsActive);
+    binder.bind(name, SecurityKeycloakRole::getName, SecurityKeycloakRole::setName);
+    binder.bind(description, SecurityKeycloakRole::getDescription,
+        SecurityKeycloakRole::setDescription);
+    binder.bind(canLogin, SecurityKeycloakRole::getCanLogin, SecurityKeycloakRole::setCanLogin);
+    binder.bind(isActive, SecurityKeycloakRole::getIsActive, SecurityKeycloakRole::setIsActive);
 
-        return editingForm;
-    }
+    return editingForm;
+  }
 
-    protected void filter(String filter) {
-        dataProvider
-            .setFilter(new DefaultFilter(
-                StringUtils.isBlank(filter) ? null : "*" + filter + "*",
-                Boolean.TRUE));
-    }
+  protected void filter(String filter) {
+    dataProvider
+        .setFilter(new DefaultFilter(
+            StringUtils.isBlank(filter) ? null : "*" + filter + "*",
+            Boolean.TRUE));
+  }
 }
