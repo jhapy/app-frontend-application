@@ -45,6 +45,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
@@ -124,7 +125,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private final HazelcastInstance hazelcastInstance;
   private final List<AttributeContextListener> contextListeners = new ArrayList<>();
 
-  public JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
+  protected JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
       HazelcastInstance hazelcastInstance, Environment environment) {
     this.menuProvider = menuProvider;
     this.hazelcastInstance = hazelcastInstance;
@@ -201,6 +202,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     return true;
   }
 
+  public Locale getDefaultLocale() {
+    return Locale.ENGLISH;
+  }
+
   public boolean hasGlobalSearch() {
     return true;
   }
@@ -218,6 +223,11 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
       if (VaadinSession.getCurrent() == null) {
           return;
       }
+
+      if ( ! hasLanguageSelect() ) {
+        UI.getCurrent().getSession().setLocale(getDefaultLocale());
+      }
+
     SecurityUser currentSecurityUser = (SecurityUser) VaadinSession.getCurrent()
         .getAttribute(SECURITY_USER_ATTRIBUTE);
     if (currentSecurityUser == null) {
@@ -550,60 +560,17 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
             menuData.addMenuEntry(subMenu);
           }
-
-          addToSecurityMenu(menuData, securitySubMenu);
-        }
-        boolean isDisplayMonitoring =
-            SecurityUtils.isAccessGranted(EurekaView.class) ||
-                SecurityUtils.isAccessGranted(CloudConfigView.class);
-        if (isDisplayMonitoring) {
-          MenuEntry monitoringSubMenu = new MenuEntry(AppConst.PAGE_MONITORING);
-          monitoringSubMenu.setVaadinIcon(VaadinIcon.GLASSES);
-          monitoringSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MONITORING));
-          monitoringSubMenu.setParentMenuEntry(settingsSubMenu);
-
-          menuData.addMenuEntry(monitoringSubMenu);
-
-          if (SecurityUtils.isAccessGranted(EurekaView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_EUREKA_ADMIN);
-            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
-            subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_EUREKA_ADMIN));
-            subMenu.setTargetClass(EurekaView.class);
-            subMenu.setParentMenuEntry(monitoringSubMenu);
-            subMenu.setHasChildNodes(false);
-
-            menuData.addMenuEntry(subMenu);
-          }
-          if (SecurityUtils.isAccessGranted(CloudConfigView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_CLOUD_CONFIG_ADMIN);
-            subMenu.setVaadinIcon(VaadinIcon.QUESTION);
-            subMenu
-                .setTitle(currentUI.getTranslation(AppConst.TITLE_CLOUD_CONFIG_ADMIN));
-            subMenu.setTargetClass(CloudConfigView.class);
-            subMenu.setParentMenuEntry(monitoringSubMenu);
-            subMenu.setHasChildNodes(false);
-
-            menuData.addMenuEntry(subMenu);
-          }
           if (SecurityUtils.isAccessGranted(MonitoringAdminView.class)) {
             MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ACTUAL_SESSIONS_ADMIN);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(
                 currentUI.getTranslation(AppConst.TITLE_ACTUAL_SESSIONS_ADMIN));
             subMenu.setTargetClass(MonitoringAdminView.class);
-            subMenu.setParentMenuEntry(monitoringSubMenu);
+            subMenu.setParentMenuEntry(securitySubMenu);
             subMenu.setHasChildNodes(false);
             menuData.addMenuEntry(subMenu);
           }
-        }
-        if (SecurityUtils.isAccessGranted(SwaggersAdminView.class)) {
-          MenuEntry swaggersMenu = new MenuEntry(AppConst.TITLE_SWAGGERS_ADMIN);
-          swaggersMenu.setVaadinIcon(VaadinIcon.CODE);
-          swaggersMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SWAGGERS_ADMIN));
-          swaggersMenu.setTargetClass(SwaggersAdminView.class);
-          swaggersMenu.setParentMenuEntry(settingsSubMenu);
-          swaggersMenu.setHasChildNodes(false);
-          menuData.addMenuEntry(swaggersMenu);
+          addToSecurityMenu(menuData, securitySubMenu);
         }
       }
       naviDrawer.refreshMenu();

@@ -20,6 +20,7 @@ package org.jhapy.frontend.client.security.keycloak;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -381,7 +382,7 @@ public class KeycloakClient implements HasLogger {
     return new ServiceResult(orikaBeanMapper.mapAsList(
         getKeycloakRealmInstance().roles().list().stream()
             .filter(roleRepresentation -> roleRepresentation.getName().startsWith("ROLE"))
-            .collect(
+            .sorted(Comparator.comparing(RoleRepresentation::getDescription)).collect(
                 Collectors.toList()), SecurityKeycloakRole.class));
   }
 
@@ -417,7 +418,7 @@ public class KeycloakClient implements HasLogger {
     }
   }
 
-  @Cacheable("findRoles")
+  @Cacheable(value = "findRoles", key = "#query")
   public ServiceResult<Page<SecurityKeycloakRole>> findRoles(FindAnyMatchingQuery query) {
     int totalElements = getKeycloakRealmInstance().roles().list(query.getFilter(), true).size();
     int start = query.getPageable().getOffset();
@@ -425,10 +426,16 @@ public class KeycloakClient implements HasLogger {
 
     Page<SecurityKeycloakRole> result = new Page<>();
 
-    List<RoleRepresentation> roles = getKeycloakRealmInstance().roles()
-        .list(query.getFilter(), start, end, true);
+    List<RoleRepresentation> roles = getKeycloakRealmInstance().roles().list(query.getFilter(),true);
+    if ( query.getPageable() != null && ! query.getPageable().getSort().isEmpty() ) {
+      var order = query.getPageable().getSort().stream().toList().get(0);
+      if ( order.getProperty().equals("name")) {
+        roles.sort( Comparator.comparing( RoleRepresentation::getName));
+      } else if ( order.getProperty().equals("description"))
+        roles.sort( Comparator.comparing( RoleRepresentation::getDescription));
+    }
 
-    result.setContent(orikaBeanMapper.mapAsList(roles, SecurityKeycloakRole.class));
+    result.setContent(orikaBeanMapper.mapAsList(roles.subList(start, end), SecurityKeycloakRole.class));
 
     result.setSize(result.getContent().size());
     result.setTotalElements((long) totalElements);
@@ -501,7 +508,7 @@ public class KeycloakClient implements HasLogger {
   @Cacheable("allGroups")
   public ServiceResult<List<SecurityKeycloakGroup>> getGroups() {
     return new ServiceResult(orikaBeanMapper
-        .mapAsList(getKeycloakRealmInstance().groups().groups(), SecurityKeycloakGroup.class));
+        .mapAsList(getKeycloakRealmInstance().groups().groups().stream().sorted(Comparator.comparing(GroupRepresentation::getName)).toList(), SecurityKeycloakGroup.class));
   }
 
   @Cacheable("groupByName")
