@@ -52,7 +52,7 @@ public class SessionCountGaugeServiceInitListener implements VaadinServiceInitLi
       var loggerPrefix = getLoggerPrefix("sessionInit");
       if (!e.getRequest().getPathInfo().startsWith("/management") && !e.getRequest().getPathInfo()
           .startsWith("/sw.js")) {
-        info(
+        trace(
             loggerPrefix, "New Vaadin session created, path {0}, current count is: {1}",
             e.getRequest().getPathInfo(), sessionsCount
                 .incrementAndGet());
@@ -60,7 +60,7 @@ public class SessionCountGaugeServiceInitListener implements VaadinServiceInitLi
     });
     vaadinService.addSessionDestroyListener(e -> {
       var loggerPrefix = getLoggerPrefix("sessionDestroy");
-      info(loggerPrefix, "Vaadin session destroyed. Current count is: {1}", sessionsCount
+      trace(loggerPrefix, "Vaadin session destroyed. Current count is: {0}", sessionsCount
           .decrementAndGet());
     });
   }

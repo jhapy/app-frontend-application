@@ -166,5 +166,5 @@ public interface AppConst {
   String SECURITY_USER_ATTRIBUTE = "SECURITY_USER";
   String THEME_ATTRIBUTE = "THEME";
 
-  String USER_ATTRIBUTE = "USER";
+  String USER_ID_ATTRIBUTE = "USER_ID";
 }

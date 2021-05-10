@@ -37,20 +37,19 @@ public class SessionManager implements VaadinServiceInitListener, HasLogger {
 
   @Override
   public void serviceInit(ServiceInitEvent event) {
-    final VaadinService vaadinService = event.getSource();
+    var vaadinService = event.getSource();
 
     vaadinService.addSessionDestroyListener(e -> {
       var loggerPrefix = getLoggerPrefix("sessionDestroy");
 
-      Optional<String> currentSecurityUser = SecurityUtils.getCurrentUserLogin();
+      var currentSecurityUser = SecurityUtils.getCurrentUserLogin();
 
-      logger().info(loggerPrefix + "Vaadin session destroyed. Current user is : " + (
-          currentSecurityUser.orElse("Not set")));
+      trace(loggerPrefix, "Vaadin session destroyed. Current user is : {0}", (currentSecurityUser.orElse("Not set")));
 
       if (e.getSession() != null && e.getSession().getSession() != null) {
-        logger().info(loggerPrefix + "End remote session");
+        trace(loggerPrefix, "End remote session");
 
-        String sessionId = e.getSession().getSession().getId();
+        var sessionId = e.getSession().getSession().getId();
         retrieveMap().remove(sessionId);
 
         AuditServices.getAuditServiceQueue()
@@ -64,7 +63,7 @@ public class SessionManager implements VaadinServiceInitListener, HasLogger {
     var loggerPrefix = getLoggerPrefix("removedDeadSessions");
     retrieveMap().forEach((s, sessionInfo) -> {
       if (sessionInfo.getLastContact().plusMinutes(2).isBefore(LocalDateTime.now())) {
-        logger().info(loggerPrefix + "Remove dead session : " + sessionInfo);
+        info(loggerPrefix, "Remove dead session : {0}", sessionInfo);
         retrieveMap().remove(s);
       }
     });

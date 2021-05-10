@@ -150,7 +150,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .disable()
         .authorizeRequests()
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-        .antMatchers("/places").permitAll()
+        .antMatchers("/").permitAll()
         .antMatchers("/api/auth-info").permitAll()
         .antMatchers("/api/**").authenticated()
         .antMatchers("/management/health").permitAll()

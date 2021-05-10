@@ -74,20 +74,4 @@ public class JacksonConfiguration {
   public ConstraintViolationProblemModule constraintViolationProblemModule() {
     return new ConstraintViolationProblemModule();
   }
-
-  @Bean
-  public ObjectMapper jsonObjectMapper() {
-    return Jackson2ObjectMapperBuilder.json()
-        .modules(module(), new JavaTimeModule())
-        .build();
-  }
-
-  public Module module() {
-    SimpleModule module = new SimpleModule();
-    module.addSerializer(Instant.class,
-        new Serialize());               // register as serialize class for Instant.class
-    module.addDeserializer(Instant.class,
-        new Deserialize());          //  register as deserialize class for Instant.class
-    return module;
-  }
 }

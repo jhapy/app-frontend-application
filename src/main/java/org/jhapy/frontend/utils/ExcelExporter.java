@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.BaseEntity;
 import org.jhapy.dto.utils.StoredFile;

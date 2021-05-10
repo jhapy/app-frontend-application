@@ -40,10 +40,6 @@ public class BaseServices {
     return getApplicationContext().getBean(ResourceService.class);
   }
 
-  public static AuthService getAuthService() {
-    return getApplicationContext().getBean(AuthService.class);
-  }
-
   public static ApplicationContext getApplicationContext() {
     ServletContext servletContext = SpringServlet.getCurrent().getServletContext();
     return WebApplicationContextUtils.getWebApplicationContext(servletContext);

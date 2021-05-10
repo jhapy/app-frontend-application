@@ -20,6 +20,7 @@ package org.jhapy.frontend.views;
 
 import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ATTRIBUTE;
 
+import com.flowingcode.vaadin.addons.errorwindow.ErrorManager;
 import com.hazelcast.core.HazelcastInstance;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -33,6 +34,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.RouterLayout;
@@ -46,13 +48,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.NewSession;
 import org.jhapy.dto.serviceQuery.SearchQuery;
 import org.jhapy.dto.serviceQuery.SearchQueryResult;
+import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.utils.StoredFile;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.jhapy.frontend.components.AppCookieConsent;
@@ -228,7 +234,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         UI.getCurrent().getSession().setLocale(getDefaultLocale());
       }
 
-    SecurityUser currentSecurityUser = (SecurityUser) VaadinSession.getCurrent()
+    var currentSecurityUser = (SecurityUser) VaadinSession.getCurrent()
         .getAttribute(SECURITY_USER_ATTRIBUTE);
     if (currentSecurityUser == null) {
       currentSecurityUser = SecurityUtils.getSecurityUser();
@@ -252,7 +258,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
                 .now(),
                 true, null));
 
-        SessionInfo sessionInfo = new SessionInfo();
+        var sessionInfo = new SessionInfo();
         sessionInfo.setJSessionId(currentSession.getSession().getId());
         sessionInfo.setLoginDateTime(LocalDateTime.now());
         sessionInfo.setLastContact(LocalDateTime.now());
@@ -357,9 +363,9 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
    * Initialise the navigation items.
    */
   private void initNaviItems() {
-    UI currentUI = UI.getCurrent();
+    var currentUI = UI.getCurrent();
 
-    MenuData menuData = naviDrawer.getFreshMenu();
+    var menuData = naviDrawer.getFreshMenu();
 
     addToMainMenu(menuData);
 
@@ -375,7 +381,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
       if (isSettingsDisplayed) {
-        MenuEntry settingsSubMenu = new MenuEntry(AppConst.PAGE_SETTINGS);
+        var settingsSubMenu = new MenuEntry(AppConst.PAGE_SETTINGS);
         settingsSubMenu.setVaadinIcon(VaadinIcon.EDIT);
         settingsSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SETTINGS));
 
@@ -390,7 +396,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             SecurityUtils.isAccessGranted(MessagesView.class);
 
         if (isDisplayI18n) {
-          MenuEntry i18nSubmenu = new MenuEntry(AppConst.PAGE_I18N);
+          var i18nSubmenu = new MenuEntry(AppConst.PAGE_I18N);
           i18nSubmenu.setVaadinIcon(VaadinIcon.SITEMAP);
           i18nSubmenu.setTitle(currentUI.getTranslation(AppConst.TITLE_I18N));
           i18nSubmenu.setParentMenuEntry(settingsSubMenu);
@@ -398,7 +404,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           menuData.addMenuEntry(i18nSubmenu);
 
           if (SecurityUtils.isAccessGranted(ActionsView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ACTIONS);
+            var subMenu = new MenuEntry(AppConst.PAGE_ACTIONS);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ACTIONS));
             subMenu.setTargetClass(ActionsView.class);
@@ -409,7 +415,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           }
 
           if (SecurityUtils.isAccessGranted(ElementsView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ELEMENTS);
+            var subMenu = new MenuEntry(AppConst.PAGE_ELEMENTS);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_ELEMENTS));
             subMenu.setTargetClass(ElementsView.class);
@@ -420,7 +426,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           }
 
           if (SecurityUtils.isAccessGranted(MessagesView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MESSAGES);
+            var subMenu = new MenuEntry(AppConst.PAGE_MESSAGES);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MESSAGES));
             subMenu.setTargetClass(MessagesView.class);
@@ -439,7 +445,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             SecurityUtils.isAccessGranted(CountriesView.class);
 
         if (isReferenceMenuDisplay) {
-          MenuEntry referenceSubMenu = new MenuEntry(AppConst.PAGE_REFERENCES);
+          var referenceSubMenu = new MenuEntry(AppConst.PAGE_REFERENCES);
           referenceSubMenu.setVaadinIcon(VaadinIcon.SITEMAP);
           referenceSubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_REFERENCES));
           referenceSubMenu.setParentMenuEntry(settingsSubMenu);
@@ -462,7 +468,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
                 SecurityUtils.isAccessGranted(MailAdminView.class);
 
         if (isDisplayNotifications) {
-          MenuEntry notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);
+          var notificationsSubMenu = new MenuEntry(AppConst.PAGE_NOTIFICATIONS);
           notificationsSubMenu.setVaadinIcon(VaadinIcon.SITEMAP);
           notificationsSubMenu
               .setTitle(currentUI.getTranslation(AppConst.TITLE_NOTIFICATION_ADMIN));
@@ -471,7 +477,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           menuData.addMenuEntry(notificationsSubMenu);
 
           if (SecurityUtils.isAccessGranted(MailTemplatesAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MAIL_TEMPLATES_ADMIN);
+            var subMenu = new MenuEntry(AppConst.PAGE_MAIL_TEMPLATES_ADMIN);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(
                 currentUI.getTranslation(AppConst.TITLE_MAIL_TEMPLATES_ADMIN));
@@ -483,7 +489,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           }
 
           if (SecurityUtils.isAccessGranted(SmsTemplatesAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SMS_TEMPLATES_ADMIN);
+            var subMenu = new MenuEntry(AppConst.PAGE_SMS_TEMPLATES_ADMIN);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu
                 .setTitle(currentUI.getTranslation(AppConst.TITLE_SMS_TEMPLATES_ADMIN));
@@ -495,7 +501,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           }
 
           if (SecurityUtils.isAccessGranted(SmsAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SMS_ADMIN);
+            var subMenu = new MenuEntry(AppConst.PAGE_SMS_ADMIN);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SMS));
             subMenu.setTargetClass(SmsAdminView.class);
@@ -506,7 +512,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           }
 
           if (SecurityUtils.isAccessGranted(MailAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_MAILS_ADMIN);
+            var subMenu = new MenuEntry(AppConst.PAGE_MAILS_ADMIN);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_MAILS));
             subMenu.setTargetClass(MailAdminView.class);
@@ -525,7 +531,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class);
 
         if (isDisplaySecurity) {
-          MenuEntry securitySubMenu = new MenuEntry(AppConst.PAGE_SECURITY);
+          var securitySubMenu = new MenuEntry(AppConst.PAGE_SECURITY);
           securitySubMenu.setVaadinIcon(VaadinIcon.KEY);
           securitySubMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SECURITY));
           securitySubMenu.setParentMenuEntry(settingsSubMenu);
@@ -533,25 +539,25 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           menuData.addMenuEntry(securitySubMenu);
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakUsersView.class)) {
-            MenuEntry subMenu = getSecurityUserMenuEntry(securitySubMenu);
+            var subMenu = getSecurityUserMenuEntry(securitySubMenu);
 
             menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakRolesView.class)) {
-            MenuEntry subMenu = getSecurityRoleMenuEntry(securitySubMenu);
+            var subMenu = getSecurityRoleMenuEntry(securitySubMenu);
 
             menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SecurityKeycloakGroupsView.class)) {
-            MenuEntry subMenu = getSecurityGroupsMenuEntry(securitySubMenu);
+            var subMenu = getSecurityGroupsMenuEntry(securitySubMenu);
 
             menuData.addMenuEntry(subMenu);
           }
 
           if (SecurityUtils.isAccessGranted(SessionView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_SESSIONS);
+            var subMenu = new MenuEntry(AppConst.PAGE_SESSIONS);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(currentUI.getTranslation(AppConst.TITLE_SESSIONS_ADMIN));
             subMenu.setTargetClass(SessionView.class);
@@ -561,7 +567,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
             menuData.addMenuEntry(subMenu);
           }
           if (SecurityUtils.isAccessGranted(MonitoringAdminView.class)) {
-            MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ACTUAL_SESSIONS_ADMIN);
+            var subMenu = new MenuEntry(AppConst.PAGE_ACTUAL_SESSIONS_ADMIN);
             subMenu.setVaadinIcon(VaadinIcon.QUESTION);
             subMenu.setTitle(
                 currentUI.getTranslation(AppConst.TITLE_ACTUAL_SESSIONS_ADMIN));
@@ -573,12 +579,12 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
           addToSecurityMenu(menuData, securitySubMenu);
         }
       }
-      naviDrawer.refreshMenu();
     }
+    naviDrawer.refreshMenu();
   }
 
   protected MenuEntry getSecurityUserMenuEntry(MenuEntry parentEntry) {
-    MenuEntry subMenu = new MenuEntry(AppConst.PAGE_USERS);
+    var subMenu = new MenuEntry(AppConst.PAGE_USERS);
     subMenu.setVaadinIcon(VaadinIcon.QUESTION);
     subMenu.setTitle(UI.getCurrent().getTranslation(AppConst.TITLE_SECURITY_USERS));
     subMenu.setTargetClass(SecurityKeycloakUsersView.class);
@@ -589,7 +595,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   }
 
   protected MenuEntry getSecurityRoleMenuEntry(MenuEntry parentEntry) {
-    MenuEntry subMenu = new MenuEntry(AppConst.PAGE_ROLES);
+    var subMenu = new MenuEntry(AppConst.PAGE_ROLES);
     subMenu.setVaadinIcon(VaadinIcon.QUESTION);
     subMenu.setTitle(UI.getCurrent().getTranslation(AppConst.TITLE_SECURITY_ROLES));
     subMenu.setTargetClass(SecurityKeycloakRolesView.class);
@@ -600,7 +606,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   }
 
   protected MenuEntry getSecurityGroupsMenuEntry(MenuEntry parentEntry) {
-    MenuEntry subMenu = new MenuEntry(AppConst.PAGE_GROUPS);
+    var subMenu = new MenuEntry(AppConst.PAGE_GROUPS);
     subMenu.setVaadinIcon(VaadinIcon.QUESTION);
     subMenu.setTitle(UI.getCurrent().getTranslation(AppConst.TITLE_SECURITY_GROUPS));
     subMenu.setTargetClass(SecurityKeycloakGroupsView.class);
@@ -681,10 +687,10 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   }
 
   public void displayInfoMessage(String message) {
-    Icon icon = UIUtils.createIcon(IconSize.S, TextColor.SUCCESS, VaadinIcon.CHECK);
-    Label label = UIUtils.createLabel(FontSize.XS, TextColor.BODY, message);
+    var icon = UIUtils.createIcon(IconSize.S, TextColor.SUCCESS, VaadinIcon.CHECK);
+    var label = UIUtils.createLabel(FontSize.XS, TextColor.BODY, message);
 
-    FlexLayout messageLayout = new FlexLayout(icon, label);
+    var messageLayout = new FlexLayout(icon, label);
 
     // Set the alignment
     messageLayout.setAlignItems(Alignment.CENTER);
@@ -695,7 +701,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         LumoStyles.Padding.Wide.M
     );
 
-    Notification notification = new Notification(messageLayout);
+    var notification = new Notification(messageLayout);
     notification.setDuration(3000);
     notification.setPosition(Position.TOP_CENTER);
 
@@ -728,14 +734,56 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
      */
   }
+public void displayErrorMessage( Throwable t  ) {
+  ErrorManager.showError(t);
+}
+
+public void displayErrorMessage( String title, String message ) {
+  var icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
+  MessageDialog okDialog = new MessageDialog()
+      .setTitle(title, icon)
+      .setMessage(message);
+  okDialog.addButton().text(getTranslation("action.global.close")).primary()
+      .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
+  okDialog.open();
+}
+  protected boolean isProductionMode() {
+    return "true".equals(System.getProperty("productionMode"));
+  }
+
+  public void displayErrorMessage( ServiceResult errorResult ) {
+    displayErrorMessage(errorResult.getMessageTitle(), errorResult.getMessage(),errorResult.getExceptionString());
+  }
+  public void displayErrorMessage( String title, String message, String stacktrace ) {
+    var icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
+    MessageDialog okDialog = new MessageDialog()
+        .setTitle(StringUtils.isNotBlank(title) ? title : getTranslation("message.global.error"), icon)
+        .setMessage(message);
+    okDialog.addButton().text(getTranslation("action.global.close")).primary()
+        .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
+
+    if ( ! isProductionMode() && StringUtils.isNotBlank(stacktrace) ) {
+      okDialog.setWidth("800px");
+      var detailsText = new TextArea();
+      detailsText.setWidthFull();
+      detailsText.setMaxHeight("15em");
+      detailsText.setReadOnly(true);
+      detailsText.setValue(stacktrace);
+      okDialog.addButtonToLeft().text(getTranslation("action.global.showErrorDetails")).icon(VaadinIcon.ARROW_DOWN)
+          .toggleDetails();
+      okDialog.getDetails().add(detailsText);
+    }
+    okDialog.open();
+  }
 
   public void displayErrorMessage(String message) {
-    Icon icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
+    var icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
     MessageDialog okDialog = new MessageDialog()
         .setTitle(getTranslation("message.global.error"), icon)
         .setMessage(message);
     okDialog.addButton().text(getTranslation("action.global.close")).primary()
         .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
+
     okDialog.open();
     /*
     Label label = UIUtils.createLabel(FontSize.XS, TextColor.ERROR, message);

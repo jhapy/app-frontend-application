@@ -199,7 +199,7 @@ public final class SecurityUtils {
 
   private static boolean isUserLoggedIn(Authentication authentication) {
     return (authentication != null
-        && !(authentication instanceof AnonymousAuthenticationToken)) || loginRememberedUser();
+        && !(authentication instanceof AnonymousAuthenticationToken));
   }
 
   /**
@@ -218,7 +218,7 @@ public final class SecurityUtils {
         .anyMatch(r -> r.getIdentifier().equals(parameterValue));
   }
 
-  public static void newSession(SecurityUser securityUser, boolean rememberMe) {
+  public static void newSession(SecurityUser securityUser) {
     SecurityContextHolder.getContext()
         .setAuthentication(new UsernamePasswordAuthenticationToken(securityUser, null,
             securityUser.getAuthorities()));
@@ -232,36 +232,10 @@ public final class SecurityUtils {
             securityUser.getUsername(), VaadinRequest.getCurrent().getRemoteAddr(),
             Instant.now(),
             true, null));
-
-    if (rememberMe) {
-      ServiceResult<RememberMeToken> _rememberMeToken = BaseServices
-          .getAuthService()
-          .createRememberMeToken(new CreateRememberMeTokenQuery(securityUser.getId()));
-
-      if (_rememberMeToken.getIsSuccess()) {
-        RememberMeToken rememberMeToken = _rememberMeToken.getData();
-
-        Cookie cookie = new Cookie(COOKIE_NAME, rememberMeToken.getToken());
-        cookie.setPath("/");
-        cookie.setMaxAge(
-            (int) (rememberMeToken.getExpiryDate().getTime()
-                - System.currentTimeMillis() * 1000));
-        cookie.setHttpOnly(true);
-        VaadinService.getCurrentResponse().addCookie(cookie);
-      }
-    }
   }
 
   public static void endSession(String jSessionId) {
-    Optional<Cookie> cookie = getRememberMeCookie();
-    if (cookie.isPresent()) {
-      String id = cookie.get().getValue();
-      BaseServices.getAuthService().clearRememberMeToken(new ClearRememberMeTokenQuery(id));
-      deleteRememberMeCookie(cookie.get());
-    }
     AuditServices.getAuditServiceQueue().endSession(new EndSession(jSessionId, Instant.now()));
-
-    // VaadinSession.getCurrent().close();
   }
 
   private static Optional<Cookie> getRememberMeCookie() {
@@ -275,37 +249,6 @@ public final class SecurityUtils {
     }
 
     return Optional.empty();
-  }
-
-  private static boolean loginRememberedUser() {
-    Optional<Cookie> rememberMeCookie = getRememberMeCookie();
-
-    if (rememberMeCookie.isPresent()) {
-      String id = rememberMeCookie.get().getValue();
-      ServiceResult<SecurityUser> _securityUser = BaseServices.getAuthService()
-          .getSecurityUserByRememberMeToken(new GetSecurityUserByRememberMeTokenQuery(id));
-
-      if (_securityUser != null && _securityUser.getIsSuccess()) {
-        newSession(_securityUser.getData(), true);
-        return true;
-      } else {
-        deleteRememberMeCookie(rememberMeCookie.get());
-      }
-    }
-
-    return false;
-  }
-
-  private static void deleteRememberMeCookie(Cookie existing) {
-    Cookie cookie = new Cookie(existing.getName(), null);
-    if (existing.getPath() != null) {
-      cookie.setPath(existing.getPath());
-    }
-    if (existing.getDomain() != null) {
-      cookie.setDomain(existing.getDomain());
-    }
-    cookie.setMaxAge(0);
-    VaadinService.getCurrentResponse().addCookie(cookie);
   }
 
   public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
