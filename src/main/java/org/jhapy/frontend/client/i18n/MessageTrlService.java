@@ -43,13 +43,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/messageTrlService")
 @Primary
-public interface MessageTrlService  extends RemoteServiceHandler {
+public interface MessageTrlService extends RemoteServiceHandler {
 
   @PostMapping(value = "/findByMessage")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findByMessageFallback")
   ServiceResult<List<MessageTrl>> findByMessage(@RequestBody FindByMessageQuery query);
 
-  default ServiceResult<List<MessageTrl>> findByMessageFallback(FindByMessageQuery query, Exception e) {
+  default ServiceResult<List<MessageTrl>> findByMessageFallback(FindByMessageQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findByMessageFallback"), e, Collections.emptyList());
   }
 
@@ -73,9 +74,10 @@ public interface MessageTrlService  extends RemoteServiceHandler {
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "getByNameAndIso3Fallback")
   ServiceResult<MessageTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
 
-  default ServiceResult<MessageTrl> getByNameAndIso3Fallback(@RequestBody GetByNameAndIso3Query query, Exception e) {
+  default ServiceResult<MessageTrl> getByNameAndIso3Fallback(
+      @RequestBody GetByNameAndIso3Query query, Exception e) {
     return defaultFallback(getLoggerPrefix("getByNameAndIso3Fallback"), e, null);
-}
+  }
 
   @PostMapping(value = "/getById")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "getByIdFallback")

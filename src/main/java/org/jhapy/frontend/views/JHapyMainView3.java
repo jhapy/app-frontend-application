@@ -28,8 +28,6 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
@@ -48,10 +46,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.security.SecurityUser;
@@ -66,6 +61,7 @@ import org.jhapy.frontend.components.FlexBoxLayout;
 import org.jhapy.frontend.components.navigation.bar.AppBar;
 import org.jhapy.frontend.components.navigation.drawer.NaviDrawerWithTreeMenu;
 import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
+import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.dataproviders.MenuHierarchicalDataProvider;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.utils.AppConst;
@@ -80,8 +76,6 @@ import org.jhapy.frontend.utils.css.Overflow;
 import org.jhapy.frontend.utils.css.Shadow;
 import org.jhapy.frontend.views.admin.MonitoringAdminView;
 import org.jhapy.frontend.views.admin.audit.SessionView;
-import org.jhapy.frontend.views.admin.configServer.CloudConfigView;
-import org.jhapy.frontend.views.admin.eureka.EurekaView;
 import org.jhapy.frontend.views.admin.i18n.ActionsView;
 import org.jhapy.frontend.views.admin.i18n.ElementsView;
 import org.jhapy.frontend.views.admin.i18n.MessagesView;
@@ -93,7 +87,6 @@ import org.jhapy.frontend.views.admin.references.CountriesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakGroupsView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakRolesView;
 import org.jhapy.frontend.views.admin.security.SecurityKeycloakUsersView;
-import org.jhapy.frontend.views.admin.swagger.SwaggersAdminView;
 import org.jhapy.frontend.views.menu.MenuData;
 import org.jhapy.frontend.views.menu.MenuEntry;
 import org.springframework.core.env.Environment;
@@ -127,16 +120,17 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private Environment environment;
   private Div appFooterOuter;
   private AppBar appBar;
+  protected AppProperties appProperties;
   protected final MenuHierarchicalDataProvider menuProvider;
   private final HazelcastInstance hazelcastInstance;
   private final List<AttributeContextListener> contextListeners = new ArrayList<>();
 
   protected JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
-      HazelcastInstance hazelcastInstance, Environment environment) {
+      HazelcastInstance hazelcastInstance, Environment environment, AppProperties appProperties) {
     this.menuProvider = menuProvider;
     this.hazelcastInstance = hazelcastInstance;
-
-    afterLogin();
+this.appProperties = appProperties;
+    // afterLogin();
 
     this.confirmDialog = new ConfirmDialog();
     confirmDialog.setCancelable(true);
@@ -226,13 +220,13 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
   public void afterLogin() {
     var loggerPrefix = getLoggerPrefix("afterLogin");
-      if (VaadinSession.getCurrent() == null) {
-          return;
-      }
+    if (VaadinSession.getCurrent() == null) {
+      return;
+    }
 
-      if ( ! hasLanguageSelect() ) {
-        UI.getCurrent().getSession().setLocale(getDefaultLocale());
-      }
+    if (!hasLanguageSelect()) {
+      UI.getCurrent().getSession().setLocale(getDefaultLocale());
+    }
 
     var currentSecurityUser = (SecurityUser) VaadinSession.getCurrent()
         .getAttribute(SECURITY_USER_ATTRIBUTE);
@@ -734,42 +728,48 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
      */
   }
-public void displayErrorMessage( Throwable t  ) {
-  ErrorManager.showError(t);
-}
 
-public void displayErrorMessage( String title, String message ) {
-  var icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
-  MessageDialog okDialog = new MessageDialog()
-      .setTitle(title, icon)
-      .setMessage(message);
-  okDialog.addButton().text(getTranslation("action.global.close")).primary()
-      .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
-  okDialog.open();
-}
+  public void displayErrorMessage(Throwable t) {
+    ErrorManager.showError(t);
+  }
+
+  public void displayErrorMessage(String title, String message) {
+    var icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
+    MessageDialog okDialog = new MessageDialog()
+        .setTitle(title, icon)
+        .setMessage(message);
+    okDialog.addButton().text(getTranslation("action.global.close")).primary()
+        .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
+    okDialog.open();
+  }
+
   protected boolean isProductionMode() {
     return "true".equals(System.getProperty("productionMode"));
   }
 
-  public void displayErrorMessage( ServiceResult errorResult ) {
-    displayErrorMessage(errorResult.getMessageTitle(), errorResult.getMessage(),errorResult.getExceptionString());
+  public void displayErrorMessage(ServiceResult errorResult) {
+    displayErrorMessage(errorResult.getMessageTitle(), errorResult.getMessage(),
+        errorResult.getExceptionString());
   }
-  public void displayErrorMessage( String title, String message, String stacktrace ) {
+
+  public void displayErrorMessage(String title, String message, String stacktrace) {
     var icon = UIUtils.createIcon(IconSize.S, TextColor.ERROR, VaadinIcon.WARNING);
     MessageDialog okDialog = new MessageDialog()
-        .setTitle(StringUtils.isNotBlank(title) ? title : getTranslation("message.global.error"), icon)
+        .setTitle(StringUtils.isNotBlank(title) ? title : getTranslation("message.global.error"),
+            icon)
         .setMessage(message);
     okDialog.addButton().text(getTranslation("action.global.close")).primary()
         .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
 
-    if ( ! isProductionMode() && StringUtils.isNotBlank(stacktrace) ) {
+    if (!isProductionMode() && StringUtils.isNotBlank(stacktrace)) {
       okDialog.setWidth("800px");
       var detailsText = new TextArea();
       detailsText.setWidthFull();
       detailsText.setMaxHeight("15em");
       detailsText.setReadOnly(true);
       detailsText.setValue(stacktrace);
-      okDialog.addButtonToLeft().text(getTranslation("action.global.showErrorDetails")).icon(VaadinIcon.ARROW_DOWN)
+      okDialog.addButtonToLeft().text(getTranslation("action.global.showErrorDetails"))
+          .icon(VaadinIcon.ARROW_DOWN)
           .toggleDetails();
       okDialog.getDetails().add(detailsText);
     }

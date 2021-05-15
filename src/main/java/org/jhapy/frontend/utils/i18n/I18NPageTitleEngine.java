@@ -63,12 +63,12 @@ public class I18NPageTitleEngine implements VaadinServiceInitListener, UIInitLis
     )
         .ifPresentOrElse(
             msgKey -> {
-              final I18NProvider i18NProvider = VaadinService
+              var i18NProvider = VaadinService
                   .getCurrent()
                   .getInstantiator()
                   .getI18NProvider();
-              final Locale locale = event.getUI().getLocale();
-              final List<Locale> providedLocales = i18NProvider.getProvidedLocales();
+              var locale = event.getUI().getLocale();
+              var providedLocales = i18NProvider.getProvidedLocales();
               match(
                   matchCase(() -> success(providedLocales.get(0))),
                   matchCase(() -> locale == null && providedLocales.isEmpty(),
@@ -96,7 +96,7 @@ public class I18NPageTitleEngine implements VaadinServiceInitListener, UIInitLis
 
   @Override
   public void uiInit(UIInitEvent event) {
-    final UI ui = event.getUI();
+    var ui = event.getUI();
     ui.addBeforeEnterListener(this);
     //addListener(ui, PermissionsChangedEvent.class, e -> ui.getPage().reload());
   }

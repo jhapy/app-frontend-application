@@ -44,8 +44,6 @@ import dev.mett.vaadin.tooltip.Tooltips;
 import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
 import dev.mett.vaadin.tooltip.config.TooltipConfiguration;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -76,19 +74,19 @@ public abstract class DefaultDetailsView<T extends BaseEntity> extends ViewFrame
 
   static {
 
-      // Yiddish
-      rtlSet = Set.of("ar", // Arabic
-          "dv", // Divehi
-          "fa", // Persian
-          "ha", // Hausa
-          "he", // Hebrew
-          "iw", // Hebrew
-          "ji", // Yiddish
-          "ps", // Pushto
-          "sd", // Sindhi
-          "ug", // Uighur
-          "ur", // Urdu
-          "yi");
+    // Yiddish
+    rtlSet = Set.of("ar", // Arabic
+        "dv", // Divehi
+        "fa", // Persian
+        "ha", // Hausa
+        "he", // Hebrew
+        "iw", // Hebrew
+        "ji", // Yiddish
+        "ps", // Pushto
+        "sd", // Sindhi
+        "ug", // Uighur
+        "ur", // Urdu
+        "yi");
   }
 
   protected final String I18N_PREFIX;

@@ -195,7 +195,8 @@ public class SecurityKeycloakUsersView extends
 
     Button impressionateButton = UIUtils
         .createButton(getTranslation("action." + I18N_PREFIX + "impressionate"));
-    impressionateButton.addClickListener(buttonClickEvent -> SecurityServices.getKeycloakClient().impressionate(securityUser.getId()));
+    impressionateButton.addClickListener(buttonClickEvent -> SecurityServices.getKeycloakClient()
+        .impressionate(securityUser.getId()));
 
     // Form layout
     FormLayout editingForm = new FormLayout();
@@ -277,11 +278,13 @@ public class SecurityKeycloakUsersView extends
     binder
         .bind(rolesField, securityKeycloakUser -> securityKeycloakUser.getRoles() == null ? null
                 : new HashSet<>(securityKeycloakUser.getRoles()),
-            (securityKeycloakUser, securityKeycloakRoles) -> securityKeycloakUser.setRoles(new ArrayList<>(securityKeycloakRoles)));
+            (securityKeycloakUser, securityKeycloakRoles) -> securityKeycloakUser
+                .setRoles(new ArrayList<>(securityKeycloakRoles)));
     binder.bind(groupsField,
         securityKeycloakUser -> securityKeycloakUser.getGroups() == null ? null
             : new HashSet<>(securityKeycloakUser.getGroups()),
-        (securityKeycloakUser, securityKeycloakGroups) -> securityKeycloakUser.setGroups(new ArrayList<>(securityKeycloakGroups)));
+        (securityKeycloakUser, securityKeycloakGroups) -> securityKeycloakUser
+            .setGroups(new ArrayList<>(securityKeycloakGroups)));
     binder.bind(effectiveRolesField,
         securityKeycloakUser -> securityKeycloakUser.getEffectiveRoles() == null ? null
             : securityKeycloakUser.getEffectiveRoles().stream()

@@ -32,7 +32,9 @@ public class CorsProxyResource extends StreamResource {
           try {
             return new URL(url).openStream();
           } catch (IOException e) {
-            HasLoggerStatic.error( CorsProxyResource.class, HasLoggerStatic.getLoggerPrefix("InputStreamFactory()"), e,"Unexpected error {0}", e.getLocalizedMessage());
+            HasLoggerStatic.error(CorsProxyResource.class,
+                HasLoggerStatic.getLoggerPrefix("InputStreamFactory()"), e, "Unexpected error {0}",
+                e.getLocalizedMessage());
             return null;
           }
         }

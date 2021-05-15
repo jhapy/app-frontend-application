@@ -223,7 +223,8 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
     if (!isGlobalSearchEnabled()) {
       Button searchButton = UIUtils.createTertiaryButton(VaadinIcon.SEARCH);
       searchButton.addClickListener(event -> appBar.searchModeOn());
-      appBar.addSearchListener(event -> filter(appBar.getSearchString(), appBar.getSearchShowActive()));
+      appBar.addSearchListener(
+          event -> filter(appBar.getSearchString(), appBar.getSearchShowActive()));
       appBar.setSearchPlaceholder(getTranslation("element.global.search"));
       appBar.addActionItem(searchButton);
     } else {

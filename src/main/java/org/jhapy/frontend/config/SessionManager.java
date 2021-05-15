@@ -2,11 +2,9 @@ package org.jhapy.frontend.config;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.vaadin.flow.server.ServiceInitEvent;
-import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.commons.utils.HasLogger;
@@ -44,7 +42,8 @@ public class SessionManager implements VaadinServiceInitListener, HasLogger {
 
       var currentSecurityUser = SecurityUtils.getCurrentUserLogin();
 
-      trace(loggerPrefix, "Vaadin session destroyed. Current user is : {0}", (currentSecurityUser.orElse("Not set")));
+      trace(loggerPrefix, "Vaadin session destroyed. Current user is : {0}",
+          (currentSecurityUser.orElse("Not set")));
 
       if (e.getSession() != null && e.getSession().getSession() != null) {
         trace(loggerPrefix, "End remote session");

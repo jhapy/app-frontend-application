@@ -94,7 +94,8 @@ public class EurekaInstancesTabContent extends ActuatorBaseView {
           new Badge(String.valueOf(eurekaApplication.getInstances().size()),
               BadgeColor.SUCCESS)
       );
-      eurekaApplicationItem.addClickListener(flexLayoutClickEvent -> eurekaApplicationInstanceGrid.setItems(eurekaApplication.getInstances()));
+      eurekaApplicationItem.addClickListener(flexLayoutClickEvent -> eurekaApplicationInstanceGrid
+          .setItems(eurekaApplication.getInstances()));
       eurekaApplicationItem
           .setDividerVisible(++idx < eurekaApplication.getInstances().size());
       items.add(eurekaApplicationItem);

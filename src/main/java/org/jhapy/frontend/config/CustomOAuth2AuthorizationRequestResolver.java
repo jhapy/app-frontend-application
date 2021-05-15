@@ -29,7 +29,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements
 
   @Override
   public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-    OAuth2AuthorizationRequest req = defaultResolver.resolve(request);
+    var req = defaultResolver.resolve(request);
     if (req != null) {
       req = customizeAuthorizationRequest(req);
     }
@@ -39,7 +39,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements
   @Override
   public OAuth2AuthorizationRequest resolve(HttpServletRequest request,
       String clientRegistrationId) {
-    OAuth2AuthorizationRequest req = defaultResolver.resolve(request, clientRegistrationId);
+    var req = defaultResolver.resolve(request, clientRegistrationId);
     if (req != null) {
       req = customizeAuthorizationRequest(req);
     }
@@ -49,16 +49,16 @@ public class CustomOAuth2AuthorizationRequestResolver implements
   private OAuth2AuthorizationRequest customizeAuthorizationRequest(
       OAuth2AuthorizationRequest req) {
     var loggerPrefix = getLoggerPrefix("customizeAuthorizationRequest", forceHttps);
-    logger().debug(loggerPrefix + "Initial Redirect URI = " + req.getRedirectUri());
+    debug(loggerPrefix, "Initial Redirect URI = {0}", req.getRedirectUri());
     if (forceHttps) {
       URI uri = null;
       try {
         uri = new URI(req.getRedirectUri());
         String newRedirectUri = "https://" + uri.getAuthority() + uri.getPath();
-        logger().debug(loggerPrefix + "New redirect URI = " + newRedirectUri);
+        debug(loggerPrefix, "New redirect URI = {0}", newRedirectUri);
         return OAuth2AuthorizationRequest.from(req).redirectUri(newRedirectUri).build();
       } catch (URISyntaxException e) {
-        logger().error(loggerPrefix + "Unexpected error : " + e.getMessage(), e);
+        error(loggerPrefix , e, "Unexpected error : {0}",e.getMessage());
       }
     }
     return OAuth2AuthorizationRequest.from(req).build();

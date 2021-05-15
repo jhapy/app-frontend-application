@@ -19,10 +19,7 @@
 package org.jhapy.frontend.client.i18n;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import java.util.Collections;
-import java.util.List;
 import org.jhapy.dto.domain.i18n.Message;
-import org.jhapy.dto.domain.i18n.MessageTrl;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.CountAnyMatchingQuery;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
@@ -44,13 +41,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/messageService")
 @Primary
-public interface MessageService  extends RemoteServiceHandler {
+public interface MessageService extends RemoteServiceHandler {
 
   @PostMapping(value = "/findAnyMatching")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findAnyMatchingFallback")
   ServiceResult<Page<Message>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  default ServiceResult<Page<Message>> findAnyMatchingFallback(FindAnyMatchingQuery query, Exception e) {
+  default ServiceResult<Page<Message>> findAnyMatchingFallback(FindAnyMatchingQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findAnyMatchingFallback"), e, new Page<>());
   }
 
@@ -67,7 +65,7 @@ public interface MessageService  extends RemoteServiceHandler {
   ServiceResult<Message> getById(@RequestBody GetByIdQuery query);
 
   default ServiceResult<Message> getByIdFallback(FindByMessageQuery query, Exception e) {
-    return defaultFallback(getLoggerPrefix("findByMessageFallback"), e,null);
+    return defaultFallback(getLoggerPrefix("findByMessageFallback"), e, null);
   }
 
   @PostMapping(value = "/save")

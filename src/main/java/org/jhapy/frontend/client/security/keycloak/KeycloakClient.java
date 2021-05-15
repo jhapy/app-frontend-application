@@ -210,7 +210,8 @@ public class KeycloakClient implements HasLogger {
       if (userRepresentation.getAttributes() == null) {
         userRepresentation.setAttributes(new HashMap<>());
       }
-      user.getAttributes().forEach((s, o) -> userRepresentation.getAttributes().put(s, Collections.singletonList(o.toString())));
+      user.getAttributes().forEach((s, o) -> userRepresentation.getAttributes()
+          .put(s, Collections.singletonList(o.toString())));
 
       userRepresentation.getAttributes()
           .put("title", Collections.singletonList(user.getTitle()));
@@ -383,7 +384,7 @@ public class KeycloakClient implements HasLogger {
         getKeycloakRealmInstance().roles().list().stream()
             .filter(roleRepresentation -> roleRepresentation.getName().startsWith("ROLE"))
             .sorted(Comparator.comparing(RoleRepresentation::getDescription)).collect(
-                Collectors.toList()), SecurityKeycloakRole.class));
+            Collectors.toList()), SecurityKeycloakRole.class));
   }
 
   @Cacheable("roleByName")
@@ -426,16 +427,19 @@ public class KeycloakClient implements HasLogger {
 
     Page<SecurityKeycloakRole> result = new Page<>();
 
-    List<RoleRepresentation> roles = getKeycloakRealmInstance().roles().list(query.getFilter(),true);
-    if ( query.getPageable() != null && ! query.getPageable().getSort().isEmpty() ) {
+    List<RoleRepresentation> roles = getKeycloakRealmInstance().roles()
+        .list(query.getFilter(), true);
+    if (query.getPageable() != null && !query.getPageable().getSort().isEmpty()) {
       var order = query.getPageable().getSort().stream().collect(Collectors.toList()).get(0);
-      if ( order.getProperty().equals("name")) {
-        roles.sort( Comparator.comparing( RoleRepresentation::getName));
-      } else if ( order.getProperty().equals("description"))
-        roles.sort( Comparator.comparing( RoleRepresentation::getDescription));
+      if (order.getProperty().equals("name")) {
+        roles.sort(Comparator.comparing(RoleRepresentation::getName));
+      } else if (order.getProperty().equals("description")) {
+        roles.sort(Comparator.comparing(RoleRepresentation::getDescription));
+      }
     }
 
-    result.setContent(orikaBeanMapper.mapAsList(roles.subList(start, end), SecurityKeycloakRole.class));
+    result.setContent(
+        orikaBeanMapper.mapAsList(roles.subList(start, end), SecurityKeycloakRole.class));
 
     result.setSize(result.getContent().size());
     result.setTotalElements((long) totalElements);
@@ -508,8 +512,9 @@ public class KeycloakClient implements HasLogger {
   @Cacheable("allGroups")
   public ServiceResult<List<SecurityKeycloakGroup>> getGroups() {
     return new ServiceResult(orikaBeanMapper
-        .mapAsList(getKeycloakRealmInstance().groups().groups().stream().sorted(Comparator.comparing(GroupRepresentation::getName)).collect(
-            Collectors.toList()), SecurityKeycloakGroup.class));
+        .mapAsList(getKeycloakRealmInstance().groups().groups().stream()
+            .sorted(Comparator.comparing(GroupRepresentation::getName)).collect(
+                Collectors.toList()), SecurityKeycloakGroup.class));
   }
 
   @Cacheable("groupByName")

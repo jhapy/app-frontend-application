@@ -21,11 +21,9 @@ package org.jhapy.frontend.client.i18n;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.Collections;
 import java.util.List;
-import org.jhapy.dto.domain.i18n.ActionTrl;
 import org.jhapy.dto.domain.i18n.ElementTrl;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
-import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.serviceQuery.generic.GetByIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.serviceQuery.i18n.FindByIso3Query;
@@ -45,13 +43,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/elementTrlService")
 @Primary
-public interface ElementTrlService  extends RemoteServiceHandler {
+public interface ElementTrlService extends RemoteServiceHandler {
 
   @PostMapping(value = "/findByElement")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findByElementFallback")
   ServiceResult<List<ElementTrl>> findByElement(@RequestBody FindByElementQuery query);
 
-  default ServiceResult<List<ElementTrl>> findByElementFallback(FindByElementQuery query, Exception e) {
+  default ServiceResult<List<ElementTrl>> findByElementFallback(FindByElementQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findByElementFallback"), e, Collections.emptyList());
   }
 
@@ -75,7 +74,8 @@ public interface ElementTrlService  extends RemoteServiceHandler {
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "getByNameAndIso3Fallback")
   ServiceResult<ElementTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
 
-  default ServiceResult<ElementTrl> getByNameAndIso3Fallback(GetByNameAndIso3Query query, Exception e) {
+  default ServiceResult<ElementTrl> getByNameAndIso3Fallback(GetByNameAndIso3Query query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("getByNameAndIso3Fallback"), e, null);
   }
 

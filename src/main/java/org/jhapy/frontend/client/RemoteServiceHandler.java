@@ -2,25 +2,18 @@ package org.jhapy.frontend.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
-import feign.FeignException.FeignServerException;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 import org.jhapy.commons.security.SecurityUtils;
-import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.utils.AppContextThread;
 import org.zalando.problem.AbstractThrowableProblem;
 import org.zalando.problem.DefaultProblem;
-import org.zalando.problem.Problem;
 import org.zalando.problem.ProblemModule;
 
 /**
@@ -29,24 +22,31 @@ import org.zalando.problem.ProblemModule;
  * @since 08/05/2021
  */
 public interface RemoteServiceHandler {
+
   default ServiceResult defaultFallback(String loggerPrefix, Exception e, Object defaultResult) {
-    error(loggerPrefix,"An error has occurred {0}", e.getLocalizedMessage());
+    error(loggerPrefix, "An error has occurred {0}", e.getLocalizedMessage());
     var objectMapper = new ObjectMapper();
     objectMapper.registerModule(new ProblemModule());
     try {
-      if ( e instanceof FeignException) {
-        var responseBody = new String(((FeignException)e).responseBody().orElseThrow( () -> new Exception("Cannot decode body") ).array());
-        AbstractThrowableProblem problem = objectMapper.readValue(responseBody, DefaultProblem.class);
-        error(loggerPrefix,"Problem is {0}", problem.getDetail() );
-        ServiceResult result = new ServiceResult<>(false, StringUtils.isNotBlank(problem.getDetail()) ? problem.getDetail() : problem.getParameters().get("message").toString(), defaultResult);
-        result.setMessageTitle(StringUtils.isNotBlank(problem.getTitle()) ? problem.getTitle() : problem.getStatus().getReasonPhrase());
-        result.setExceptionString( ExceptionUtils.getStackTrace(problem));
+      if (e instanceof FeignException) {
+        var responseBody = new String(((FeignException) e).responseBody()
+            .orElseThrow(() -> new Exception("Cannot decode body")).array());
+        AbstractThrowableProblem problem = objectMapper
+            .readValue(responseBody, DefaultProblem.class);
+        error(loggerPrefix, "Problem is {0}", problem.getDetail());
+        ServiceResult result = new ServiceResult<>(false,
+            StringUtils.isNotBlank(problem.getDetail()) ? problem.getDetail()
+                : problem.getParameters().get("message").toString(), defaultResult);
+        result.setMessageTitle(StringUtils.isNotBlank(problem.getTitle()) ? problem.getTitle()
+            : problem.getStatus().getReasonPhrase());
+        result.setExceptionString(ExceptionUtils.getStackTrace(problem));
         return result;
       } else {
         return new ServiceResult<>(false, e.getLocalizedMessage(), defaultResult);
       }
     } catch (Exception exception) {
-      error(loggerPrefix,"Unexpected error {0} while decoding remote exception", exception.getLocalizedMessage());
+      error(loggerPrefix, "Unexpected error {0} while decoding remote exception",
+          exception.getLocalizedMessage());
       return new ServiceResult<>(false, e.getLocalizedMessage(), defaultResult);
     }
   }

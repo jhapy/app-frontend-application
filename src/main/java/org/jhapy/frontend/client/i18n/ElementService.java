@@ -19,9 +19,6 @@
 package org.jhapy.frontend.client.i18n;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import java.util.Collections;
-import java.util.List;
-import org.jhapy.dto.domain.i18n.ActionTrl;
 import org.jhapy.dto.domain.i18n.Element;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.CountAnyMatchingQuery;
@@ -43,13 +40,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/elementService")
 @Primary
-public interface ElementService  extends RemoteServiceHandler {
+public interface ElementService extends RemoteServiceHandler {
 
   @PostMapping(value = "/findAnyMatching")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findAnyMatchingFallback")
   ServiceResult<Page<Element>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  default ServiceResult<Page<Element>> findAnyMatchingFallback(FindAnyMatchingQuery query, Exception e) {
+  default ServiceResult<Page<Element>> findAnyMatchingFallback(FindAnyMatchingQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findAnyMatchingFallback"), e, new Page<>());
   }
 

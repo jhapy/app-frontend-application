@@ -24,10 +24,8 @@ import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.CountAnyMatchingQuery;
 import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.serviceQuery.generic.GetByStrIdQuery;
-import org.jhapy.dto.serviceQuery.googlePlaceSearch.SearchPlacesQuery;
 import org.jhapy.dto.utils.Page;
 import org.jhapy.frontend.client.RemoteServiceHandler;
-import org.jhapy.frontend.client.notification.MailServiceFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +44,8 @@ public interface SessionService extends RemoteServiceHandler {
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findAnyMatchingFallback")
   ServiceResult<Page<Session>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  default ServiceResult<Page<Session>> findAnyMatchingFallback(FindAnyMatchingQuery query, Exception e) {
+  default ServiceResult<Page<Session>> findAnyMatchingFallback(FindAnyMatchingQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findAnyMatchingFallback"), e, new Page<>());
   }
 

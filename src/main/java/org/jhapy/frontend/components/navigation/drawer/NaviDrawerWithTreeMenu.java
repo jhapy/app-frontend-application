@@ -51,9 +51,9 @@ import org.vaadin.tatu.Tree;
 public class NaviDrawerWithTreeMenu extends HorizontalLayout
     implements AfterNavigationObserver, HasLogger {
 
-  private final String CLASS_NAME = "navi-drawer";
-  private final String RAIL = "rail";
-  private final String OPEN = "open";
+  private final static String CLASS_NAME = "navi-drawer";
+  private final static String RAIL = "rail";
+  private final static String OPEN = "open";
 
   private Div scrim;
 
@@ -65,7 +65,6 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
   private Tree<MenuEntry> menu;
   private MenuData menuData;
   private final MenuHierarchicalDataProvider dataProvider;
-  private final String lastContentWidth = null;
   private Dragger dragger;
   private final Div main = new Div();
 
@@ -103,7 +102,7 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    UI ui = attachEvent.getUI();
+    var ui = attachEvent.getUI();
     ui.getPage().executeJavaScript("window.addSwipeAway($0,$1,$2,$3)",
         mainContent.getElement(), this, "onSwipeAway",
         scrim.getElement());
@@ -190,7 +189,6 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
 
     menu.setSizeFull();
     menu.setHeightByRows(true);
-    //menu.setMinWidth("400px");
     menu.setHeightByRows(true);
     menu.setId("treegridbasic");
     menu.getStyle().set("font-size", "0.8em");
@@ -198,7 +196,6 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
     menu.setItemTitleProvider(MenuEntry::getTitle);
     menu.addItemClickListener(event -> {
       MenuEntry selectedItem = getSelectedItem();
-      //if (selectedItem != null && !selectedItem.equals(lastMenuEntry)) {
       if (selectedItem != null) {
         navigate(selectedItem);
       }
@@ -211,7 +208,7 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
       Collection<MenuEntry> items = menuEntryTreeGridExpandEvent.getItems();
 
       if (!items.isEmpty()) {
-        MenuEntry item = items.iterator().next();
+        var item = items.iterator().next();
         menu.select(item);
         if (item.getTargetClass() != null && !item.equals(lastMenuEntry)) {
           navigate(item);
@@ -222,14 +219,10 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
       if (!menuEntryTreeGridCollapseEvent.isFromClient()) {
         return;
       }
-      Collection<MenuEntry> items = menuEntryTreeGridCollapseEvent.getItems();
-      MenuEntry selectedItem = getSelectedItem();
-     /* if ( selectedItem != null  && ! selectedItem.equals(lastMenuEntry)) {
-        navigate( selectedItem);
-      };
-      */
+      var items = menuEntryTreeGridCollapseEvent.getItems();
+
       if (!items.isEmpty()) {
-        MenuEntry item = items.iterator().next();
+        var item = items.iterator().next();
         menu.select(item);
         if (item.getTargetClass() != null && !item.equals(lastMenuEntry)) {
           navigate(item);
@@ -237,7 +230,7 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
       }
     });
 
-    GridContextMenu<MenuEntry> contextMenu = menu.addContextMenu();
+    var contextMenu = menu.addContextMenu();
     contextMenu.setDynamicContentHandler(menuEntry -> {
       if (menuEntry == null) {
         return false;
@@ -259,11 +252,11 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
           if (menuItem.getComponent() != null) {
             contextMenu
                 .addItem(menuItem.getComponent(),
-                    menu -> menuItem.getClickListener().accept(menu));
+                    clickedMenu -> menuItem.getClickListener().accept(clickedMenu));
           } else {
             contextMenu
                 .addItem(menuItem.getTitle(),
-                    menu -> menuItem.getClickListener().accept(menu));
+                    clickedMenu -> menuItem.getClickListener().accept(clickedMenu));
           }
         }
       });
@@ -273,12 +266,11 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
   }
 
   public MenuEntry getSelectedItem() {
-    return menu.getSelectedItems().size() == 0 ? null
-        : menu.getSelectedItems().iterator().next();
+    return menu.getSelectedItems().isEmpty() ? null : menu.getSelectedItems().iterator().next();
   }
 
   public boolean isSelected(String targetId) {
-    MenuEntry selected = getSelectedItem();
+    var selected = getSelectedItem();
     if (selected == null || StringUtils.isBlank(selected.getTargetId())) {
       return false;
     }
@@ -296,23 +288,18 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
     }
 
     if (menuEntry.getTargetParams() != null) {
-      logger().debug(loggerPrefix + "Navigate with Target Params");
-      String params = menuEntry.getTargetParams().toString();
-      logger().debug(
-          loggerPrefix + "Target Class = " + menuEntry.getTargetClass() + ", Parameter = "
-              + params);
+      debug( loggerPrefix,"Navigate with Target Params");
+      var params = menuEntry.getTargetParams().toString();
+      debug(loggerPrefix,"Target Class = {0}, Parameter = {1}", menuEntry.getTargetClass(), params);
       UI.getCurrent().navigate(menuEntry.getTargetClass(), params);
     } else if (menuEntry.getTargetId() != null) {
-      logger().debug(loggerPrefix + "Navigate with Target ID");
-      String targetId = menuEntry.getTargetId();
-
-      logger().debug(
-          loggerPrefix + "Target Class = " + menuEntry.getTargetClass() + ", Parameter = "
-              + targetId);
+      debug( loggerPrefix,"Navigate with Target ID");
+      var targetId = menuEntry.getTargetId();
+      debug(loggerPrefix, "Target Class = {0}, Parameter = {1}", menuEntry.getTargetClass(), targetId);
       UI.getCurrent().navigate(menuEntry.getTargetClass(), targetId);
     } else {
-      logger().debug(loggerPrefix + "Navigate without Target Params or Target ID");
-      logger().debug(loggerPrefix + "Target Class = " + menuEntry.getTargetClass());
+      debug( loggerPrefix,"Navigate without Target Params or Target ID");
+      debug( loggerPrefix,"Target Class = {0}", menuEntry.getTargetClass());
       UI.getCurrent().navigate(menuEntry.getTargetClass());
     }
     lastMenuEntry = menuEntry;
@@ -320,7 +307,7 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
 
   private void initFooter(String version, String environement) {
     if (StringUtils.isNotBlank(version)) {
-      Label l = UIUtils.createH5Label("Version " + version + " (" + environement + ")");
+      var l = UIUtils.createH5Label("Version " + version + " (" + environement + ")");
       l.addClassName(CLASS_NAME + "__footer");
       l.addClassName("version");
       mainContent.add(l);

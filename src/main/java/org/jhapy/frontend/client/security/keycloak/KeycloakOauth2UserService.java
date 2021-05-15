@@ -52,7 +52,7 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class KeycloakOauth2UserService extends OidcUserService {
 
-  private final OAuth2Error INVALID_REQUEST = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
+  private final OAuth2Error invalidRequest = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
 
   private final JwtDecoder jwtDecoder;
 
@@ -68,9 +68,9 @@ public class KeycloakOauth2UserService extends OidcUserService {
   @Override
   public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
 
-    OidcUser user = super.loadUser(userRequest);
+    var user = super.loadUser(userRequest);
 
-    Set<GrantedAuthority> authorities = new LinkedHashSet<>();
+    var authorities = new LinkedHashSet<GrantedAuthority>();
     authorities.addAll(user.getAuthorities());
     authorities.addAll(extractKeycloakAuthorities(userRequest));
 
@@ -85,34 +85,35 @@ public class KeycloakOauth2UserService extends OidcUserService {
   private Collection<? extends GrantedAuthority> extractKeycloakAuthorities(
       OidcUserRequest userRequest) {
 
-    Jwt token = parseJwt(userRequest.getAccessToken().getTokenValue());
+    var token = parseJwt(userRequest.getAccessToken().getTokenValue());
 
     // Would be great if Spring Security would provide something like a plugable
     // OidcUserRequestAuthoritiesExtractor interface to hide the junk below...
 
-    Map<String, Object> claims = token.getClaims();
-    Map<String, Object> resourceMap = (Map<String, Object>) claims.get("resource_access");
-    final Map<String, Object> realmAccess = (Map<String, Object>) token.getClaims()
-        .get("realm_access");
-    String clientId = userRequest.getClientRegistration().getClientId();
+    var claims = token.getClaims();
+    @SuppressWarnings("unchecked")
+    var resourceMap = (Map<String, Object>) claims.get("resource_access");
+    @SuppressWarnings("unchecked")
+    var realmAccess = (Map<String, Object>) token.getClaims().get("realm_access");
+    var clientId = userRequest.getClientRegistration().getClientId();
 
     @SuppressWarnings("unchecked")
-    Map<String, Map<String, Object>> clientResource = (Map<String, Map<String, Object>>) resourceMap
-        .get(clientId);
+    var clientResource = (Map<String, Map<String, Object>>) resourceMap.get(clientId);
     if (!CollectionUtils.isEmpty(clientResource)) {
-      List<String> clientRoles = (List<String>) clientResource.get("roles");
+      @SuppressWarnings("unchecked")
+      var clientRoles = (List<String>) clientResource.get("roles");
       if (CollectionUtils.isEmpty(clientRoles)) {
         return Collections.emptyList();
       }
-      Collection<? extends GrantedAuthority> authorities = AuthorityUtils
-          .createAuthorityList(clientRoles.toArray(new String[0]));
+      var authorities = AuthorityUtils.createAuthorityList(clientRoles.toArray(new String[0]));
       if (authoritiesMapper == null) {
         return authorities;
       }
 
       return authoritiesMapper.mapAuthorities(authorities);
     } else {
-      Collection<String> roles = (Collection<String>) claims.getOrDefault("groups",
+      @SuppressWarnings("unchecked")
+      var roles = (Collection<String>) claims.getOrDefault("groups",
           claims.getOrDefault("roles", realmAccess.getOrDefault("roles", new ArrayList<>())));
 
       return roles.stream()
@@ -127,7 +128,7 @@ public class KeycloakOauth2UserService extends OidcUserService {
       // Token is already verified by spring security infrastructure
       return jwtDecoder.decode(accessTokenValue);
     } catch (JwtException e) {
-      throw new OAuth2AuthenticationException(INVALID_REQUEST, e);
+      throw new OAuth2AuthenticationException(invalidRequest, e);
     }
   }
 }

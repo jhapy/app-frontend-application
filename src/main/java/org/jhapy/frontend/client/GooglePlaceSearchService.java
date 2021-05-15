@@ -24,7 +24,6 @@ import com.google.maps.model.PlacesSearchResult;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import org.jhapy.dto.serviceQuery.ServiceResult;
-import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.serviceQuery.googlePlaceSearch.AutocompleteSearchRequestQuery;
 import org.jhapy.dto.serviceQuery.googlePlaceSearch.GetGooglePhotoQuery;
 import org.jhapy.dto.serviceQuery.googlePlaceSearch.GetPlaceDetailsQuery;
@@ -58,7 +57,8 @@ public interface GooglePlaceSearchService extends RemoteServiceHandler {
   ServiceResult<List<PlacesSearchResult>> searchAroundByKeyword(
       @RequestBody SearchAroundByKeywordQuery query);
 
-  default ServiceResult<List<PlacesSearchResult>> searchAroundByKeywordFallback(SearchPlacesQuery query, Exception e) {
+  default ServiceResult<List<PlacesSearchResult>> searchAroundByKeywordFallback(
+      SearchAroundByKeywordQuery query, Exception e) {
     return defaultFallback(getLoggerPrefix("searchAroundByKeywordFallback"), e, null);
   }
 
@@ -67,7 +67,8 @@ public interface GooglePlaceSearchService extends RemoteServiceHandler {
   ServiceResult<List<AutocompletePrediction>> autocompleteSearchRequest(
       @RequestBody AutocompleteSearchRequestQuery query);
 
-  default ServiceResult<List<AutocompletePrediction>> autocompleteSearchRequestFallback(SearchPlacesQuery query, Exception e) {
+  default ServiceResult<List<AutocompletePrediction>> autocompleteSearchRequestFallback(
+      AutocompleteSearchRequestQuery query, Exception e) {
     return defaultFallback(getLoggerPrefix("autocompleteSearchRequestFallback"), e, null);
   }
 
@@ -75,7 +76,7 @@ public interface GooglePlaceSearchService extends RemoteServiceHandler {
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "getGooglePhotoFallback")
   ServiceResult<StoredFile> getGooglePhoto(@RequestBody GetGooglePhotoQuery query);
 
-  default ServiceResult<StoredFile> getGooglePhotoFallback(SearchPlacesQuery query, Exception e) {
+  default ServiceResult<StoredFile> getGooglePhotoFallback(GetGooglePhotoQuery query, Exception e) {
     return defaultFallback(getLoggerPrefix("getGooglePhotoFallback"), e, null);
   }
 
@@ -83,7 +84,8 @@ public interface GooglePlaceSearchService extends RemoteServiceHandler {
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "getPlaceDetailsFallback")
   ServiceResult<PlaceDetails> getPlaceDetails(@RequestBody GetPlaceDetailsQuery query);
 
-  default ServiceResult<PlaceDetails> getPlaceDetailsFallback(SearchPlacesQuery query, Exception e) {
+  default ServiceResult<PlaceDetails> getPlaceDetailsFallback(GetPlaceDetailsQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("getPlaceDetailsFallback"), e, null);
   }
 }

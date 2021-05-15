@@ -20,8 +20,11 @@ package org.jhapy.frontend.config;
 
 import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jhapy.commons.security.oauth2.AudienceValidator;
@@ -30,8 +33,12 @@ import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
+import org.jhapy.frontend.security.AuthenticationListener;
+import org.jhapy.frontend.security.CustomRequestCache;
 import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
 import org.jhapy.frontend.security.SecurityUtils;
+import org.jhapy.frontend.utils.AttributeContextListener;
+import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -54,9 +61,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
-import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -65,7 +73,9 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
@@ -95,7 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
       SecurityProblemSupport problemSupport,
       SecurityRoleService securityRoleService,
       ClientRegistrationRepository clientRegistrationRepository,
-        @Value("${kc.realm}") String realm) {
+      @Value("${kc.realm}") String realm) {
     this.problemSupport = problemSupport;
     this.appProperties = appProperties;
     this.securityRoleService = securityRoleService;
@@ -140,14 +150,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     var loggerPrefix = getLoggerPrefix("configure");
+    // @formatter:off
     http
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and()
-        .headers()
-        .frameOptions()
-        .disable()
-        .and()
         .csrf()
         .disable()
+        .headers()
+/*        .contentSecurityPolicy(appProperties.getSecurity().getContentSecurityPolicy())
+    .and()
+        .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+    .and()
+        .featurePolicy("geolocation 'self'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; fullscreen 'self'; payment 'none'")
+    .and()
+ */
+        .frameOptions()
+        .deny()
+    .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+    .and()
+        .requestCache().requestCache(new CustomRequestCache())
+    .and()
         .authorizeRequests()
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
         .antMatchers("/").permitAll()
@@ -159,7 +181,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .antMatchers("/management/prometheus").permitAll()
         .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
         .anyRequest().fullyAuthenticated()
-        .and()
+    .and()
         .logout().addLogoutHandler(new LogoutHandler() {
                                      @Override
                                      public void logout(HttpServletRequest request, HttpServletResponse response,
@@ -189,27 +211,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
                                        if (logoutResponse.getStatusCode().is2xxSuccessful()) {
                                          info(loggerPrefix, "Successfully logged out in Keycloak");
                                        } else {
-                                         info(loggerPrefix,"Could not propagate logout to Keycloak");
+                                         info(loggerPrefix, "Could not propagate logout to Keycloak");
                                        }
                                      }
                                    }
-    ).and()
+          )
+    .and()
         .oauth2ResourceServer()
         .jwt()
         .jwtAuthenticationConverter(authenticationConverter())
-        .and().and()
+    .and()
+        .and()
         .oauth2Login().authorizationEndpoint()
         .authorizationRequestResolver(
             new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
                 "/oauth2/authorization", forceHttpsForRealm)).and().userInfoEndpoint()
         .oidcUserService(keycloakOidcUserService).and()
-        // I don't want a page with different clients as login options
-        // So i use the constant from OAuth2AuthorizationRequestRedirectFilter
-        // plus the configured realm as immediate redirect to Keycloak
-        //.loginPage(DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
         .loginPage(appProperties.getAuthorization().getLoginRootUrl()
             + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
-    debug(loggerPrefix, "Using login root url : {0}{1}/{2}", appProperties.getAuthorization().getLoginRootUrl(), DEFAULT_AUTHORIZATION_REQUEST_BASE_URI, realm);
+    // @formatter:on
+    debug(loggerPrefix, "Using login root url : {0}{1}/{2}",
+        appProperties.getAuthorization().getLoginRootUrl(), DEFAULT_AUTHORIZATION_REQUEST_BASE_URI,
+        realm);
   }
 
   Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {

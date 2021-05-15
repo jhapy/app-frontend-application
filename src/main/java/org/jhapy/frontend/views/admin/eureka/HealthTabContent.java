@@ -38,7 +38,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import java.net.URI;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import org.jhapy.commons.security.oauth2.AuthorizationHeaderUtil;
 import org.jhapy.dto.registry.ActuatorHealth;

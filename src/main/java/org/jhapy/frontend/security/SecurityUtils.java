@@ -19,6 +19,7 @@
 package org.jhapy.frontend.security;
 
 import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ATTRIBUTE;
+import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ID_ATTRIBUTE;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 import com.vaadin.flow.server.ServletHelper.RequestType;
@@ -37,16 +38,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import org.jhapy.dto.domain.security.RememberMeToken;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.EndSession;
 import org.jhapy.dto.messageQueue.NewSession;
-import org.jhapy.dto.serviceQuery.ServiceResult;
-import org.jhapy.dto.serviceQuery.authentification.ClearRememberMeTokenQuery;
-import org.jhapy.dto.serviceQuery.authentification.CreateRememberMeTokenQuery;
-import org.jhapy.dto.serviceQuery.authentification.GetSecurityUserByRememberMeTokenQuery;
 import org.jhapy.frontend.annotations.PublicView;
-import org.jhapy.frontend.client.BaseServices;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
@@ -102,8 +97,7 @@ public final class SecurityUtils {
     if (!isUserLoggedIn()) {
       return null;
     }
-    if (VaadinSession.getCurrent() != null
-        && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
+    if (VaadinSession.getCurrent() != null && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
       return (SecurityUser) VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE);
     }
     Object principal = context.getAuthentication().getPrincipal();
@@ -116,6 +110,7 @@ public final class SecurityUtils {
       securityUser.setUsername(attributes.get("preferred_username").toString());
       securityUser.setId(attributes.get("sub"));
       VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
+      VaadinSession.getCurrent().setAttribute(SECURITY_USER_ID_ATTRIBUTE, securityUser.getId());
       return securityUser;
     } else if (principal instanceof SecurityUser) {
       return (SecurityUser) principal;

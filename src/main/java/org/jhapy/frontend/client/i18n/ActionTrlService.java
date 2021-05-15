@@ -21,18 +21,15 @@ package org.jhapy.frontend.client.i18n;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.Collections;
 import java.util.List;
-import org.jhapy.dto.domain.i18n.Action;
 import org.jhapy.dto.domain.i18n.ActionTrl;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
-import org.jhapy.dto.serviceQuery.generic.FindAnyMatchingQuery;
 import org.jhapy.dto.serviceQuery.generic.GetByIdQuery;
 import org.jhapy.dto.serviceQuery.generic.SaveQuery;
 import org.jhapy.dto.serviceQuery.i18n.FindByIso3Query;
 import org.jhapy.dto.serviceQuery.i18n.GetByNameAndIso3Query;
 import org.jhapy.dto.serviceQuery.i18n.actionTrl.CountByActionQuery;
 import org.jhapy.dto.serviceQuery.i18n.actionTrl.FindByActionQuery;
-import org.jhapy.dto.utils.Page;
 import org.jhapy.frontend.client.AuthorizedFeignClient;
 import org.jhapy.frontend.client.RemoteServiceHandler;
 import org.springframework.context.annotation.Primary;
@@ -46,13 +43,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/actionTrlService")
 @Primary
-public interface ActionTrlService  extends RemoteServiceHandler {
+public interface ActionTrlService extends RemoteServiceHandler {
 
   @PostMapping(value = "/findByAction")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findByActionFallback")
   ServiceResult<List<ActionTrl>> findByAction(@RequestBody FindByActionQuery query);
 
-  default ServiceResult<List<ActionTrl>> findByActionFallback(FindByActionQuery query, Exception e) {
+  default ServiceResult<List<ActionTrl>> findByActionFallback(FindByActionQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findByActionFallback"), e, Collections.emptyList());
   }
 
@@ -76,7 +74,8 @@ public interface ActionTrlService  extends RemoteServiceHandler {
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "getByNameAndIso3Fallback")
   ServiceResult<ActionTrl> getByNameAndIso3(@RequestBody GetByNameAndIso3Query query);
 
-  default ServiceResult<ActionTrl> getByNameAndIso3Fallback(GetByNameAndIso3Query query, Exception e) {
+  default ServiceResult<ActionTrl> getByNameAndIso3Fallback(GetByNameAndIso3Query query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("getByNameAndIso3Fallback"), e, null);
   }
 

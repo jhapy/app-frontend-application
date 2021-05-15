@@ -20,7 +20,6 @@ package org.jhapy.frontend.client.i18n;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.jhapy.dto.domain.i18n.Action;
-import org.jhapy.dto.domain.i18n.Message;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.serviceQuery.generic.CountAnyMatchingQuery;
 import org.jhapy.dto.serviceQuery.generic.DeleteByIdQuery;
@@ -41,13 +40,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @AuthorizedFeignClient(name = "${jhapy.remote-services.i18n-server.name:null}", url = "${jhapy.remote-services.i18n-server.url:}", path = "/api/actionService")
 @Primary
-public interface ActionService  extends RemoteServiceHandler {
+public interface ActionService extends RemoteServiceHandler {
 
   @PostMapping(value = "/findAnyMatching")
   @CircuitBreaker(name = "defaultServiceCircuitBreaker", fallbackMethod = "findAnyMatchingFallback")
   ServiceResult<Page<Action>> findAnyMatching(@RequestBody FindAnyMatchingQuery query);
 
-  default ServiceResult<Page<Action>> findAnyMatchingFallback(FindAnyMatchingQuery query, Exception e) {
+  default ServiceResult<Page<Action>> findAnyMatchingFallback(FindAnyMatchingQuery query,
+      Exception e) {
     return defaultFallback(getLoggerPrefix("findAnyMatchingFallback"), e, new Page<>());
   }
 
@@ -80,6 +80,6 @@ public interface ActionService  extends RemoteServiceHandler {
   ServiceResult<Void> delete(@RequestBody DeleteByIdQuery query);
 
   default ServiceResult<Void> deleteFallback(DeleteByIdQuery query, Exception e) {
-    return defaultFallback(getLoggerPrefix("deleteFallback"), e,null);
+    return defaultFallback(getLoggerPrefix("deleteFallback"), e, null);
   }
 }

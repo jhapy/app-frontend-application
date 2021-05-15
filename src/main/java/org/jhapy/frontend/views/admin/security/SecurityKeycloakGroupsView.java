@@ -177,7 +177,8 @@ public class SecurityKeycloakGroupsView extends
     binder.bind(rolesField,
         securityKeycloakUser -> securityKeycloakUser.getRoles() != null ? new HashSet<>(
             securityKeycloakUser.getRoles()) : null,
-        (securityKeycloakUser, securityKeycloakRoles) -> securityKeycloakUser.setRoles(new ArrayList<>(securityKeycloakRoles)));
+        (securityKeycloakUser, securityKeycloakRoles) -> securityKeycloakUser
+            .setRoles(new ArrayList<>(securityKeycloakRoles)));
     binder.bind(effectiveRolesField,
         securityKeycloakUser -> securityKeycloakUser.getEffectiveRoles() != null
             ? securityKeycloakUser.getEffectiveRoles().stream()
