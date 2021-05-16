@@ -24,6 +24,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import java.text.MessageFormat;
 import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.config.AppProperties;
@@ -45,11 +46,9 @@ public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitLi
 
   @Override
   public void serviceInit(ServiceInitEvent event) {
-    var loggerPrefix = getLoggerPrefix("serviceInit");
     event.getSource().addUIInitListener(uiEvent -> {
-      final UI ui = uiEvent.getUI();
+      var ui = uiEvent.getUI();
       ui.getLoadingIndicatorConfiguration().setApplyDefaultTheme(false);
-      //ui.add(new OfflineBanner());
       ui.addBeforeEnterListener(this::beforeEnter);
     });
   }
@@ -66,9 +65,12 @@ public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitLi
       if (SecurityUtils.isUserLoggedIn()) {
         event.rerouteToError(AccessDeniedException.class);
       } else {
-        event.rerouteTo(appProperties.getAuthorization().getLoginRootUrl()
-            + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + appProperties.getSecurity()
-            .getRealm());
+        UI.getCurrent().getPage().executeJs(
+            MessageFormat.format("window.open(\"{0}{1}/{2}\", \"_self\")",
+                appProperties.getAuthorization().getLoginRootUrl(),
+                DEFAULT_AUTHORIZATION_REQUEST_BASE_URI,
+                appProperties.getSecurity()
+                    .getRealm()));
       }
     }
   }

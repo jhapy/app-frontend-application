@@ -179,7 +179,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
         .anyRequest().fullyAuthenticated()
     .and()
-        .logout().addLogoutHandler(keycloakLogoutHandler())
+        .logout().addLogoutHandler(keycloakLogoutHandler()).logoutSuccessUrl("/")
     .and()
         .oauth2ResourceServer()
         .jwt()
