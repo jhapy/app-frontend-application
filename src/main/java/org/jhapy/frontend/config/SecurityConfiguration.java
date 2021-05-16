@@ -20,6 +20,7 @@ package org.jhapy.frontend.config;
 
 import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 
+import com.vaadin.flow.server.VaadinSession;
 import de.codecamp.vaadin.security.spring.autoconfigure.VaadinSecurityProperties;
 import de.codecamp.vaadin.security.spring.config.VaadinSecurityConfigurerAdapter;
 import java.io.IOException;
@@ -83,14 +84,13 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 public class SecurityConfiguration extends VaadinSecurityConfigurerAdapter implements HasLogger {
 
   public static final String LOGIN_URL =
-      OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/wannaenjoy";
+      OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/oidc";
 
   public static final String LOGOUT_URL = "/logout";
 
   @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
   private String issuerUri;
 
-  private List<AuthenticationListener> authenticationListeners = new ArrayList<>();
   private final AppProperties appProperties;
   private final SecurityProblemSupport problemSupport;
   private final SecurityRoleService securityRoleService;
@@ -191,15 +191,6 @@ public class SecurityConfiguration extends VaadinSecurityConfigurerAdapter imple
             new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization", forceHttpsForRealm))
         .and().userInfoEndpoint()
         .oidcUserService(keycloakOidcUserService).and()
-        .successHandler(new SavedRequestAwareAuthenticationSuccessHandler() {
-          @Override
-          public void onAuthenticationSuccess(
-              HttpServletRequest request, HttpServletResponse response,
-              Authentication authentication) throws IOException, ServletException {
-            authenticationListeners.forEach(authenticationListener -> authenticationListener.onAuthenticationSuccess(request, response, authentication));
-            super.onAuthenticationSuccess(request, response, authentication);
-          }
-        })
         .loginPage(appProperties.getAuthorization().getLoginRootUrl()
             + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
     // @formatter:on
@@ -220,14 +211,6 @@ public class SecurityConfiguration extends VaadinSecurityConfigurerAdapter imple
         new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
     oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
     return oidcLogoutSuccessHandler;
-  }
-
-  public void addAuthenticationListener(AuthenticationListener authenticationListener) {
-    authenticationListeners.add(authenticationListener);
-  }
-
-  public void removeAuthenticationListener(AuthenticationListener authenticationListener) {
-    authenticationListeners.remove(authenticationListener);
   }
 
   @Bean

@@ -86,8 +86,10 @@ public final class SecurityUtils {
       securityUser.setLastName(attributes.get("family_name").toString());
       securityUser.setUsername(attributes.get("preferred_username").toString());
       securityUser.setId(attributes.get("sub"));
-      VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
-      VaadinSession.getCurrent().setAttribute(SECURITY_USER_ID_ATTRIBUTE, securityUser.getId());
+      if (  VaadinSession.getCurrent() != null ) {
+        VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
+        VaadinSession.getCurrent().setAttribute(SECURITY_USER_ID_ATTRIBUTE, securityUser.getId());
+      }
       return securityUser;
     } else if (principal instanceof SecurityUser) {
       return (SecurityUser) principal;

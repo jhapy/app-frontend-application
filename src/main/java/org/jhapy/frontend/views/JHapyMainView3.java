@@ -19,6 +19,7 @@
 package org.jhapy.frontend.views;
 
 import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ATTRIBUTE;
+import static org.jhapy.frontend.utils.AppConst.THEME_ATTRIBUTE;
 
 import com.flowingcode.vaadin.addons.errorwindow.ErrorManager;
 import com.hazelcast.core.HazelcastInstance;
@@ -40,6 +41,7 @@ import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.theme.lumo.Lumo;
 import de.codecamp.vaadin.components.messagedialog.MessageDialog;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -130,7 +132,20 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     this.menuProvider = menuProvider;
     this.hazelcastInstance = hazelcastInstance;
     this.appProperties = appProperties;
-    // afterLogin();
+
+    getElement().executeJs("return window.matchMedia('(prefers-color-scheme: dark)').matches").then(jsonValue -> {
+      logger().debug(jsonValue.asBoolean());
+      var themeList = UI.getCurrent().getElement().getThemeList();
+      if (!jsonValue.asBoolean()) {
+        themeList.remove(Lumo.DARK);
+        VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, null);
+      } else {
+        themeList.add(Lumo.DARK);
+        VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, Lumo.DARK);
+      }
+    });
+
+    afterLogin();
 
     this.confirmDialog = new ConfirmDialog();
     confirmDialog.setCancelable(true);
@@ -176,7 +191,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     return null;
   }
 
-  private ConcurrentMap<String, SessionInfo> retrieveMap() {
+  protected ConcurrentMap<String, SessionInfo> retrieveMap() {
     return hazelcastInstance.getMap("userSessions");
   }
 

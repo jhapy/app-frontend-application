@@ -50,24 +50,6 @@ public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitLi
     event.getSource().addUIInitListener(uiEvent -> {
       var ui = uiEvent.getUI();
       ui.getLoadingIndicatorConfiguration().setApplyDefaultTheme(false);
-      //ui.addBeforeEnterListener(this::beforeEnter);
     });
   }
-
-  /**
-   * Reroutes the user if she is not authorized to access the view.
-   *
-   * @param event before navigation event with event details
-   */
-  /*
-  private void beforeEnter(BeforeEnterEvent event) {
-    final boolean accessGranted = org.jhapy.frontend.security.SecurityUtils.isAccessGranted(event.getNavigationTarget());
-    if (!accessGranted) {
-      if (SecurityUtils.isUserLoggedIn()) {
-        event.rerouteToError(AccessDeniedException.class);
-      }
-    }
-  }
-
-   */
 }
