@@ -619,7 +619,7 @@ this.appProperties = appProperties;
 
     // setAppFooterInner();
 
-    appBar = new AppBar();
+    appBar = new AppBar(appProperties);
     //UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }

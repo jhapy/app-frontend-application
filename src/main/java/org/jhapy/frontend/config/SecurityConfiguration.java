@@ -33,7 +33,6 @@ import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
-import org.jhapy.frontend.security.AuthenticationListener;
 import org.jhapy.frontend.security.CustomRequestCache;
 import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
 import org.jhapy.frontend.security.SecurityUtils;
@@ -104,13 +103,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
   public SecurityConfiguration(AppProperties appProperties,
       SecurityProblemSupport problemSupport,
       SecurityRoleService securityRoleService,
-      ClientRegistrationRepository clientRegistrationRepository,
-      @Value("${kc.realm}") String realm) {
+      ClientRegistrationRepository clientRegistrationRepository) {
     this.problemSupport = problemSupport;
     this.appProperties = appProperties;
     this.securityRoleService = securityRoleService;
     this.clientRegistrationRepository = clientRegistrationRepository;
-    this.realm = realm;
+    this.realm = appProperties.getSecurity().getRealm();
     this.forceHttpsForRealm = appProperties.getAuthorization().getForceRealmToHttps();
   }
 
@@ -155,13 +153,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .csrf()
         .disable()
         .headers()
-/*        .contentSecurityPolicy(appProperties.getSecurity().getContentSecurityPolicy())
+        .contentSecurityPolicy(appProperties.getSecurity().getContentSecurityPolicy())
     .and()
         .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
     .and()
-        .featurePolicy("geolocation 'self'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; fullscreen 'self'; payment 'none'")
+        .featurePolicy(appProperties.getSecurity().getFeaturePolicy())
     .and()
- */
         .frameOptions()
         .deny()
     .and()
@@ -182,40 +179,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
         .anyRequest().fullyAuthenticated()
     .and()
-        .logout().addLogoutHandler(new LogoutHandler() {
-                                     @Override
-                                     public void logout(HttpServletRequest request, HttpServletResponse response,
-                                         Authentication authentication) {
-                                       if (authentication != null
-                                           && authentication.getPrincipal() != null
-                                           && authentication.getPrincipal() instanceof OidcUser) {
-                                         propagateLogoutToKeycloak(
-                                             (OidcUser) authentication.getPrincipal());
-                                       }
-                                     }
-
-                                     private void propagateLogoutToKeycloak(OidcUser user) {
-                                       var loggerPrefix = getLoggerPrefix(
-                                           "propagateLogoutToKeycloak");
-                                       String endSessionEndpoint =
-                                           user.getIssuer() + "/protocol/openid-connect/logout";
-
-                                       UriComponentsBuilder builder = UriComponentsBuilder //
-                                           .fromUriString(endSessionEndpoint) //
-                                           .queryParam("id_token_hint",
-                                               user.getIdToken().getTokenValue());
-
-                                       info(loggerPrefix, "Call Keycloak logout endpoint");
-                                       ResponseEntity<String> logoutResponse = restTemplate
-                                           .getForEntity(builder.toUriString(), String.class);
-                                       if (logoutResponse.getStatusCode().is2xxSuccessful()) {
-                                         info(loggerPrefix, "Successfully logged out in Keycloak");
-                                       } else {
-                                         info(loggerPrefix, "Could not propagate logout to Keycloak");
-                                       }
-                                     }
-                                   }
-          )
+        .logout().addLogoutHandler(keycloakLogoutHandler())
     .and()
         .oauth2ResourceServer()
         .jwt()

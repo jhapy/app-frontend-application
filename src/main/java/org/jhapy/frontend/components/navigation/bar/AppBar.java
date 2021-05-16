@@ -20,6 +20,7 @@ package org.jhapy.frontend.components.navigation.bar;
 
 
 import static org.jhapy.frontend.utils.AppConst.THEME_ATTRIBUTE;
+import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
@@ -72,6 +73,7 @@ import org.jhapy.frontend.components.notification.DefaultNotificationHolder;
 import org.jhapy.frontend.components.notification.component.NotificationButton;
 import org.jhapy.frontend.components.notification.entity.DefaultNotification;
 import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
+import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
 import org.jhapy.frontend.security.SecurityUtils2;
@@ -133,8 +135,10 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private Registration searchEscRegistration;
 
   private MenuItem languageMenu;
+  private final AppProperties appProperties;
 
-  public AppBar() {
+  public AppBar(AppProperties appProperties) {
+    this.appProperties = appProperties;
     setClassName(CLASS_NAME);
     initMenuIcon();
     initContextIcon();
@@ -255,44 +259,62 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     avatar.setAlt("User menu");
     avatar.setSrc(UIUtils.IMG_PATH + "icons8-question-mark-64.png");
 
-    if (SecurityUtils.isUserLoggedIn()) {
-      StoredFile userAvatar = AppContext.getInstance().getCurrentAvatar();
-      if (userAvatar != null) {
-        avatar.setSrc(new StreamResource(userAvatar.getFilename(),
-            () -> new ByteArrayInputStream(userAvatar.getContent())));
-      }
+    StoredFile userAvatar = AppContext.getInstance().getCurrentAvatar();
+    if (userAvatar != null) {
+      avatar.setSrc(new StreamResource(userAvatar.getFilename(),
+          () -> new ByteArrayInputStream(userAvatar.getContent())));
+    }
 
-      Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
+    Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
 
-      var contextMenu = new ContextMenu(avatar);
-      contextMenu.setOpenOnClick(true);
+    var contextMenu = new ContextMenu(avatar);
+    contextMenu.setOpenOnClick(true);
 
-      var languageButton = UIUtils
-          .createButton(getTranslation("action.settings.language"), VaadinIcon.GLOBE,
-              ButtonVariant.LUMO_TERTIARY_INLINE);
-      var currentLocale = UI.getCurrent().getSession().getLocale();
-      debug(loggerPrefix, "Current locale : {0}", currentLocale.getLanguage());
-      languageMenu = contextMenu.addItem(languageButton);
+    var languageButton = UIUtils
+        .createButton(getTranslation("action.settings.language"), VaadinIcon.GLOBE,
+            ButtonVariant.LUMO_TERTIARY_INLINE);
+    var currentLocale = UI.getCurrent().getSession().getLocale();
+    debug(loggerPrefix, "Current locale : {0}", currentLocale.getLanguage());
+    languageMenu = contextMenu.addItem(languageButton);
 
-      List<MenuItem> menuItems = new ArrayList<>();
-      MyI18NProvider.getAvailableLanguagesInDB(getLocale()).forEach(locale -> {
-        MenuItem menu = languageMenu.getSubMenu()
-            .addItem(new Label(locale.getDisplayLanguage(getLocale())));
-        menu.setCheckable(true);
-        logger()
-            .debug(loggerPrefix, "Add locale : {0} - {1}", locale, locale.getLanguage());
-        menu.setChecked(currentLocale.getLanguage().equals(locale.getLanguage()));
-        menu.addClickListener(event -> {
-          setLanguage(locale);
-          menuItems.forEach(menuItem -> {
-            if (!menuItem.equals(menu)) {
-              menuItem.setChecked(false);
-            }
-          });
+    List<MenuItem> menuItems = new ArrayList<>();
+    MyI18NProvider.getAvailableLanguagesInDB(getLocale()).forEach(locale -> {
+      MenuItem menu = languageMenu.getSubMenu()
+          .addItem(new Label(locale.getDisplayLanguage(getLocale())));
+      menu.setCheckable(true);
+      logger()
+          .debug(loggerPrefix, "Add locale : {0} - {1}", locale, locale.getLanguage());
+      menu.setChecked(currentLocale.getLanguage().equals(locale.getLanguage()));
+      menu.addClickListener(event -> {
+        setLanguage(locale);
+        menuItems.forEach(menuItem -> {
+          if (!menuItem.equals(menu)) {
+            menuItem.setChecked(false);
+          }
         });
-        menuItems.add(menu);
       });
+      menuItems.add(menu);
+    });
+    var themeList = UI.getCurrent().getElement().getThemeList();
+    var switchDarkThemeButton = UIUtils
+        .createButton(getTranslation("action.global.darkTheme"), VaadinIcon.CIRCLE_THIN,
+            ButtonVariant.LUMO_TERTIARY_INLINE);
+    if (VaadinSession.getCurrent().getAttribute(THEME_ATTRIBUTE) != null) {
+      switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
+    }
 
+    contextMenu.addItem(switchDarkThemeButton, event -> {
+      if (themeList.contains(Lumo.DARK)) {
+        themeList.remove(Lumo.DARK);
+        switchDarkThemeButton.setIcon(VaadinIcon.CIRCLE_THIN.create());
+        VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, null);
+      } else {
+        themeList.add(Lumo.DARK);
+        switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
+        VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, Lumo.DARK);
+      }
+    });
+    if (SecurityUtils.isUserLoggedIn()) {
       var settingsButton = UIUtils
           .createButton(currentUserLogin.orElse("-- Unknown --"), VaadinIcon.USER,
               ButtonVariant.LUMO_TERTIARY_INLINE);
@@ -302,29 +324,17 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
         }
       });
 
-      var themeList = UI.getCurrent().getElement().getThemeList();
-      var switchDarkThemeButton = UIUtils
-          .createButton(getTranslation("action.global.darkTheme"), VaadinIcon.CIRCLE_THIN,
-              ButtonVariant.LUMO_TERTIARY_INLINE);
-      if (VaadinSession.getCurrent().getAttribute(THEME_ATTRIBUTE) != null) {
-        switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
-      }
-
-      contextMenu.addItem(switchDarkThemeButton, event -> {
-        if (themeList.contains(Lumo.DARK)) {
-          themeList.remove(Lumo.DARK);
-          switchDarkThemeButton.setIcon(VaadinIcon.CIRCLE_THIN.create());
-          VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, null);
-        } else {
-          themeList.add(Lumo.DARK);
-          switchDarkThemeButton.setIcon(VaadinIcon.CHECK_CIRCLE_O.create());
-          VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, Lumo.DARK);
-        }
-      });
       var exitButton = UIUtils
           .createButton(getTranslation("action.global.logout"), VaadinIcon.EXIT,
               ButtonVariant.LUMO_TERTIARY_INLINE);
       contextMenu.addItem(new Anchor("logout", exitButton));
+    } else {
+      var loginButton = UIUtils
+          .createButton(getTranslation("action.global.login"), VaadinIcon.USER,
+              ButtonVariant.LUMO_TERTIARY_INLINE);
+      contextMenu.addItem(new Anchor(appProperties.getAuthorization().getLoginRootUrl()
+          + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + appProperties.getSecurity()
+          .getRealm(), loginButton));
     }
   }
 
