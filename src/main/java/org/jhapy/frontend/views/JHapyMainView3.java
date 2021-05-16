@@ -129,7 +129,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
       HazelcastInstance hazelcastInstance, Environment environment, AppProperties appProperties) {
     this.menuProvider = menuProvider;
     this.hazelcastInstance = hazelcastInstance;
-this.appProperties = appProperties;
+    this.appProperties = appProperties;
     // afterLogin();
 
     this.confirmDialog = new ConfirmDialog();

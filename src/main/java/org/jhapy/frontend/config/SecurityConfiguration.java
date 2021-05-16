@@ -20,6 +20,8 @@ package org.jhapy.frontend.config;
 
 import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 
+import de.codecamp.vaadin.security.spring.autoconfigure.VaadinSecurityProperties;
+import de.codecamp.vaadin.security.spring.config.VaadinSecurityConfigurerAdapter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,10 +35,9 @@ import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
-import org.jhapy.frontend.security.CustomRequestCache;
+import org.jhapy.frontend.security.AuthenticationListener;
 import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
-import org.jhapy.frontend.security.SecurityUtils;
-import org.jhapy.frontend.utils.AttributeContextListener;
+import org.jhapy.frontend.security.VaadinOAuth2RequestCache;
 import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +46,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AuthenticatedVoter;
@@ -56,15 +56,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
@@ -73,21 +71,26 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Order(100)
 @Import(SecurityProblemSupport.class)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter implements HasLogger {
+public class SecurityConfiguration extends VaadinSecurityConfigurerAdapter implements HasLogger {
+
+  public static final String LOGIN_URL =
+      OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/wannaenjoy";
+
+  public static final String LOGOUT_URL = "/logout";
 
   @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
   private String issuerUri;
 
+  private List<AuthenticationListener> authenticationListeners = new ArrayList<>();
   private final AppProperties appProperties;
   private final SecurityProblemSupport problemSupport;
   private final SecurityRoleService securityRoleService;
@@ -100,10 +103,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
 
   private final RestTemplate restTemplate = new RestTemplate();
 
-  public SecurityConfiguration(AppProperties appProperties,
+  public SecurityConfiguration(VaadinSecurityProperties properties,
+      AppProperties appProperties,
       SecurityProblemSupport problemSupport,
       SecurityRoleService securityRoleService,
       ClientRegistrationRepository clientRegistrationRepository) {
+    super(properties);
     this.problemSupport = problemSupport;
     this.appProperties = appProperties;
     this.securityRoleService = securityRoleService;
@@ -148,27 +153,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     var loggerPrefix = getLoggerPrefix("configure");
+
+    super.configure(http);
+
     // @formatter:off
     http
-        .csrf()
-        .disable()
         .headers()
         .contentSecurityPolicy(appProperties.getSecurity().getContentSecurityPolicy())
-    .and()
+        .and()
         .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-    .and()
+        .and()
         .featurePolicy(appProperties.getSecurity().getFeaturePolicy())
-    .and()
+        .and()
         .frameOptions()
         .deny()
-    .and()
+        .and()
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-    .and()
-        .requestCache().requestCache(new CustomRequestCache())
-    .and()
+        .and()
+        .requestCache().requestCache(new VaadinOAuth2RequestCache())
+        .and()
         .authorizeRequests()
-        .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
         .antMatchers("/").permitAll()
         .antMatchers("/api/auth-info").permitAll()
         .antMatchers("/api/**").authenticated()
@@ -178,19 +183,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
         .antMatchers("/management/prometheus").permitAll()
         .antMatchers("/management/**").hasAuthority("ROLE_ADMIN")
         .anyRequest().fullyAuthenticated()
-    .and()
-        .logout().addLogoutHandler(keycloakLogoutHandler()).logoutSuccessUrl("/")
-    .and()
-        .oauth2ResourceServer()
-        .jwt()
-        .jwtAuthenticationConverter(authenticationConverter())
-    .and()
+        .and()
+        .logout().logoutSuccessHandler(oidcLogoutSuccessHandler())
         .and()
         .oauth2Login().authorizationEndpoint()
         .authorizationRequestResolver(
-            new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
-                "/oauth2/authorization", forceHttpsForRealm)).and().userInfoEndpoint()
+            new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization", forceHttpsForRealm))
+        .and().userInfoEndpoint()
         .oidcUserService(keycloakOidcUserService).and()
+        .successHandler(new SavedRequestAwareAuthenticationSuccessHandler() {
+          @Override
+          public void onAuthenticationSuccess(
+              HttpServletRequest request, HttpServletResponse response,
+              Authentication authentication) throws IOException, ServletException {
+            authenticationListeners.forEach(authenticationListener -> authenticationListener.onAuthenticationSuccess(request, response, authentication));
+            super.onAuthenticationSuccess(request, response, authentication);
+          }
+        })
         .loginPage(appProperties.getAuthorization().getLoginRootUrl()
             + DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/" + realm);
     // @formatter:on
@@ -204,6 +213,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
     jwtAuthenticationConverter
         .setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
     return jwtAuthenticationConverter;
+  }
+
+  private LogoutSuccessHandler oidcLogoutSuccessHandler() {
+    OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =
+        new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
+    oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
+    return oidcLogoutSuccessHandler;
+  }
+
+  public void addAuthenticationListener(AuthenticationListener authenticationListener) {
+    authenticationListeners.add(authenticationListener);
+  }
+
+  public void removeAuthenticationListener(AuthenticationListener authenticationListener) {
+    authenticationListeners.remove(authenticationListener);
   }
 
   @Bean

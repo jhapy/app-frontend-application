@@ -76,7 +76,6 @@ import org.jhapy.frontend.components.search.overlay.SearchOverlayButton;
 import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.layout.size.Right;
 import org.jhapy.frontend.security.SecurityUtils;
-import org.jhapy.frontend.security.SecurityUtils2;
 import org.jhapy.frontend.utils.LumoStyles;
 import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
@@ -265,7 +264,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
           () -> new ByteArrayInputStream(userAvatar.getContent())));
     }
 
-    Optional<String> currentUserLogin = SecurityUtils2.getCurrentUserLogin();
+    Optional<String> currentUserLogin = SecurityUtils.getCurrentUserLogin();
 
     var contextMenu = new ContextMenu(avatar);
     contextMenu.setOpenOnClick(true);

@@ -25,10 +25,10 @@ import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.text.MessageFormat;
-import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.config.AppProperties;
 import org.jhapy.frontend.exceptions.AccessDeniedException;
+import org.jhapy.frontend.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @SpringComponent
 @CssImport(value = "./styles/loading-indicator.css")
 public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitListener, HasLogger {
+
   @Autowired
   private AppProperties appProperties;
 
@@ -49,7 +50,7 @@ public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitLi
     event.getSource().addUIInitListener(uiEvent -> {
       var ui = uiEvent.getUI();
       ui.getLoadingIndicatorConfiguration().setApplyDefaultTheme(false);
-      ui.addBeforeEnterListener(this::beforeEnter);
+      //ui.addBeforeEnterListener(this::beforeEnter);
     });
   }
 
@@ -58,20 +59,15 @@ public class GlobalConfigureUIServiceInitListener implements VaadinServiceInitLi
    *
    * @param event before navigation event with event details
    */
+  /*
   private void beforeEnter(BeforeEnterEvent event) {
-    final boolean accessGranted = org.jhapy.frontend.security.SecurityUtils
-        .isAccessGranted(event.getNavigationTarget());
+    final boolean accessGranted = org.jhapy.frontend.security.SecurityUtils.isAccessGranted(event.getNavigationTarget());
     if (!accessGranted) {
       if (SecurityUtils.isUserLoggedIn()) {
         event.rerouteToError(AccessDeniedException.class);
-      } else {
-        UI.getCurrent().getPage().executeJs(
-            MessageFormat.format("window.open(\"{0}{1}/{2}\", \"_self\")",
-                appProperties.getAuthorization().getLoginRootUrl(),
-                DEFAULT_AUTHORIZATION_REQUEST_BASE_URI,
-                appProperties.getSecurity()
-                    .getRealm()));
       }
     }
   }
+
+   */
 }

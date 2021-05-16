@@ -26,6 +26,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.RouterLayout;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.domain.notification.MailTemplate;
@@ -52,7 +53,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 2019-04-14
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_MAIL_TEMPLATES_ADMIN)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class MailTemplatesAdminView extends ViewFrame implements RouterLayout, HasLogger {
 
   private final static String I18N_PREFIX = "mailTemplate.";

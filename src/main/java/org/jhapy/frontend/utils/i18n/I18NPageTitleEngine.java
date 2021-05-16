@@ -24,7 +24,6 @@ import static org.rapidpm.frp.model.Result.failure;
 import static org.rapidpm.frp.model.Result.success;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterListener;
 import com.vaadin.flow.server.ServiceInitEvent;
@@ -32,8 +31,6 @@ import com.vaadin.flow.server.UIInitEvent;
 import com.vaadin.flow.server.UIInitListener;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServiceInitListener;
-import java.util.List;
-import java.util.Locale;
 import org.jhapy.commons.utils.HasLogger;
 import org.rapidpm.frp.functions.CheckedFunction;
 

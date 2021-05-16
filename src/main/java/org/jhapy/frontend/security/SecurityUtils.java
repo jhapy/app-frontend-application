@@ -22,37 +22,28 @@ import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ATTRIBUTE;
 import static org.jhapy.frontend.utils.AppConst.SECURITY_USER_ID_ATTRIBUTE;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
-import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.server.VaadinRequest;
-import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.shared.ApplicationConstants;
+import de.codecamp.vaadin.security.spring.access.VaadinSecurity;
+import de.codecamp.vaadin.security.spring.access.rules.PermitAll;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.EndSession;
 import org.jhapy.dto.messageQueue.NewSession;
-import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.client.audit.AuditServices;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 /**
@@ -65,31 +56,16 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
  */
 public final class SecurityUtils {
 
-  public static final String SESSION_USERNAME = "username";
-  private static final String COOKIE_NAME = "remember-me";
-
-
   private SecurityUtils() {
     // Util methods only
   }
 
-  /**
-   * Gets the user name of the currently signed in user.
-   *
-   * @return the user name of the current user or <code>null</code> if the user has not signed in
-   */
-  public static String getUsername() {
-    SecurityContext context = SecurityContextHolder.getContext();
-    if (!isUserLoggedIn()) {
-      return "Anonymous";
+  public static Optional<String> getCurrentUserLogin() {
+    if (VaadinSecurity.check().isAuthenticated()) {
+      return Optional.of(VaadinSecurity.getAuthentication().getName());
+    } else {
+      return Optional.empty();
     }
-    Object principal = context.getAuthentication().getPrincipal();
-    if (principal instanceof UserDetails) {
-      UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
-      return userDetails.getUsername();
-    }
-    // Anonymous or no authentication.
-    return "Anonymous";
   }
 
   public static SecurityUser getSecurityUser() {
@@ -97,7 +73,8 @@ public final class SecurityUtils {
     if (!isUserLoggedIn()) {
       return null;
     }
-    if (VaadinSession.getCurrent() != null && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
+    if (VaadinSession.getCurrent() != null
+        && VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE) != null) {
       return (SecurityUser) VaadinSession.getCurrent().getAttribute(SECURITY_USER_ATTRIBUTE);
     }
     Object principal = context.getAuthentication().getPrincipal();
@@ -119,26 +96,6 @@ public final class SecurityUtils {
     return null;
   }
 
-  public static SecurityUser getSecurityUser(Authentication authentication) {
-    if (authentication == null) {
-      return null;
-    }
-    Object principal = authentication.getPrincipal();
-    if (principal instanceof DefaultOidcUser) {
-      Map<String, Object> attributes = ((DefaultOidcUser) principal).getAttributes();
-      SecurityUser securityUser = new SecurityUser();
-      securityUser.setEmail(attributes.get("email").toString());
-      securityUser.setFirstName(attributes.get("given_name").toString());
-      securityUser.setLastName(attributes.get("family_name").toString());
-      securityUser.setUsername(attributes.get("preferred_username").toString());
-      return securityUser;
-    } else if (principal instanceof SecurityUser) {
-      return (SecurityUser) principal;
-    }
-    // Anonymous or no authentication.
-    return null;
-  }
-
   /**
    * Checks if access is granted for the current user for the given secured view, defined by the
    * view class.
@@ -148,39 +105,34 @@ public final class SecurityUtils {
    */
   public static boolean isAccessGranted(Class<?> viewClass) {
     // Always allow access to public views
-    PublicView publicView = AnnotationUtils.findAnnotation(viewClass, PublicView.class);
-    if (publicView != null) {
+    PermitAll permitAll = AnnotationUtils.findAnnotation(viewClass, PermitAll.class);
+    if (permitAll != null) {
       return true;
     }
 
-    Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
-
     // All other views require authentication
-    if (!isUserLoggedIn(userAuthentication)) {
+    if (!VaadinSecurity.check().isAuthenticated()) {
       return false;
     }
 
     // Allow if no roles are required.
     Secured secured = AnnotationUtils.findAnnotation(viewClass, Secured.class);
-    if (secured == null) {
+    RequiresRole requiresRole = AnnotationUtils.findAnnotation(viewClass, RequiresRole.class);
+    if (secured == null && requiresRole == null) {
       return true;
     }
 
-    List<String> allowedRoles = Arrays.asList(secured.value());
-    return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-        .anyMatch(allowedRoles::contains);
-  }
-
-  public static boolean hasRole(String role) {
-    Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // All other views require authentication
-    if (!isUserLoggedIn(userAuthentication)) {
-      return false;
+    List<String> allowedRoles = new ArrayList<>();
+    if (secured != null) {
+      allowedRoles.addAll(Arrays.asList(secured.value()));
+    }
+    if (requiresRole != null) {
+      allowedRoles.addAll(Arrays.asList(requiresRole.value()));
     }
 
-    return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-        .anyMatch(s -> s.equals(role));
+    return VaadinSecurity.check().getAuthentication().getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .anyMatch(allowedRoles::contains);
   }
 
   /**
@@ -189,28 +141,7 @@ public final class SecurityUtils {
    * @return true if the user is logged in. False otherwise.
    */
   public static boolean isUserLoggedIn() {
-    return isUserLoggedIn(SecurityContextHolder.getContext().getAuthentication());
-  }
-
-  private static boolean isUserLoggedIn(Authentication authentication) {
-    return (authentication != null
-        && !(authentication instanceof AnonymousAuthenticationToken));
-  }
-
-  /**
-   * Tests if the request is an internal framework request. The test consists of checking if the
-   * request parameter is present and if its value is consistent with any of the request types
-   * know.
-   *
-   * @param request {@link HttpServletRequest}
-   * @return true if is an internal framework request. False otherwise.
-   */
-  static public boolean isFrameworkInternalRequest(HttpServletRequest request) {
-    final String parameterValue = request
-        .getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
-    return parameterValue != null
-        && Stream.of(RequestType.values())
-        .anyMatch(r -> r.getIdentifier().equals(parameterValue));
+    return VaadinSecurity.check().isAuthenticated();
   }
 
   public static void newSession(SecurityUser securityUser) {
@@ -231,35 +162,5 @@ public final class SecurityUtils {
 
   public static void endSession(String jSessionId) {
     AuditServices.getAuditServiceQueue().endSession(new EndSession(jSessionId, Instant.now()));
-  }
-
-  private static Optional<Cookie> getRememberMeCookie() {
-    if (VaadinService.getCurrentRequest() == null) {
-      return Optional.empty();
-    }
-
-    Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
-    if (cookies != null) {
-      return Arrays.stream(cookies).filter(c -> c.getName().equals(COOKIE_NAME)).findFirst();
-    }
-
-    return Optional.empty();
-  }
-
-  public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
-    return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
-  }
-
-  @SuppressWarnings("unchecked")
-  private static Collection<String> getRolesFromClaims(Map<String, Object> claims) {
-    return (Collection<String>) claims.getOrDefault("groups",
-        claims.getOrDefault("roles", new ArrayList<>()));
-  }
-
-  private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
-    return roles.stream()
-        .filter(role -> role.startsWith("ROLE_"))
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
   }
 }

@@ -26,6 +26,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.notification.Mail;
 import org.jhapy.dto.domain.notification.MailStatusEnum;
@@ -45,7 +46,7 @@ import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_MAILS_ADMIN)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class MailAdminView extends
     DefaultMasterDetailsView<Mail, DefaultFilter, SearchQuery, SearchQueryResult> {
 

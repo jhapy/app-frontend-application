@@ -58,7 +58,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements
         debug(loggerPrefix, "New redirect URI = {0}", newRedirectUri);
         return OAuth2AuthorizationRequest.from(req).redirectUri(newRedirectUri).build();
       } catch (URISyntaxException e) {
-        error(loggerPrefix , e, "Unexpected error : {0}",e.getMessage());
+        error(loggerPrefix, e, "Unexpected error : {0}", e.getMessage());
       }
     }
     return OAuth2AuthorizationRequest.from(req).build();

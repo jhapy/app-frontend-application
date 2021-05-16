@@ -27,6 +27,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.TextRenderer;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +61,7 @@ import org.vaadin.gatanaso.MultiselectComboBox;
  * @since 12/06/2020
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_GROUPS)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class SecurityKeycloakGroupsView extends
     DefaultMasterDetailsView<SecurityKeycloakGroup, DefaultFilter, SearchQuery, SearchQueryResult> {
 

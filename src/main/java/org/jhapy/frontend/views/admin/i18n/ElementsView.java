@@ -24,6 +24,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextField;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.i18n.Element;
@@ -55,7 +56,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 2019-04-21
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_ELEMENTS)
-@Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
+@RequiresRole({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
 public class ElementsView extends
     DefaultMasterDetailsView<Element, DefaultFilter, SearchQuery, SearchQueryResult> {
 

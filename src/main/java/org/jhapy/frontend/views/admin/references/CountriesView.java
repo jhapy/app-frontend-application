@@ -29,6 +29,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.TextRenderer;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.jhapy.dto.domain.reference.Country;
 import org.jhapy.dto.domain.reference.IntermediateRegion;
 import org.jhapy.dto.domain.reference.IntermediateRegionTrl;
@@ -66,7 +67,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 2019-04-21
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_COUNTRIES)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class CountriesView extends
     DefaultMasterDetailsView<Country, DefaultFilter, SearchQuery, SearchQueryResult> {
 

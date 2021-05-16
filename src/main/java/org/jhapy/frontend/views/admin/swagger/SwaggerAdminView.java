@@ -12,6 +12,7 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.shared.Registration;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.utils.SecurityConst;
@@ -31,7 +32,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 17/09/2020
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_SWAGGER_ADMIN)
-@Secured(SecurityConst.ROLE_SWAGGER)
+@RequiresRole(SecurityConst.ROLE_SWAGGER)
 public class SwaggerAdminView extends ViewFrame implements RouterLayout, HasLogger,
     HasUrlParameter<String> {
 

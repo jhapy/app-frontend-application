@@ -31,6 +31,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.TextRenderer;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -64,7 +65,7 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SECURITY_USERS)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class SecurityKeycloakUsersView extends
     DefaultMasterDetailsView<SecurityKeycloakUser, DefaultFilter, SearchQuery, SearchQueryResult> {
 

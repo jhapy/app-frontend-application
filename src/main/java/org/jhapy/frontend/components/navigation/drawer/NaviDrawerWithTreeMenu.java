@@ -25,9 +25,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -288,18 +286,20 @@ public class NaviDrawerWithTreeMenu extends HorizontalLayout
     }
 
     if (menuEntry.getTargetParams() != null) {
-      debug( loggerPrefix,"Navigate with Target Params");
+      debug(loggerPrefix, "Navigate with Target Params");
       var params = menuEntry.getTargetParams().toString();
-      debug(loggerPrefix,"Target Class = {0}, Parameter = {1}", menuEntry.getTargetClass(), params);
+      debug(loggerPrefix, "Target Class = {0}, Parameter = {1}", menuEntry.getTargetClass(),
+          params);
       UI.getCurrent().navigate(menuEntry.getTargetClass(), params);
     } else if (menuEntry.getTargetId() != null) {
-      debug( loggerPrefix,"Navigate with Target ID");
+      debug(loggerPrefix, "Navigate with Target ID");
       var targetId = menuEntry.getTargetId();
-      debug(loggerPrefix, "Target Class = {0}, Parameter = {1}", menuEntry.getTargetClass(), targetId);
+      debug(loggerPrefix, "Target Class = {0}, Parameter = {1}", menuEntry.getTargetClass(),
+          targetId);
       UI.getCurrent().navigate(menuEntry.getTargetClass(), targetId);
     } else {
-      debug( loggerPrefix,"Navigate without Target Params or Target ID");
-      debug( loggerPrefix,"Target Class = {0}", menuEntry.getTargetClass());
+      debug(loggerPrefix, "Navigate without Target Params or Target ID");
+      debug(loggerPrefix, "Target Class = {0}", menuEntry.getTargetClass());
       UI.getCurrent().navigate(menuEntry.getTargetClass());
     }
     lastMenuEntry = menuEntry;

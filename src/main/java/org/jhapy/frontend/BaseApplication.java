@@ -121,7 +121,7 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
           "with both the 'dev' and 'prod' profiles at the same time.");
     }
   }
-
+/*
   @RequestMapping("/")
   public String forward(@Value("${vaadin.url}") String vaadinUrl) {
     return "redirect:" + vaadinUrl;
@@ -145,7 +145,7 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
 
     return registrationBean;
   }
-
+*/
   private SpringServlet buildSpringServlet(ApplicationContext applicationContext) {
     return new SpringServlet(applicationContext, true) {
       @Override

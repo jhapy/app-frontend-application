@@ -33,6 +33,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
@@ -69,7 +70,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 2019-04-21
  */
 @I18NPageTitle(messageKey = AppConst.PAGE_ACTIONS)
-@Secured({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
+@RequiresRole({SecurityConst.ROLE_I18N_WRITE, SecurityConst.ROLE_ADMIN})
 public class ActionsView extends
     DefaultMasterDetailsView<Action, DefaultFilter, SearchQuery, SearchQueryResult> {
 

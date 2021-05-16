@@ -24,6 +24,7 @@ import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.tabs.Tab;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.jhapy.commons.security.oauth2.AuthorizationHeaderUtil;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.registry.EurekaApplication;
@@ -42,7 +43,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_EUREKA_ADMIN)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class EurekaView extends ViewFrame implements HasLogger {
 
   private final static String I18N_PREFIX = "eureka.";

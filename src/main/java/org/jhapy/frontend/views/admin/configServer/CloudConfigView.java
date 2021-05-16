@@ -21,6 +21,7 @@ package org.jhapy.frontend.views.admin.configServer;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.tabs.Tab;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.jhapy.commons.security.oauth2.AuthorizationHeaderUtil;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.dto.utils.SecurityConst;
@@ -38,7 +39,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 11/06/2020
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_CLOUD_CONFIG_ADMIN)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class CloudConfigView extends ViewFrame implements HasLogger {
 
   private final static String I18N_PREFIX = "cloudConfig.";

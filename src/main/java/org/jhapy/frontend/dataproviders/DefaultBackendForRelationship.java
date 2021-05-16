@@ -109,8 +109,8 @@ public abstract class DefaultBackendForRelationship<C extends BaseRelationshipEn
     long maxId = 0;
     List<C> result = stream.collect(Collectors.toList());
     for (C c : result) {
-      if ((long) c.getId() > maxId) {
-        maxId = (long) c.getId();
+      if (c.getId() > maxId) {
+        maxId = c.getId();
       }
     }
     uniqueLong.set(maxId + 1);

@@ -6,8 +6,8 @@ import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasErrorParameter;
 import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.ParentLayout;
+import de.codecamp.vaadin.security.spring.access.rules.PermitAll;
 import javax.servlet.http.HttpServletResponse;
-import org.jhapy.frontend.annotations.PublicView;
 import org.jhapy.frontend.layout.ViewFrame;
 import org.jhapy.frontend.views.JHapyMainView3;
 
@@ -16,7 +16,7 @@ import org.jhapy.frontend.views.JHapyMainView3;
  * @version 1.0
  * @since 08/05/2020
  */
-@PublicView
+@PermitAll
 @ParentLayout(JHapyMainView3.class)
 public class RouteNotFoundExceptionHandler extends ViewFrame implements
     HasErrorParameter<NotFoundException> {

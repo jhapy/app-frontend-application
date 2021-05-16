@@ -24,6 +24,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.textfield.TextField;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.dto.domain.audit.Session;
 import org.jhapy.dto.serviceQuery.SearchQuery;
@@ -40,7 +41,7 @@ import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SESSIONS_ADMIN)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class SessionView extends
     DefaultMasterDetailsView<Session, DefaultFilter, SearchQuery, SearchQueryResult> {
 

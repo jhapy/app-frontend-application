@@ -5,6 +5,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.router.RouterLayout;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
@@ -30,7 +31,7 @@ import org.springframework.security.access.annotation.Secured;
  * @since 17/09/2020
  */
 @I18NPageTitle(messageKey = AppConst.TITLE_ACTUAL_SESSIONS_ADMIN)
-@Secured(SecurityConst.ROLE_ADMIN)
+@RequiresRole(SecurityConst.ROLE_ADMIN)
 public class MonitoringAdminView extends ViewFrame implements RouterLayout, HasLogger {
 
   private final HazelcastInstance hazelcastInstance;

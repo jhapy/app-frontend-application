@@ -23,6 +23,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
 import org.jhapy.dto.registry.EurekaApplication;
 import org.jhapy.dto.registry.EurekaInfo;
 import org.jhapy.dto.serviceQuery.BaseRemoteQuery;
@@ -43,7 +44,7 @@ import org.springframework.security.access.annotation.Secured;
 
 
 @I18NPageTitle(messageKey = AppConst.TITLE_SWAGGERS_ADMIN)
-@Secured(SecurityConst.ROLE_SWAGGER)
+@RequiresRole(SecurityConst.ROLE_SWAGGER)
 public class SwaggersAdminView extends ViewFrame {
 
   private static final String I18N_PREFIX = "swagger.";
