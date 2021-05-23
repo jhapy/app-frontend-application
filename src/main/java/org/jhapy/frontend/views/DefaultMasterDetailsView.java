@@ -47,7 +47,6 @@ import dev.mett.vaadin.tooltip.config.TC_HIDE_ON_CLICK;
 import dev.mett.vaadin.tooltip.config.TooltipConfiguration;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -93,7 +92,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
   protected T currentEditing;
   private final Class<T> entityType;
   private final Function<T, ServiceResult<T>> saveHandler;
-  private final Consumer<T> deleteHandler;
+  private final Function<T, ServiceResult<Void>> deleteHandler;
   private Tabs tabs;
   private Button newRecordButton;
   private Boolean initialFetch = Boolean.TRUE;
@@ -107,7 +106,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler,
+      Function<T, ServiceResult<T>> saveHandler, Function<T, ServiceResult<Void>> deleteHandler,
       MyI18NProvider myI18NProvider) {
     this(I18N_PREFIX, entityType, dataProvider, true, saveHandler, deleteHandler,
         myI18NProvider);
@@ -115,7 +114,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
   public DefaultMasterDetailsView(String I18N_PREFIX, Class<T> entityType,
       DefaultDataProvider<T, F> dataProvider, Boolean initialFetch,
-      Function<T, ServiceResult<T>> saveHandler, Consumer<T> deleteHandler,
+      Function<T, ServiceResult<T>> saveHandler, Function<T, ServiceResult<Void>> deleteHandler,
       MyI18NProvider myI18NProvider) {
     this.I18N_PREFIX = I18N_PREFIX;
     this.entityType = entityType;
@@ -466,9 +465,7 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
         if (result.getIsSuccess() && result.getData() != null) {
           currentEditing = result.getData();
         } else {
-          JHapyMainView3.get()
-              .displayErrorMessage(
-                  getTranslation("message.global.unknownError", result.getMessage()));
+          JHapyMainView3.get().displayErrorMessage(result);
           return;
         }
       }
@@ -515,7 +512,10 @@ public abstract class DefaultMasterDetailsView<T extends BaseEntity, F extends D
 
   private void deleteConfirmed() {
     if (beforeDelete(currentEditing)) {
-      deleteHandler.accept(currentEditing);
+      ServiceResult<Void> result = deleteHandler.apply(currentEditing);
+      if (!result.getIsSuccess()) {
+        JHapyMainView3.get().displayErrorMessage(result);
+      }
     }
 
     afterDelete();

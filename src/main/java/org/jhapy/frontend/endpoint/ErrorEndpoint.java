@@ -71,7 +71,6 @@ public class ErrorEndpoint implements ErrorController, HasLogger {
     return ResponseEntity.ok(errorMessage);
   }
 
-  @Override
   public String getErrorPath() {
     return "/error";
   }

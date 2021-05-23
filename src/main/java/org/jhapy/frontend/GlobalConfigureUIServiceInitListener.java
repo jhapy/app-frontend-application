@@ -16,19 +16,12 @@
 
 package org.jhapy.frontend;
 
-import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
-
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.text.MessageFormat;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.config.AppProperties;
-import org.jhapy.frontend.exceptions.AccessDeniedException;
-import org.jhapy.frontend.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

@@ -24,7 +24,6 @@ import org.jhapy.frontend.layout.size.Vertical;
 import org.jhapy.frontend.utils.AppConst;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView3;
-import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author Alexandre Clavaud.

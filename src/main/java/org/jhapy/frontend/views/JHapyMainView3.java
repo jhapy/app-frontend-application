@@ -51,6 +51,7 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jhapy.commons.utils.HasLogger;
+import org.jhapy.commons.utils.HasLoggerStatic;
 import org.jhapy.dto.domain.security.SecurityUser;
 import org.jhapy.dto.messageQueue.NewSession;
 import org.jhapy.dto.serviceQuery.SearchQuery;
@@ -128,22 +129,23 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private final List<AttributeContextListener> contextListeners = new ArrayList<>();
 
   protected JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
-      HazelcastInstance hazelcastInstance, Environment environment, AppProperties appProperties) {
+      HazelcastInstance hazelcastInstance, Environment environment, AppProperties appProperties, boolean hasGlobalSearch, boolean hasGlobalNotification) {
     this.menuProvider = menuProvider;
     this.hazelcastInstance = hazelcastInstance;
     this.appProperties = appProperties;
 
-    getElement().executeJs("return window.matchMedia('(prefers-color-scheme: dark)').matches").then(jsonValue -> {
-      logger().debug(jsonValue.asBoolean());
-      var themeList = UI.getCurrent().getElement().getThemeList();
-      if (!jsonValue.asBoolean()) {
-        themeList.remove(Lumo.DARK);
-        VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, null);
-      } else {
-        themeList.add(Lumo.DARK);
-        VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, Lumo.DARK);
-      }
-    });
+    getElement().executeJs("return window.matchMedia('(prefers-color-scheme: dark)').matches")
+        .then(jsonValue -> {
+          logger().debug(jsonValue.asBoolean());
+          var themeList = UI.getCurrent().getElement().getThemeList();
+          if (!jsonValue.asBoolean()) {
+            themeList.remove(Lumo.DARK);
+            VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, null);
+          } else {
+            themeList.add(Lumo.DARK);
+            VaadinSession.getCurrent().setAttribute(THEME_ATTRIBUTE, Lumo.DARK);
+          }
+        });
 
     afterLogin();
 
@@ -169,7 +171,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     postNaviItems(naviDrawer.getMenuComponent());
 
     // Configure the headers and footers (optional)
-    initHeadersAndFooters();
+    initHeadersAndFooters(hasGlobalSearch, hasGlobalNotification);
 
     getElement().appendChild(new AppCookieConsent().getElement());
   }
@@ -219,10 +221,6 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
 
   public Locale getDefaultLocale() {
     return Locale.ENGLISH;
-  }
-
-  public boolean hasGlobalSearch() {
-    return true;
   }
 
   public StoredFile getLoggedUserAvatar(SecurityUser securityUser) {
@@ -628,13 +626,13 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   /**
    * Configure the app's inner and outer headers and footers.micrometer-core.version
    */
-  protected void initHeadersAndFooters() {
+  protected void initHeadersAndFooters(boolean hasGlobalSearch, boolean hasGlobalNotification) {
     //setAppHeaderOuter();
     //setAppFooterOuter();
 
     // setAppFooterInner();
 
-    appBar = new AppBar(appProperties);
+    appBar = new AppBar(appProperties, hasGlobalSearch, hasGlobalNotification);
     //UIUtils.setTheme(Lumo.DARK, appBar);
     setAppHeaderInner(appBar);
   }
@@ -762,6 +760,16 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     return "true".equals(System.getProperty("productionMode"));
   }
 
+  public static void displayErrorMessageStatic(ServiceResult errorResult) {
+    var loggerPrefix = HasLoggerStatic.getLoggerPrefix("displayErrorMessageStatic");
+    JHapyMainView3 current = get();
+    if (current != null) {
+      current.displayErrorMessage(errorResult);
+    } else {
+      HasLoggerStatic.error( JHapyMainView3.class, loggerPrefix, "MainView is null, cannot display message : " + errorResult.getMessage() );
+    }
+  }
+
   public void displayErrorMessage(ServiceResult errorResult) {
     displayErrorMessage(errorResult.getMessageTitle(), errorResult.getMessage(),
         errorResult.getExceptionString());
@@ -775,9 +783,7 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
         .setMessage(message);
     okDialog.addButton().text(getTranslation("action.global.close")).primary()
         .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
-
     if (!isProductionMode() && StringUtils.isNotBlank(stacktrace)) {
-      okDialog.setWidth("800px");
       var detailsText = new TextArea();
       detailsText.setWidthFull();
       detailsText.setMaxHeight("15em");

@@ -23,7 +23,6 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.DateTimeFormatter;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView3;
-import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author Alexandre Clavaud.

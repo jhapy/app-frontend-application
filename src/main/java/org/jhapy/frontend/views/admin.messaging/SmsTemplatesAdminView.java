@@ -45,7 +45,6 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.css.BoxSizing;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.views.JHapyMainView3;
-import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author jHapy Lead Dev.

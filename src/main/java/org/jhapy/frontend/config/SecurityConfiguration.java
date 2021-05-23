@@ -20,26 +20,18 @@ package org.jhapy.frontend.config;
 
 import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 
-import com.vaadin.flow.server.VaadinSession;
 import de.codecamp.vaadin.security.spring.autoconfigure.VaadinSecurityProperties;
 import de.codecamp.vaadin.security.spring.config.VaadinSecurityConfigurerAdapter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.jhapy.commons.security.oauth2.AudienceValidator;
 import org.jhapy.commons.security.oauth2.JwtGrantedAuthorityConverter;
 import org.jhapy.commons.utils.HasLogger;
 import org.jhapy.frontend.client.security.SecurityRoleService;
 import org.jhapy.frontend.client.security.keycloak.KeycloakLogoutHandler;
 import org.jhapy.frontend.client.security.keycloak.KeycloakOauth2UserService;
-import org.jhapy.frontend.security.AuthenticationListener;
 import org.jhapy.frontend.security.JHapyAccessDecisionVoter;
 import org.jhapy.frontend.security.VaadinOAuth2RequestCache;
-import org.jhapy.frontend.views.JHapyMainView3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -58,7 +50,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -71,7 +62,6 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.client.RestTemplate;
@@ -188,7 +178,8 @@ public class SecurityConfiguration extends VaadinSecurityConfigurerAdapter imple
         .and()
         .oauth2Login().authorizationEndpoint()
         .authorizationRequestResolver(
-            new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization", forceHttpsForRealm))
+            new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
+                "/oauth2/authorization", forceHttpsForRealm))
         .and().userInfoEndpoint()
         .oidcUserService(keycloakOidcUserService).and()
         .loginPage(appProperties.getAuthorization().getLoginRootUrl()

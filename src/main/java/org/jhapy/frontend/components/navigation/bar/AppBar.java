@@ -136,14 +136,16 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private MenuItem languageMenu;
   private final AppProperties appProperties;
 
-  public AppBar(AppProperties appProperties) {
+  public AppBar(AppProperties appProperties, boolean hasGlobalSearch, boolean hasGlobalNotification) {
     this.appProperties = appProperties;
     setClassName(CLASS_NAME);
     initMenuIcon();
     initContextIcon();
+    if ( hasGlobalNotification )
     initNotification();
     initTitle("");
     initSearch();
+    if ( hasGlobalSearch )
     initSearch2();
     initAvatar();
     initActionItems();
@@ -153,9 +155,6 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
-    if (!JHapyMainView3.get().hasGlobalSearch()) {
-      searchButton.setVisible(false);
-    }
     if (!JHapyMainView3.get().hasLanguageSelect()) {
       languageMenu.setVisible(false);
     }
@@ -355,8 +354,20 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   private void initContainer() {
-    container = new FlexBoxLayout(menuIcon, contextIcon, this.title, searchArea,
-        actionItems, notificationButton, searchButton, avatar);
+    List<Component> components = new ArrayList<>();
+    components.add(menuIcon);
+    components.add(contextIcon);
+    components.add(this.title);
+    components.add(searchArea);
+    components.add(actionItems);
+    if ( notificationButton != null )
+      components.add(notificationButton);
+    if ( searchButton != null )
+      components.add(searchButton);
+    components.add(avatar);
+
+      container = new FlexBoxLayout(components.toArray(new Component[0]));
+
     container.addClassName(CLASS_NAME + "__container");
     container.setAlignItems(FlexComponent.Alignment.CENTER);
     container.setFlexGrow(1, searchArea);
@@ -633,6 +644,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   public void disableGlobalSearch() {
+    if (searchButton != null )
     searchButton.setVisible(false);
   }
 

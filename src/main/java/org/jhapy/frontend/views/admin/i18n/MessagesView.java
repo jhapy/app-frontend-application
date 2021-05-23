@@ -48,7 +48,6 @@ import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
 import org.jhapy.frontend.views.JHapyMainView3;
-import org.springframework.security.access.annotation.Secured;
 
 /**
  * @author jHapy Lead Dev.

@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
+import org.jhapy.commons.exception.ErrorConstants;
+import org.jhapy.commons.exception.JHapyProblem;
 import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.utils.AppContextThread;
@@ -31,15 +34,23 @@ public interface RemoteServiceHandler {
       if (e instanceof FeignException) {
         var responseBody = new String(((FeignException) e).responseBody()
             .orElseThrow(() -> new Exception("Cannot decode body")).array());
-        AbstractThrowableProblem problem = objectMapper
-            .readValue(responseBody, DefaultProblem.class);
-        error(loggerPrefix, "Problem is {0}", problem.getDetail());
-        ServiceResult result = new ServiceResult<>(false,
-            StringUtils.isNotBlank(problem.getDetail()) ? problem.getDetail()
-                : problem.getParameters().get("message").toString(), defaultResult);
-        result.setMessageTitle(StringUtils.isNotBlank(problem.getTitle()) ? problem.getTitle()
-            : problem.getStatus().getReasonPhrase());
-        result.setExceptionString(ExceptionUtils.getStackTrace(problem));
+        JHapyProblem problem = objectMapper.readValue(responseBody, JHapyProblem.class);
+
+        ServiceResult result;
+        if ( problem.getType().equals(ErrorConstants.SERVICE_EXCEPTION_TYPE)) {
+          String serviceName = problem.getServiceName();
+          result = new ServiceResult<>(false, problem.getTitle(), defaultResult);
+          result.setMessageTitle(serviceName);
+        } else {
+          result = new ServiceResult<>(false,
+              StringUtils.isNotBlank(problem.getDetail()) ? problem.getDetail()
+                  : problem.getMessage(), defaultResult);
+          result.setMessageTitle(StringUtils.isNotBlank(problem.getTitle()) ? problem.getTitle()
+              : problem.getStatus().getReasonPhrase());
+        }
+
+        if ( problem.getStacktrace() != null )
+          result.setExceptionString(Arrays.asList(problem.getStacktrace()).stream().collect(Collectors.joining("\n")));
         return result;
       } else {
         return new ServiceResult<>(false, e.getLocalizedMessage(), defaultResult);

@@ -27,6 +27,7 @@ import com.vaadin.flow.server.VaadinSession;
 import de.codecamp.vaadin.security.spring.access.VaadinSecurity;
 import de.codecamp.vaadin.security.spring.access.rules.PermitAll;
 import de.codecamp.vaadin.security.spring.access.rules.RequiresRole;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,6 @@ import org.jhapy.frontend.client.audit.AuditServices;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -86,7 +86,7 @@ public final class SecurityUtils {
       securityUser.setLastName(attributes.get("family_name").toString());
       securityUser.setUsername(attributes.get("preferred_username").toString());
       securityUser.setId(attributes.get("sub"));
-      if (  VaadinSession.getCurrent() != null ) {
+      if (VaadinSession.getCurrent() != null) {
         VaadinSession.getCurrent().setAttribute(SECURITY_USER_ATTRIBUTE, securityUser);
         VaadinSession.getCurrent().setAttribute(SECURITY_USER_ID_ATTRIBUTE, securityUser.getId());
       }
@@ -164,5 +164,9 @@ public final class SecurityUtils {
 
   public static void endSession(String jSessionId) {
     AuditServices.getAuditServiceQueue().endSession(new EndSession(jSessionId, Instant.now()));
+  }
+
+  public static boolean hasRole(String role) {
+    return VaadinSecurity.hasAccess(MessageFormat.format("hasRole(''{0}'')", role));
   }
 }

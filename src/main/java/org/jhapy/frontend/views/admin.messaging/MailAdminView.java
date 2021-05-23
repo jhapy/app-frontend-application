@@ -43,7 +43,6 @@ import org.jhapy.frontend.utils.UIUtils;
 import org.jhapy.frontend.utils.i18n.I18NPageTitle;
 import org.jhapy.frontend.utils.i18n.MyI18NProvider;
 import org.jhapy.frontend.views.DefaultMasterDetailsView;
-import org.springframework.security.access.annotation.Secured;
 
 @I18NPageTitle(messageKey = AppConst.TITLE_MAILS_ADMIN)
 @RequiresRole(SecurityConst.ROLE_ADMIN)

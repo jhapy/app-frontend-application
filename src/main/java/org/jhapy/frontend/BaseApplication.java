@@ -39,12 +39,8 @@ import org.jhapy.commons.utils.SpringProfileConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 
 /**
@@ -121,31 +117,32 @@ public abstract class BaseApplication implements InitializingBean, HasLogger {
           "with both the 'dev' and 'prod' profiles at the same time.");
     }
   }
-/*
-  @RequestMapping("/")
-  public String forward(@Value("${vaadin.url}") String vaadinUrl) {
-    return "redirect:" + vaadinUrl;
-  }
 
-  @RequestMapping("/sw.js")
-  public String forwardSW(@Value("${vaadin.url}") String vaadinUrl) {
-    return "forward:" + vaadinUrl + "sw.js";
-  }
+  /*
+    @RequestMapping("/")
+    public String forward(@Value("${vaadin.url}") String vaadinUrl) {
+      return "redirect:" + vaadinUrl;
+    }
 
-  @Bean
-  public ServletRegistrationBean<SpringServlet> springServlet(
-      ApplicationContext applicationContext,
-      @Value("${vaadin.urlMapping}") String vaadinUrlMapping) {
+    @RequestMapping("/sw.js")
+    public String forwardSW(@Value("${vaadin.url}") String vaadinUrl) {
+      return "forward:" + vaadinUrl + "sw.js";
+    }
 
-    SpringServlet servlet = buildSpringServlet(applicationContext);
-    ServletRegistrationBean<SpringServlet> registrationBean =
-        new ServletRegistrationBean<>(servlet, vaadinUrlMapping, "/frontend/*");
-    registrationBean.setLoadOnStartup(1);
-    //registrationBean.addInitParameter(Constants.SERVLET_PARAMETER_SYNC_ID_CHECK, "false");
+    @Bean
+    public ServletRegistrationBean<SpringServlet> springServlet(
+        ApplicationContext applicationContext,
+        @Value("${vaadin.urlMapping}") String vaadinUrlMapping) {
 
-    return registrationBean;
-  }
-*/
+      SpringServlet servlet = buildSpringServlet(applicationContext);
+      ServletRegistrationBean<SpringServlet> registrationBean =
+          new ServletRegistrationBean<>(servlet, vaadinUrlMapping, "/frontend/*");
+      registrationBean.setLoadOnStartup(1);
+      //registrationBean.addInitParameter(Constants.SERVLET_PARAMETER_SYNC_ID_CHECK, "false");
+
+      return registrationBean;
+    }
+  */
   private SpringServlet buildSpringServlet(ApplicationContext applicationContext) {
     return new SpringServlet(applicationContext, true) {
       @Override
