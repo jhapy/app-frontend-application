@@ -50,7 +50,7 @@ public interface RemoteServiceHandler {
         }
 
         if ( problem.getStacktrace() != null )
-          result.setExceptionString(Arrays.asList(problem.getStacktrace()).stream().collect(Collectors.joining("\n")));
+          result.setExceptionString(String.join("\n", Arrays.asList(problem.getStacktrace())));
         return result;
       } else {
         return new ServiceResult<>(false, e.getLocalizedMessage(), defaultResult);
