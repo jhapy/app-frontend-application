@@ -183,14 +183,20 @@
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-spring</artifactId>
+      <artifactId>vaadin-spring-boot-starter</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.vaadin.artur</groupId>
+      <artifactId>a-vaadin-helper</artifactId>
+    </dependency>
     <dependency>
       <groupId>javaxt</groupId>
       <artifactId>javaxt-core</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.twelvemonkeys.common</groupId>
       <artifactId>common-lang</artifactId>
