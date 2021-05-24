@@ -38,8 +38,12 @@ public interface RemoteServiceHandler {
 
         ServiceResult result;
         if ( problem.getType().equals(ErrorConstants.SERVICE_EXCEPTION_TYPE)) {
-          String serviceName = problem.getServiceName();
-          result = new ServiceResult<>(false, problem.getTitle(), defaultResult);
+          var serviceName = problem.getServiceName();
+          var message = problem.getTitle();
+          if ( problem.getErrors() != null ) {
+           message += " : " + String.join(", ", Arrays.asList(problem.getErrors()));
+          }
+          result = new ServiceResult<>(false, message, defaultResult);
           result.setMessageTitle(serviceName);
         } else {
           result = new ServiceResult<>(false,

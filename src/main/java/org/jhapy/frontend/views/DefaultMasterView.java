@@ -22,6 +22,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.FooterRow;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
@@ -49,6 +50,7 @@ import org.jhapy.frontend.utils.i18n.MyI18NProvider;
  * @version 1.0
  * @since 8/27/19
  */
+@CssImport(value = "./styles/grids.css", themeFor = "vaadin-grid")
 public abstract class DefaultMasterView<T extends BaseEntity, F extends DefaultFilter> extends
     ViewFrame {
 

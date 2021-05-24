@@ -693,6 +693,16 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     return naviDrawer;
   }
 
+  public void displayInfoMessage(String title, String message) {
+    var icon = UIUtils.createIcon(IconSize.S, TextColor.PRIMARY, VaadinIcon.INFO);
+    MessageDialog okDialog = new MessageDialog()
+        .setTitle(title, icon)
+        .setMessage(message);
+    okDialog.addButton().text(getTranslation("action.global.close")).primary()
+        .closeOnClick().clickShortcutEnter().clickShortcutEscape().closeOnClick();
+    okDialog.open();
+  }
+
   public void displayInfoMessage(String message) {
     var icon = UIUtils.createIcon(IconSize.S, TextColor.SUCCESS, VaadinIcon.CHECK);
     var label = UIUtils.createLabel(FontSize.XS, TextColor.BODY, message);
