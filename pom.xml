@@ -290,7 +290,10 @@
       <groupId>ch.carnet.kasparscherrer</groupId>
       <artifactId>emptyformlayoutitem</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.vaadin.helper</groupId>
+      <artifactId>async-manager</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.claspina</groupId>
       <artifactId>confirm-dialog</artifactId>
