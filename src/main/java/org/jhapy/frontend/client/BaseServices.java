@@ -32,10 +32,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @Service
 public class BaseServices {
 
-  public static GooglePlaceSearchService getGooglePlaceSearchService() {
-    return getApplicationContext().getBean(GooglePlaceSearchService.class);
-  }
-
   public static ResourceService getResourceService() {
     return getApplicationContext().getBean(ResourceService.class);
   }

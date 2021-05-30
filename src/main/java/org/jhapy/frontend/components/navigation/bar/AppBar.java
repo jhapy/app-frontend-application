@@ -122,6 +122,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private Button addTab;
 
   private FlexBoxLayout searchArea;
+  private FlexBoxLayout header;
   private TextField search;
   private Checkbox activeFilter;
   private ArrayList<Registration> searchValueChangedListeners;
@@ -150,6 +151,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     initAvatar();
     initActionItems();
     initContainer();
+    initHeader();
     initTabs();
   }
 
@@ -195,6 +197,25 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private void initTitle(String title) {
     this.title = new H4(title);
     this.title.setClassName(CLASS_NAME + "__title");
+  }
+
+  private void initHeader() {
+    header = new FlexBoxLayout();
+    header.setVisible(false);
+    header.addClassName(CLASS_NAME + "__container");
+    header.setAlignItems(FlexComponent.Alignment.CENTER);
+    header.setSpacing(Right.S);
+
+    add( header );
+  }
+
+  public void resetHeader() {
+    header.removeAll();
+    header.setVisible(false);
+  }
+  public void addToHeader( Component component ){
+    header.add(component);
+    header.setVisible(true);
   }
 
   private void initNotification() {
@@ -602,6 +623,7 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     removeAllTabs();
     resetSearchArea();
     searchModeOff();
+    resetHeader();
     if (searchValueChangedListeners != null) {
       searchValueChangedListeners.forEach(Registration::remove);
       searchValueChangedListeners.clear();
