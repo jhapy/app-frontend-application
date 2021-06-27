@@ -45,7 +45,7 @@ public abstract class DefaultDataProvider<T extends BaseEntity, F extends Defaul
     setSortOrder(defaultSortDirection, defaultSortFields);
   }
 
-  private void setSortOrder(DirectionEnum direction, String[] properties) {
+  public void setSortOrder(DirectionEnum direction, String[] properties) {
     QuerySortOrderBuilder builder = new QuerySortOrderBuilder();
     for (String property : properties) {
       if (direction.equals(DirectionEnum.ASC)) {
