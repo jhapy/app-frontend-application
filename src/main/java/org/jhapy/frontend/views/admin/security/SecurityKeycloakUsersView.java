@@ -39,7 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
-import org.jhapy.commons.utils.OrikaBeanMapper;
 import org.jhapy.dto.domain.security.SecurityKeycloakGroup;
 import org.jhapy.dto.domain.security.SecurityKeycloakRole;
 import org.jhapy.dto.domain.security.SecurityKeycloakUser;
@@ -68,16 +67,12 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 public class SecurityKeycloakUsersView extends
     DefaultMasterDetailsView<SecurityKeycloakUser, DefaultFilter, SearchQuery, SearchQueryResult> {
 
-  private final OrikaBeanMapper orikaBeanMapper;
-
-  public SecurityKeycloakUsersView(OrikaBeanMapper orikaBeanMapper,
-      MyI18NProvider myI18NProvider) {
+  public SecurityKeycloakUsersView(MyI18NProvider myI18NProvider) {
     super("securityUser.", SecurityKeycloakUser.class, new SecurityUserKeycloakDataProvider(),
         false,
         (e) -> SecurityServices.getKeycloakClient().saveUser(new SaveQuery<>(e)),
         e -> SecurityServices.getKeycloakClient().deleteUser(new DeleteByStrIdQuery(e.getId())),
         myI18NProvider);
-    this.orikaBeanMapper = orikaBeanMapper;
   }
 
   @Override

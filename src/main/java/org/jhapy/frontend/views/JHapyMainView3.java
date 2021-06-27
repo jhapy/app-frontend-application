@@ -129,7 +129,8 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
   private final List<AttributeContextListener> contextListeners = new ArrayList<>();
 
   protected JHapyMainView3(MenuHierarchicalDataProvider menuProvider,
-      HazelcastInstance hazelcastInstance, Environment environment, AppProperties appProperties, boolean hasGlobalSearch, boolean hasGlobalNotification) {
+      HazelcastInstance hazelcastInstance, Environment environment, AppProperties appProperties,
+      boolean hasGlobalSearch, boolean hasGlobalNotification) {
     this.menuProvider = menuProvider;
     this.hazelcastInstance = hazelcastInstance;
     this.appProperties = appProperties;
@@ -776,7 +777,8 @@ public abstract class JHapyMainView3 extends FlexBoxLayout
     if (current != null) {
       current.displayErrorMessage(errorResult);
     } else {
-      HasLoggerStatic.error( JHapyMainView3.class, loggerPrefix, "MainView is null, cannot display message : " + errorResult.getMessage() );
+      HasLoggerStatic.error(JHapyMainView3.class, loggerPrefix,
+          "MainView is null, cannot display message : " + errorResult.getMessage());
     }
   }
 

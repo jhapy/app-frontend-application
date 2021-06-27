@@ -137,17 +137,24 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   private MenuItem languageMenu;
   private final AppProperties appProperties;
 
-  public AppBar(AppProperties appProperties, boolean hasGlobalSearch, boolean hasGlobalNotification) {
+  public AppBar(AppProperties appProperties) {
+    this(appProperties, false, false);
+  }
+
+  public AppBar(AppProperties appProperties, boolean hasGlobalSearch,
+      boolean hasGlobalNotification) {
     this.appProperties = appProperties;
     setClassName(CLASS_NAME);
     initMenuIcon();
     initContextIcon();
-    if ( hasGlobalNotification )
-    initNotification();
+    if (hasGlobalNotification) {
+      initNotification();
+    }
     initTitle("");
     initSearch();
-    if ( hasGlobalSearch )
-    initSearch2();
+    if (hasGlobalSearch) {
+      initSearch2();
+    }
     initAvatar();
     initActionItems();
     initContainer();
@@ -206,14 +213,15 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     header.setAlignItems(FlexComponent.Alignment.CENTER);
     header.setSpacing(Right.S);
 
-    add( header );
+    add(header);
   }
 
   public void resetHeader() {
     header.removeAll();
     header.setVisible(false);
   }
-  public void addToHeader( Component component ){
+
+  public void addToHeader(Component component) {
     header.add(component);
     header.setVisible(true);
   }
@@ -381,13 +389,15 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
     components.add(this.title);
     components.add(searchArea);
     components.add(actionItems);
-    if ( notificationButton != null )
+    if (notificationButton != null) {
       components.add(notificationButton);
-    if ( searchButton != null )
+    }
+    if (searchButton != null) {
       components.add(searchButton);
+    }
     components.add(avatar);
 
-      container = new FlexBoxLayout(components.toArray(new Component[0]));
+    container = new FlexBoxLayout(components.toArray(new Component[0]));
 
     container.addClassName(CLASS_NAME + "__container");
     container.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -666,8 +676,9 @@ public class AppBar extends FlexBoxLayout implements LocaleChangeObserver, HasLo
   }
 
   public void disableGlobalSearch() {
-    if (searchButton != null )
-    searchButton.setVisible(false);
+    if (searchButton != null) {
+      searchButton.setVisible(false);
+    }
   }
 
 

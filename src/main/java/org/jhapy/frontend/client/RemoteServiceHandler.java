@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -15,8 +13,6 @@ import org.jhapy.commons.exception.JHapyProblem;
 import org.jhapy.commons.security.SecurityUtils;
 import org.jhapy.dto.serviceQuery.ServiceResult;
 import org.jhapy.dto.utils.AppContextThread;
-import org.zalando.problem.AbstractThrowableProblem;
-import org.zalando.problem.DefaultProblem;
 import org.zalando.problem.ProblemModule;
 
 /**
@@ -37,11 +33,11 @@ public interface RemoteServiceHandler {
         JHapyProblem problem = objectMapper.readValue(responseBody, JHapyProblem.class);
 
         ServiceResult result;
-        if ( problem.getType().equals(ErrorConstants.SERVICE_EXCEPTION_TYPE)) {
+        if (problem.getType().equals(ErrorConstants.SERVICE_EXCEPTION_TYPE)) {
           var serviceName = problem.getServiceName();
           var message = problem.getTitle();
-          if ( problem.getErrors() != null ) {
-           message += " : " + String.join(", ", Arrays.asList(problem.getErrors()));
+          if (problem.getErrors() != null) {
+            message += " : " + String.join(", ", Arrays.asList(problem.getErrors()));
           }
           result = new ServiceResult<>(false, message, defaultResult);
           result.setMessageTitle(serviceName);
@@ -53,8 +49,9 @@ public interface RemoteServiceHandler {
               : problem.getStatus().getReasonPhrase());
         }
 
-        if ( problem.getStacktrace() != null )
+        if (problem.getStacktrace() != null) {
           result.setExceptionString(String.join("\n", Arrays.asList(problem.getStacktrace())));
+        }
         return result;
       } else {
         return new ServiceResult<>(false, e.getLocalizedMessage(), defaultResult);
