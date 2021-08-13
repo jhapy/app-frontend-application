@@ -29,10 +29,11 @@ import org.jhapy.frontend.views.JHapyMainView3;
 
 /**
  * A view frame that establishes app design guidelines. It consists of three parts:
+ *
  * <ul>
- * <li>Topmost {@link #setViewHeader(Component...) header}</li>
- * <li>Center {@link #setViewContent(Component...) content}</li>
- * <li>Bottom {@link #setViewFooter(Component...) footer}</li>
+ *   <li>Topmost {@link #setViewHeader(Component...) header}
+ *   <li>Center {@link #setViewContent(Component...) content}
+ *   <li>Bottom {@link #setViewFooter(Component...) footer}
  * </ul>
  */
 @CssImport("./styles/components/view-frame.css")
@@ -57,25 +58,19 @@ public class ViewFrame extends Composite<Div> implements HasStyle {
     getContent().add(header, content, footer);
   }
 
-  /**
-   * Sets the header slot's components.
-   */
+  /** Sets the header slot's components. */
   public void setViewHeader(Component... components) {
     header.removeAll();
     header.add(components);
   }
 
-  /**
-   * Sets the content slot's components.
-   */
+  /** Sets the content slot's components. */
   public void setViewContent(Component... components) {
     content.removeAll();
     content.add(components);
   }
 
-  /**
-   * Sets the footer slot's components.
-   */
+  /** Sets the footer slot's components. */
   public void setViewFooter(Component... components) {
     footer.removeAll();
     footer.add(components);
@@ -84,7 +79,6 @@ public class ViewFrame extends Composite<Div> implements HasStyle {
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
-    JHapyMainView3.get().getAppBar().reset();
+    if (JHapyMainView3.get() != null) JHapyMainView3.get().getAppBar().reset();
   }
-
 }
