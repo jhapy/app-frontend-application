@@ -81,7 +81,7 @@
 
         <spring-data-provider.version>2.1.0</spring-data-provider.version>
 
-        <vaadin.version>14.5.3</vaadin.version>
+        <vaadin.version>14.5.5</vaadin.version>
 
         <confirm-dialog.versîon>2.0.0</confirm-dialog.versîon>
         <multiselect-combo-box-flow.version>3.0.2</multiselect-combo-box-flow.version>
@@ -940,7 +940,7 @@
         </repository>
         <repository>
             <id>javaxt.com</id>
-            <url>http://www.javaxt.com/maven</url>
+            <url>https://www.javaxt.com/maven</url>
         </repository>
         <repository>
             <id>vaadin-prereleases</id>
